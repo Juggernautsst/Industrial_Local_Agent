@@ -1,0 +1,4 @@
+[submodule "components/stage1a-good-story-agent"]
+	path = components/stage1a-good-story-agent
+	url = git@github.com:Juggernautsst/stage1a-good-story-agent.git
+	branch = main
