@@ -1,0 +1,107 @@
+name: 科研实验 / Research experiment
+description: 使用公开或合成材料开展可复核实验 / Run a reviewable experiment using public or synthetic material
+title: "[Research] "
+labels: []
+assignees: []
+body:
+  - type: markdown
+    attributes:
+      value: |
+        此父仓库表单只用于跨组件实验设计或集成验收。组件内部实验应停止填写，并转到组件仓库创建 Issue。普通 Issue 不得包含真实高价值数据、真实研究中的机密或受限未公开结论、凭据或机密漏洞详情。
+
+        This parent-repository form is only for cross-component experiment design or integration acceptance. For a component-internal experiment, stop and create the Issue in the component repository. Ordinary Issues must not contain real high-value data, confidential or restricted unpublished findings from real research, credentials, or confidential vulnerability details.
+
+  - type: input
+    id: owning_repository
+    attributes:
+      label: 所属仓库与组件 / Owning repository and component
+      description: 本表单只接受父仓库拥有的跨组件实验；组件实验请转到对应组件仓库。 / This form accepts only parent-owned cross-component experiments; route component experiments to the component repository.
+      placeholder: Juggernautsst/Industrial_Local_Agent - cross-component evaluation
+    validations:
+      required: true
+
+  - type: textarea
+    id: question_claim
+    attributes:
+      label: 研究问题与候选主张 / Question and candidate claim
+      description: 写明可改变判断的问题，并区分预期、假设和已有证据；不得提前写成结论。 / State the decision-changing question and separate expectation, hypothesis, and existing evidence without prestating a conclusion.
+      placeholder: |
+        Research question / 研究问题:
+        Candidate claim and scope / 候选主张与适用范围:
+        Non-goals / 非目标:
+    validations:
+      required: true
+
+  - type: textarea
+    id: inputs_provenance
+    attributes:
+      label: 输入与来源 / Inputs and provenance
+      description: 只使用公开或合成材料；记录来源、版本、hash 方案和许可边界。 / Use only public or synthetic material; record sources, versions, hashing plan, and licensing boundary.
+      placeholder: |
+        Data classification / 数据分类:
+        Sources and versions / 来源与版本:
+        Hash and licensing boundary / Hash 与许可边界:
+    validations:
+      required: true
+
+  - type: textarea
+    id: method
+    attributes:
+      label: 执行前方法 / Method defined before execution
+      description: 说明步骤、变量、对照、环境、随机性和停止条件。 / Define steps, variables, controls, environment, randomness, and stopping conditions.
+    validations:
+      required: true
+
+  - type: textarea
+    id: metrics
+    attributes:
+      label: 指标与成功阈值 / Metrics and success thresholds
+      description: 给出计算方式、单位和预先确定的通过阈值。 / Define calculations, units, and predetermined passing thresholds.
+    validations:
+      required: true
+
+  - type: textarea
+    id: falsification
+    attributes:
+      label: 失败与反证条件 / Failure and falsification criteria
+      description: 什么结果会拒绝、降低或限制候选主张？ / What result rejects, weakens, or limits the candidate claim?
+    validations:
+      required: true
+
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: 验收证据 / Acceptance evidence
+      description: 列出必须保留的结果摘要、provenance、人工评分或图表。 / List required result summaries, provenance, human ratings, or figures.
+      placeholder: |
+        - [ ] Evidence item 1 / 证据项 1
+        - [ ] Evidence item 2 / 证据项 2
+    validations:
+      required: true
+
+  - type: textarea
+    id: dependencies_risk_budget
+    attributes:
+      label: 依赖、风险与预算 / Dependencies, risk, and budget
+      description: 写明完整关联、风险、限制、外部服务、最小成本、硬上限、取消条件和授权；没有则写 None。 / State complete links, risks, limits, external services, minimum cost, hard cap, cancellation, and authorization; enter None when absent.
+      placeholder: |
+        Dependencies / 依赖:
+        Security, privacy, and residual limitations / 安全、隐私与遗留限制:
+        External services and hard budget / 外部服务与硬预算:
+        Rollback or cancellation / 回滚或取消:
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: research_checks
+    attributes:
+      label: 实验确认 / Experiment checks
+      options:
+        - label: 输入仅为公开或明确标记的合成材料。 / Inputs are public or explicitly labeled synthetic material only.
+          required: true
+        - label: 本 Issue 不含凭据、真实科研数据或真实研究中的机密或受限未公开结论。 / This Issue contains no credentials, real research data, or confidential or restricted unpublished findings from real research.
+          required: true
+        - label: 云端或付费执行在获得单独授权前不会开始。 / Cloud or paid execution will not start without separate authorization.
+          required: true
+        - label: 未把免费额度或模型输出当作固定事实。 / Free allowances and model output are not treated as fixed facts.
+          required: true

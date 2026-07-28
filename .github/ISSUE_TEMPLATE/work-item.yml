@@ -1,0 +1,113 @@
+name: 通用任务 / General work item
+description: 代码、文档、配置、集成或仓库维护 / Code, documentation, configuration, integration, or repository maintenance
+title: "[Work] "
+labels: []
+assignees: []
+body:
+  - type: markdown
+    attributes:
+      value: |
+        一个 Issue 只描述一项可独立验收的交付。请勿填写 token、私钥、真实科研数据、真实研究中的机密或受限未公开结论、绝对路径或完整原始日志。
+
+        One Issue describes one independently acceptable deliverable. Do not include tokens, private keys, real research data, confidential or restricted unpublished findings from real research, absolute paths, or complete raw logs.
+
+  - type: dropdown
+    id: work_type
+    attributes:
+      label: 工作类型 / Work type
+      options:
+        - Feature / 功能
+        - Bug / 缺陷
+        - Documentation / 文档
+        - Configuration or dependency / 配置或依赖
+        - Integration / 集成
+        - Submodule pin / 子模块指针
+        - Repository operation / 仓库操作
+        - Other / 其他
+    validations:
+      required: true
+
+  - type: input
+    id: owning_repository
+    attributes:
+      label: 所属仓库与组件 / Owning repository and component
+      description: 使用完整 owner/repository；组件实现应提交到组件仓库。 / Use full owner/repository; component implementation belongs in the component repository.
+      placeholder: Juggernautsst/Industrial_Local_Agent - parent documentation
+    validations:
+      required: true
+
+  - type: textarea
+    id: problem_outcome
+    attributes:
+      label: 问题与目标结果 / Problem and intended outcome
+      description: 说明当前问题、用户或研究工作流影响，以及完成后可观察的结果。 / State the problem, workflow impact, and observable outcome.
+    validations:
+      required: true
+
+  - type: textarea
+    id: scope
+    attributes:
+      label: 范围与非目标 / Scope and non-goals
+      description: 分别列出本 Issue 的明确交付，以及不会修改、执行或声称的内容。 / List concrete deliverables and what this work will not change, execute, or claim.
+      placeholder: |
+        In scope / 范围内:
+        -
+
+        Non-goals / 非目标:
+        -
+    validations:
+      required: true
+
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: 验收条件 / Acceptance criteria
+      description: 使用可验证 checklist；不要写实现步骤。 / Use a verifiable checklist, not implementation steps.
+      placeholder: |
+        - [ ] Observable criterion 1 / 可观察条件 1
+        - [ ] Observable criterion 2 / 可观察条件 2
+    validations:
+      required: true
+
+  - type: textarea
+    id: validation
+    attributes:
+      label: 验证方案与证据 / Validation plan and evidence
+      description: 写明测试类别、人工检查和应保留的证据摘要。 / State test categories, manual checks, and evidence summaries to retain.
+    validations:
+      required: true
+
+  - type: textarea
+    id: dependencies
+    attributes:
+      label: 依赖与关联 / Dependencies and links
+      description: 使用完整跨仓库引用；没有则写 None。 / Use complete cross-repository references; enter None when absent.
+      placeholder: None
+    validations:
+      required: true
+
+  - type: textarea
+    id: data_risk_budget
+    attributes:
+      label: 数据、风险与预算 / Data, risk, and budget
+      description: 写明数据分类、安全、隐私、兼容性、外部副作用、付费上限与回滚；没有则写 None。 / State data class, security, privacy, compatibility, external effects, hard budget, and rollback; enter None when absent.
+      placeholder: |
+        Data classification / 数据分类:
+        Risks and external effects / 风险与外部副作用:
+        Hard budget / 硬预算:
+        Rollback / 回滚:
+        Residual risk / 遗留风险:
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: submission_checks
+    attributes:
+      label: 提交确认 / Submission checks
+      options:
+        - label: 已搜索重复 Issue。 / I searched for duplicate Issues.
+          required: true
+        - label: 已确认这是正确的 owning repository。 / I confirmed this is the correct owning repository.
+          required: true
+        - label: 本 Issue 不含凭据、真实科研数据、真实研究中的机密或受限未公开结论，或完整原始日志。 / This Issue contains no credentials, real research data, confidential or restricted unpublished findings from real research, or complete raw logs.
+          required: true

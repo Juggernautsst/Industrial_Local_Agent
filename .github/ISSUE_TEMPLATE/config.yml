@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 机密安全报告 / Confidential security report
+    url: https://github.com/Juggernautsst/Industrial_Local_Agent/blob/main/SECURITY.md
+    about: 不要创建普通 Issue；先阅读受限报告流程。 / Do not open an ordinary Issue; read the restricted reporting process first.

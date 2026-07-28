@@ -82,6 +82,22 @@ The Tidy3D Python client is publicly available, but common FDTD solving workflow
 - 公开任一仓库前，必须单独完成许可证、安全和机器信息清理审查。
   Before making either repository public, perform separate licensing, security, and machine-information reviews.
 
+## 工作治理与远端留痕 / Work Governance and Remote Traceability
+
+所有持久性修改和外部副作用都使用“一项可验收工作一个 GitHub Issue”的流程。Issue 记录目标、范围、决策和验收历史，README 与 `docs/` 保存当前事实；不为每条本地命令创建 Issue 或评论。
+
+All durable changes and external side effects follow one GitHub Issue per independently acceptable deliverable. Issues preserve objectives, scope, decisions, and acceptance history, while README and `docs/` preserve current truth; do not create Issues or comments for every local command.
+
+- [Agent 工作规则 / Agent workflow rules](AGENTS.md)
+- [创建 Issue / Create an Issue](https://github.com/Juggernautsst/Industrial_Local_Agent/issues/new/choose)
+- [查看工作记录 / View work history](https://github.com/Juggernautsst/Industrial_Local_Agent/issues)
+
+普通 Issue 不得包含凭据、真实科研数据、真实研究中的机密或受限未公开结论，或机密漏洞详情。父仓库与组件仓库分别拥有自己的 Issue；跨仓库任务使用父 umbrella Issue 和子 implementation Issue 互链。
+
+Ordinary Issues must not contain credentials, real research data, confidential or restricted unpublished findings from real research, or confidential vulnerability details. Parent and component repositories own separate Issues; cross-repository work uses linked parent umbrella and child implementation Issues.
+
+- [安全报告流程 / Security reporting](SECURITY.md)
+
 ## 详细资料 / Detailed Records
 
 - [总体架构 / Architecture](docs/ARCHITECTURE.md)
