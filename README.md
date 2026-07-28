@@ -10,8 +10,12 @@
   The Stage 1A engineering MVP is complete: a local, evidence-traceable scientific-story agent at version `0.1.1`, with `38 passed` automated tests.
 - Stage 1A 的科研质量验收尚未完成；当前只有一组合成光子学案例，还需要四组案例和独立人工评估。
   Stage 1A scientific-quality acceptance is not complete; the current evidence includes one synthetic photonics case, with four additional cases and independent human evaluation still required.
-- Stage 1B 尚未实现。下一项工程任务是只读 Tidy3D 结果适配器，而不是让 Agent 持有 API key 或自动提交云端任务。
-  Stage 1B is not implemented. The next engineering task is a read-only Tidy3D result adapter, not an agent that holds API keys or automatically submits cloud jobs.
+- Stage 1B 尚未实现。它仍是独立的只读 Tidy3D 结果适配器，但当前工程优先完成身份感知授权检索与安全发布基础；这些安全门槛通过后再实施适配器。Agent 不持有 API key，也不自动提交云端任务。
+  Stage 1B is not implemented. It remains an independent read-only Tidy3D result adapter, but current engineering first establishes identity-aware authorized retrieval and the secure-release foundation; adapter implementation follows those security gates. The agent does not hold API keys or automatically submit cloud jobs.
+- Enterprise E0 已定义单用户 local 与身份感知 enterprise 两种模式、跨组件契约和威胁模型；SSO、授权检索、RLS、多租户服务和集中式模型 gateway 仍未实现。
+  Enterprise E0 defines single-user local and identity-aware enterprise modes, cross-component contracts, and a threat model; SSO, authorized retrieval, RLS, multitenant service, and a centralized model gateway remain unimplemented.
+- Stage 1A 的 provider-boundary 实施正在子仓库中独立审查；在子 PR 合并并另行更新 gitlink 前，父仓库固定版本仍是 `4e3bdda`，不能把开发分支描述成已部署能力。
+  The Stage 1A provider-boundary implementation is under independent review in the child repository. Until its child PR is merged and the gitlink is updated separately, the parent pin remains `4e3bdda` and the development branch is not a deployed capability.
 - 安全发布、跨机构传输和区块链均未实现。未来必须先建立威胁模型、加密、密钥管理、访问控制和审计，再判断区块链是否解决剩余问题。
   Secure release, cross-institution transfer, and blockchain are not implemented. A future stage must first define threat modeling, encryption, key management, access control, and auditing before deciding whether blockchain solves a remaining problem.
 
@@ -21,11 +25,12 @@
 | --- | --- | --- | --- |
 | `components/stage1a-good-story-agent/` | Git submodule | 本地证据可追溯科研写作 Agent / Local evidence-traceable scientific-writing agent | `4e3bdda` |
 | `docs/ARCHITECTURE.md` | 父仓库文档 / Parent documentation | 组件边界、更新规则和安全模型 / Component boundaries, update rules, and security model | 当前父仓库 / Current parent |
+| `docs/ENTERPRISE_DEPLOYMENT.md` | 父仓库文档 / Parent documentation | 企业部署模式、契约、威胁模型和验收门槛 / Enterprise deployment modes, contracts, threat model, and acceptance gates | E0 设计基线 / E0 design baseline |
 | `docs/ROADMAP.md` | 父仓库文档 / Parent documentation | Stage 1A 至 Stage 3 的验收路线 / Acceptance roadmap from Stage 1A through Stage 3 | 当前父仓库 / Current parent |
 
-未来可能增加 `tidy3d-adapter`、`secure-data-transfer` 和 `workflow-orchestrator`，但在接口与验收条件稳定前不创建空组件。
+未来可能增加 `tidy3d-adapter`、identity-aware retrieval、model gateway、`secure-data-transfer` 和 `workflow-orchestrator`，但在接口与验收条件稳定前不创建空组件。
 
-Future components may include `tidy3d-adapter`, `secure-data-transfer`, and `workflow-orchestrator`, but empty components will not be created before their interfaces and acceptance criteria are stable.
+Future components may include `tidy3d-adapter`, identity-aware retrieval, a model gateway, `secure-data-transfer`, and `workflow-orchestrator`, but empty components will not be created before their interfaces and acceptance criteria are stable.
 
 ## 获取完整仓库 / Clone the Complete Repository
 
@@ -69,6 +74,24 @@ Tidy3D Python 客户端可公开获取，但常见 FDTD 求解流程通常涉及
 
 The Tidy3D Python client is publicly available, but common FDTD solving workflows usually involve cloud services, credentials, and FlexCredits; it is not equivalent to a complete local offline solver. Stage 1B will first read public or synthetic exports and normalize simulation metadata, monitor CSV data, units, grids, boundaries, convergence checks, and SHA-256 values. Free-account allowances may change, so any cloud job must use the actual account to estimate cost and set a hard budget first.
 
+## 企业内网共享与权限检索 / Enterprise Intranet and Authorized Retrieval
+
+一台服务器可以为多个内网用户提供较小的本地模型，但不能直接暴露当前 Flask 服务。企业目标需要机构 SSO、可信 API gateway、服务端身份委托、RBAC+ABAC、PostgreSQL/pgvector `FORCE ROW LEVEL SECURITY`、top-K source 重新授权、tenant-scoped storage/cache、model gateway 和最小 audit。只有入口 gateway 对用户网络开放。
+
+One server can provide a smaller local model to multiple intranet users, but the current Flask service cannot be directly exposed. The enterprise target requires institutional SSO, a trusted API gateway, server-side identity delegation, RBAC+ABAC, PostgreSQL/pgvector `FORCE ROW LEVEL SECURITY`, top-K source reauthorization, tenant-scoped storage/cache, a model gateway, and minimal audit. Only the entry gateway is exposed to the user network.
+
+RAG 只在已经授权的 source set 内排序相关内容；metadata filter 不是授权，LLM 也不能批准访问。retrieval gateway 生成短期签名 `AuthorizedEvidenceBundle`，Stage 1A 只能使用该 bundle，并验证所有输出 citation 都属于它。当前 startup token 只是本地会话控制，不是 user identity。
+
+RAG ranks relevant content only inside an already authorized source set. Metadata filters are not authorization, and the LLM cannot approve access. The retrieval gateway creates a signed short-lived `AuthorizedEvidenceBundle`; Stage 1A can use only that bundle and verifies that every output citation belongs to it. The current startup token is local session control, not user identity.
+
+当前实施顺序是：审查 E1 provider boundary；用合成数据验证 E2 身份委托、同 tenant/跨 tenant 授权与 RLS；先定义 secure-release package/receipt 协议，再分别实现审批与接收者密钥、加密 envelope/verifier、audit-committed outbox；然后实施 Tidy3D Stage 1B。各组件在架构上保持独立，这个顺序不表示上述未实现能力已经可用。
+
+The current implementation order is: review the E1 provider boundary; validate E2 identity delegation, same-tenant and cross-tenant authorization, and RLS with synthetic data; define the secure-release package/receipt protocol, then separately implement approval and recipient keys, the cryptographic envelope/verifier, and an audit-committed outbox; then implement Tidy3D Stage 1B. These components remain architecturally independent, and this order does not imply that the unimplemented capabilities are available.
+
+Kimi K3 仅作为未来 cluster-class model gateway 的候选 open-weight provider。官方规模约为 2.8T 总参数、104B 激活参数和约 1.561 TB checkpoint，不能部署在当前 RTX 4070 Ti 工作站；RAG 不会降低模型权重内存。完整设计、非目标与验收测试见 [企业部署与威胁模型](docs/ENTERPRISE_DEPLOYMENT.md)。
+
+Kimi K3 is only a future candidate open-weight provider behind a cluster-class model gateway. Its official scale is approximately 2.8T total parameters, 104B active parameters, and a 1.561 TB checkpoint, so it cannot run on the current RTX 4070 Ti workstation; RAG does not reduce model-weight memory. See [Enterprise Deployment and Threat Model](docs/ENTERPRISE_DEPLOYMENT.md) for the full design, non-goals, and acceptance tests.
+
 ## 安全边界 / Security Boundaries
 
 - 父仓库和子仓库均应保持 private；父仓库权限不会自动授予 private 子仓库权限。
@@ -79,6 +102,10 @@ The Tidy3D Python client is publicly available, but common FDTD solving workflow
   The current `/mnt/d` working copy is for development, public material, and synthetic data only; it is unsuitable for unpublished or high-value material.
 - private GitHub 可见性不是数据加密、主机隔离或外发控制。
   Private GitHub visibility is not data encryption, host isolation, or egress control.
+- 当前 Stage 1A startup token 不区分 user、tenant 或 owner，run list/read/export 也没有 tenant isolation；不得通过改变绑定地址直接用于内网多用户。
+  The current Stage 1A startup token does not distinguish user, tenant, or owner, and run list/read/export has no tenant isolation; do not turn it into a multiuser intranet service by changing the bind address.
+- RAG relevance、LLM 输出或 vector metadata filter 都不是授权证据；身份、策略和数据库层必须默认拒绝并独立审计。
+  RAG relevance, LLM output, and vector metadata filters are not authorization evidence; identity, policy, and database layers must fail closed and be audited independently.
 - 公开任一仓库前，必须单独完成许可证、安全和机器信息清理审查。
   Before making either repository public, perform separate licensing, security, and machine-information reviews.
 
@@ -101,8 +128,9 @@ Ordinary Issues must not contain credentials, real research data, confidential o
 ## 详细资料 / Detailed Records
 
 - [总体架构 / Architecture](docs/ARCHITECTURE.md)
+- [企业部署与威胁模型 / Enterprise deployment and threat model](docs/ENTERPRISE_DEPLOYMENT.md)
 - [实施路线 / Roadmap](docs/ROADMAP.md)
-- [Stage 1A 完整交接 / Complete Stage 1A handoff](components/stage1a-good-story-agent/STAGE1A_HANDOFF.md)
+- [Stage 1A 历史交接 / Historical Stage 1A handoff](components/stage1a-good-story-agent/STAGE1A_HANDOFF.md)（其中 next-step 顺序已由父仓库 roadmap 取代 / its next-step ordering is superseded by the parent roadmap）
 - [Stage 1A 使用说明 / Stage 1A usage](components/stage1a-good-story-agent/README.md)
 
 父仓库当前未声明统一许可证。每个组件保留自己的许可证责任；父仓库许可证不会自动覆盖 submodule。
