@@ -127,6 +127,7 @@ Ordinary Issues must not contain credentials, real research data, confidential o
 
 ## 详细资料 / Detailed Records
 
+- [项目完整实现手册 / Complete implementation handbook](docs/IMPLEMENTATION_HANDBOOK.md)：从版本状态进入 Stage 1A 源码调用链、运行契约、测试缺口和未来设计的统一阅读地图。 / A unified map from version status into the Stage 1A source call chain, runtime contracts, test gaps, and future design.
 - [总体架构 / Architecture](docs/ARCHITECTURE.md)
 - [企业部署与威胁模型 / Enterprise deployment and threat model](docs/ENTERPRISE_DEPLOYMENT.md)
 - [实施路线 / Roadmap](docs/ROADMAP.md)
