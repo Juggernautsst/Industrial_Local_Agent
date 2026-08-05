@@ -152,6 +152,22 @@ secure-release 可以接收研究者从 tenant storage 中明确选择且获批�
 
 Secure release may accept researcher-selected and approved raw/derived artifacts directly from tenant storage or Stage 1A outputs; it is not a downstream-only Stage 1A step. Every input retains its classification and passes independent approval.
 
+### 7.3 外发网关与 MCP 工作流 / External Egress Gateway and MCP Workflow
+
+下图把入口身份网关和外发出口网关分成两个逻辑平面。MCP 位于内网控制平面，只把自然语言意图转换成受限的 typed API 请求；它不拥有公网路由、审批权、私钥或任意 HTTP/shell/filesystem 工具。`Secure-Release Service` 在受保护的内网边界内完成服务端分类、接收者公钥核验、人工审批绑定、应用层 envelope encryption 和签名；KMS/HSM 负责密钥托管。只有已经通过审计 outbox 的 `delivery_pending` 密文包可以交给 DMZ 出口 relay。
+
+The figure separates the ingress identity gateway from the outbound egress gateway into two logical planes. MCP stays in the intranet control plane and translates natural-language intent into restricted typed API requests; it has no Internet route, approval authority, private keys, or arbitrary HTTP/shell/filesystem tools. The protected `Secure-Release Service` performs server-side classification, recipient-key verification, human-approval binding, application-level envelope encryption, and signing; KMS/HSM owns key custody. Only an audited `delivery_pending` ciphertext package may be handed to the DMZ egress relay.
+
+![内网 Agent 到外部协作者的安全发布工作流 / Intranet Agent to External Collaborator Secure-Release Workflow](figures/intranet-secure-release-egress.svg)
+
+这张图表达的最小流程是：研究者意图 → 入口认证 → Stage 1A/授权检索 → MCP 生成 `ReleaseCandidate` → 可信 UI 与 MFA/人工审批 → Secure-Release + KMS/HSM 加密签名 → audit-committed outbox → 唯一外发 relay → 获批的外部传输端点 → 分级签名回执与对账。TLS/mTLS 是传输层保护，不能替代包级加密；区块链（若未来有明确的跨机构见证需求）最多记录 opaque hash/timestamp，不存原文、密文、密钥或接收者隐私元数据。
+
+The minimum workflow is: researcher intent -> ingress authentication -> Stage 1A/authorized retrieval -> MCP creates a `ReleaseCandidate` -> trusted UI and MFA/human approval -> Secure-Release + KMS/HSM encryption and signing -> audit-committed outbox -> sole outbound relay -> approved external transport endpoint -> signed, graded receipt and reconciliation. TLS/mTLS protects the transport layer but cannot replace package encryption. If a blockchain is later justified for cross-institution witnessing, it may record only an opaque hash/timestamp; it must not store plaintext, ciphertext, keys, or recipient-sensitive metadata.
+
+在受控单机试点中，入口网关、MCP、Secure-Release 和 relay 可以物理共址，但必须使用独立进程/容器、service identity、网络命名空间、端口和 default-deny 防火墙规则。生产部署应优先把内网控制平面、Secure-Release/KMS 区和 DMZ egress relay 分开；Stage 1A、数据库、检索、模型和 MCP 均不得直接出网。当前图和规则是架构设计，相关安全发布和外发传输仍未实现。
+
+In a controlled single-host pilot, the ingress gateway, MCP, Secure-Release, and relay may share hardware, but they still require separate processes/containers, service identities, network namespaces, ports, and default-deny firewall rules. Production should separate the intranet control plane, Secure-Release/KMS zone, and DMZ egress relay. Stage 1A, the database, retrieval, model, and MCP must not connect directly to the Internet. The figure and rules are design only; secure release and external transfer are not implemented.
+
 ## 8. 授权与模型责任边界 / Authorization and Model Responsibility Boundaries
 
 | 边界 / Boundary | 权威控制 / Authoritative control | Defense in depth / 纵深控制 | 禁止的捷径 / Prohibited shortcut |
