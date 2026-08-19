@@ -4,6 +4,7 @@ import dataclasses
 import hmac
 import ipaddress
 import json
+import math
 import mimetypes
 import socket
 import threading
@@ -100,7 +101,7 @@ class DemoApplication:
         if action == "retrieve":
             subject_id = payload.get("subject_id")
             query = payload.get("query")
-            if subject_id not in self.ALLOWED_SUBJECTS:
+            if not isinstance(subject_id, str) or subject_id not in self.ALLOWED_SUBJECTS:
                 raise ValueError("Unknown synthetic subject.")
             if not isinstance(query, str) or not query.strip() or len(query) > 500:
                 raise ValueError("Query must contain 1 to 500 characters.")
@@ -189,8 +190,9 @@ class E2DemoHTTPServer(HTTPServer):
         *,
         request_deadline_seconds: float = REQUEST_DEADLINE_SECONDS,
     ) -> None:
-        if request_deadline_seconds <= 0:
-            raise ValueError("request_deadline_seconds must be positive")
+        if not math.isfinite(request_deadline_seconds) or request_deadline_seconds <= 0:
+            raise ValueError("request_deadline_seconds must be finite and positive")
+        resolved_asset_directory = asset_directory.resolve()
         application = DemoApplication(fixture_path)
         try:
             super().__init__(server_address, E2DemoRequestHandler)
@@ -198,7 +200,7 @@ class E2DemoHTTPServer(HTTPServer):
             application.close()
             raise
         self.application = application
-        self.asset_directory = asset_directory.resolve()
+        self.asset_directory = resolved_asset_directory
         self.session_token = session_token
         self.request_deadline_seconds = request_deadline_seconds
 
@@ -215,6 +217,7 @@ class E2DemoRequestHandler(BaseHTTPRequestHandler):
     def setup(self) -> None:
         super().setup()
         self._request_started_at = time.monotonic()
+        self._request_deadline_expired = threading.Event()
         self.connection.settimeout(REQUEST_IDLE_TIMEOUT_SECONDS)
         self._deadline_timer = threading.Timer(
             self.server.request_deadline_seconds,
@@ -223,13 +226,25 @@ class E2DemoRequestHandler(BaseHTTPRequestHandler):
         self._deadline_timer.daemon = True
         self._deadline_timer.start()
 
+    def handle(self) -> None:
+        try:
+            super().handle()
+        except (BrokenPipeError, ConnectionResetError):
+            if not self._request_deadline_expired.is_set():
+                raise
+
     def finish(self) -> None:
         try:
-            super().finish()
+            try:
+                super().finish()
+            except (BrokenPipeError, ConnectionResetError):
+                if not self._request_deadline_expired.is_set():
+                    raise
         finally:
             self._deadline_timer.cancel()
 
     def _expire_request(self) -> None:
+        self._request_deadline_expired.set()
         self.close_connection = True
         try:
             self.connection.shutdown(socket.SHUT_RDWR)

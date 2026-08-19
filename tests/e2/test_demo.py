@@ -6,7 +6,9 @@ import subprocess
 import sys
 import threading
 import time
+from http.server import HTTPServer
 from pathlib import Path
+from typing import NoReturn
 from urllib.error import HTTPError
 from urllib.parse import parse_qs, urlsplit
 from urllib.request import Request, urlopen
@@ -165,12 +167,18 @@ def test_browser_demo_is_loopback_token_guarded_and_content_free():
             f"Content-Length: {len(duplicate_action)}\r\n".encode("ascii"),
             duplicate_action,
         ) == 400
+
+        invalid_subject = b'{"action":"retrieve","subject_id":[],"query":"waveguide"}'
+        assert raw_action_request(
+            f"Content-Length: {len(invalid_subject)}\r\n".encode("ascii"),
+            invalid_subject,
+        ) == 400
     finally:
         process.terminate()
         process.wait(timeout=5)
 
 
-def test_browser_demo_enforces_connection_deadline_and_recovers():
+def test_browser_demo_enforces_connection_deadline_and_recovers(capsys):
     root = Path(__file__).parents[2]
     server = E2DemoHTTPServer(
         ("127.0.0.1", 0),
@@ -196,6 +204,67 @@ def test_browser_demo_enforces_connection_deadline_and_recovers():
         server.shutdown()
         thread.join(timeout=2)
         server.server_close()
+    assert "Traceback" not in capsys.readouterr().err
+
+
+def test_browser_demo_rejects_non_finite_request_deadlines():
+    root = Path(__file__).parents[2]
+    for invalid_deadline in (float("nan"), float("inf")):
+        try:
+            E2DemoHTTPServer(
+                ("127.0.0.1", 0),
+                root / "fixtures/e2/synthetic_corpus.json",
+                root / "src/industrial_local_agent/e2/demo_static",
+                "test-token",
+                request_deadline_seconds=invalid_deadline,
+            )
+        except ValueError as error:
+            assert str(error) == "request_deadline_seconds must be finite and positive"
+        else:
+            raise AssertionError(f"Invalid deadline was accepted: {invalid_deadline!r}")
+
+
+def test_browser_demo_resolves_assets_before_binding(monkeypatch):
+    root = Path(__file__).parents[2]
+    probe = socket.socket()
+    probe.bind(("127.0.0.1", 0))
+    host, port = probe.getsockname()
+    probe.close()
+
+    class FailingAssetDirectory:
+        def resolve(self) -> NoReturn:
+            raise RuntimeError("synthetic asset resolution failure")
+
+    bound_servers = []
+    original_server_bind = E2DemoHTTPServer.server_bind
+
+    def record_server_bind(server) -> None:
+        bound_servers.append(server)
+        original_server_bind(server)
+
+    monkeypatch.setattr(E2DemoHTTPServer, "server_bind", record_server_bind)
+    try:
+        try:
+            E2DemoHTTPServer(
+                (host, port),
+                root / "fixtures/e2/synthetic_corpus.json",
+                FailingAssetDirectory(),
+                "test-token",
+            )
+        except RuntimeError as error:
+            assert str(error) == "synthetic asset resolution failure"
+        else:
+            raise AssertionError("Synthetic asset resolution failure was not raised.")
+        assert not bound_servers
+    finally:
+        for server in bound_servers:
+            HTTPServer.server_close(server)
+
+    replacement = socket.socket()
+    try:
+        replacement.bind((host, port))
+    finally:
+        replacement.close()
 
 
 def test_browser_demo_releases_socket_when_application_close_fails():
