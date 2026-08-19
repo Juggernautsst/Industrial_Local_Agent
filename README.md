@@ -14,8 +14,10 @@
   Current child-main engineering evidence is `117 passed, 1 skipped` offline, one live MCP `qwen2.5:3b` pass, and material-free/attachment Web-chat smoke; these are engineering-boundary evidence, not scientific-quality or enterprise-security certification.
 - Stage 1B 尚未实现。它仍是独立的只读 Tidy3D 结果适配器，但当前工程优先完成身份感知授权检索与安全发布基础；这些安全门槛通过后再实施适配器。Agent 不持有 API key，也不自动提交云端任务。
   Stage 1B is not implemented. It remains an independent read-only Tidy3D result adapter, but current engineering first establishes identity-aware authorized retrieval and the secure-release foundation; adapter implementation follows those security gates. The agent does not hold API keys or automatically submit cloud jobs.
-- Enterprise E0 已合并到父仓库 `main`，定义单用户 local 与身份感知 enterprise 两种模式、跨组件契约和威胁模型；SSO、授权检索、RLS、多租户服务和集中式模型 gateway 仍未实现。
-  Enterprise E0 is merged into the parent `main`, defining single-user local and identity-aware enterprise modes, cross-component contracts, and a threat model; SSO, authorized retrieval, RLS, multitenant service, and a centralized model gateway remain unimplemented.
+- Enterprise E0 已合并到父仓库 `main`，定义单用户 local 与身份感知 enterprise 两种模式、跨组件契约和威胁模型；生产 SSO、PostgreSQL RLS、多租户服务和集中式模型 gateway 仍未实现。
+  Enterprise E0 is merged into the parent `main`, defining single-user local and identity-aware enterprise modes, cross-component contracts, and a threat model; production SSO, PostgreSQL RLS, multitenant service, and a centralized model gateway remain unimplemented.
+- Enterprise E2 已加入一个只使用合成数据、无模型依赖的身份感知授权检索 vertical slice：服务端 tenant mapping、forced-scope SQLite 检索、source reauthorization、签名 bundle、replay protection 和 content-free audit hash chain。它证明契约和 fail-closed 顺序，不等于生产 E2。
+  Enterprise E2 now includes a synthetic, model-free identity-aware authorized-retrieval vertical slice: server-side tenant mapping, forced-scope SQLite retrieval, source reauthorization, signed bundles, replay protection, and a content-free audit hash chain. It proves the contracts and fail-closed sequence, not production E2.
 - 子仓库的 provider boundary、MCP facade 和 Web chat 已合并并固定到 parent `main`（`efea263`）。这仍是单用户、回环、本地演示能力，不是企业多用户或安全发布完成。
   The provider boundary, MCP facade, and Web chat are merged and pinned in parent `main` (`efea263`). This remains a single-user, loopback, local-demo capability, not completed enterprise multiuser or secure release.
 - 安全发布、跨机构传输和区块链均未实现。未来必须先建立威胁模型、加密、密钥管理、访问控制和审计，再判断区块链是否解决剩余问题。
@@ -26,13 +28,15 @@
 | 路径 / Path | 类型 / Type | 职责 / Responsibility | 当前固定版本 / Current Pin |
 | --- | --- | --- | --- |
 | `components/stage1a-good-story-agent/` | Git submodule | 本地科研 Agent、MCP facade 和 material-optional chat / Local research agent, MCP facade, and material-optional chat | `efea263` |
+| `src/industrial_local_agent/e2/` | 父仓库合成实现 / Parent synthetic implementation | E2 身份、策略、forced scope、bundle 和 audit vertical slice / E2 identity, policy, forced scope, bundle, and audit vertical slice | Issue #10 branch |
+| `docs/E2_IMPLEMENTATION.md` | 父仓库文档 / Parent documentation | E2 实施边界、运行命令和限制 / E2 implementation boundary, commands, and limits | Current branch |
 | `docs/ARCHITECTURE.md` | 父仓库文档 / Parent documentation | 组件边界、更新规则和安全模型 / Component boundaries, update rules, and security model | 当前父仓库 / Current parent |
-| `docs/ENTERPRISE_DEPLOYMENT.md` | 父仓库文档 / Parent documentation | 企业部署模式、契约、威胁模型和验收门槛 / Enterprise deployment modes, contracts, threat model, and acceptance gates | E0 设计基线 / E0 design baseline |
+| `docs/ENTERPRISE_DEPLOYMENT.md` | 父仓库文档 / Parent documentation | 企业部署模式、契约、威胁模型和验收门槛 / Enterprise deployment modes, contracts, threat model, and acceptance gates | E0 + E2 synthetic status |
 | `docs/ROADMAP.md` | 父仓库文档 / Parent documentation | Stage 1A 至 Stage 3 的验收路线 / Acceptance roadmap from Stage 1A through Stage 3 | 当前父仓库 / Current parent |
 
 未来可能增加 `tidy3d-adapter`、identity-aware retrieval、model gateway、`secure-data-transfer` 和 `workflow-orchestrator`，但在接口与验收条件稳定前不创建空组件。
 
-Future components may include `tidy3d-adapter`, identity-aware retrieval, a model gateway, `secure-data-transfer`, and `workflow-orchestrator`, but empty components will not be created before their interfaces and acceptance criteria are stable.
+Future components may include a production identity-aware retrieval service, `tidy3d-adapter`, a model gateway, `secure-data-transfer`, and `workflow-orchestrator`, but empty components will not be created before their interfaces and acceptance criteria are stable.
 
 ## 获取完整仓库 / Clone the Complete Repository
 
@@ -90,9 +94,9 @@ RAG 只在已经授权的 source set 内排序相关内容；metadata filter 不
 
 RAG ranks relevant content only inside an already authorized source set. Metadata filters are not authorization, and the LLM cannot approve access. The retrieval gateway creates a signed short-lived `AuthorizedEvidenceBundle`; Stage 1A can use only that bundle and verifies that every output citation belongs to it. The current startup token is local session control, not user identity.
 
-当前实施顺序是：用合成数据验证 E2 身份委托、同 tenant/跨 tenant 授权与 RLS；先定义 secure-release package/receipt 协议，再分别实现审批与接收者密钥、加密 envelope/verifier、audit-committed outbox；然后实施 Tidy3D Stage 1B。各组件在架构上保持独立，这个顺序不表示上述未实现能力已经可用。
+当前实施顺序是：先审查 E2 合成 vertical slice，再定义 secure-release package/receipt 协议，分别实现审批与接收者密钥、加密 envelope/verifier、audit-committed outbox；之后再实施生产 E2/E3/E4 和 Tidy3D Stage 1B。各组件在架构上保持独立，这个顺序不表示上述未实现能力已经可用。
 
-The current implementation order is: validate E2 identity delegation, same-tenant and cross-tenant authorization, and RLS with synthetic data; define the secure-release package/receipt protocol, then separately implement approval and recipient keys, the cryptographic envelope/verifier, and an audit-committed outbox; then implement Tidy3D Stage 1B. These components remain architecturally independent, and this order does not imply that the unimplemented capabilities are available.
+The current implementation order is: review the synthetic E2 vertical slice, define the secure-release package/receipt protocol, separately implement approval and recipient keys, the cryptographic envelope/verifier, and an audit-committed outbox, then implement production E2/E3/E4 and Tidy3D Stage 1B. These components remain architecturally independent, and this order does not imply that unimplemented capabilities are available.
 
 Kimi K3 仅作为未来 cluster-class model gateway 的候选 open-weight provider。官方规模约为 2.8T 总参数、104B 激活参数和约 1.561 TB checkpoint，不能部署在当前 RTX 4070 Ti 工作站；RAG 不会降低模型权重内存。完整设计、非目标与验收测试见 [企业部署与威胁模型](docs/ENTERPRISE_DEPLOYMENT.md)。
 

@@ -1,0 +1,21 @@
+{
+  "tenants": [
+    {"tenant_id": "tenant-a", "label": "Synthetic Photonics Group A"},
+    {"tenant_id": "tenant-b", "label": "Synthetic Photonics Group B"}
+  ],
+  "users": [
+    {"subject_id": "user-alice", "tenant_id": "tenant-a", "role": "researcher"},
+    {"subject_id": "user-bob", "tenant_id": "tenant-a", "role": "reviewer"},
+    {"subject_id": "user-carol", "tenant_id": "tenant-b", "role": "researcher"}
+  ],
+  "projects": [
+    {"project_id": "project-a1", "tenant_id": "tenant-a", "members": ["user-alice"]},
+    {"project_id": "project-a2", "tenant_id": "tenant-a", "members": ["user-bob"]},
+    {"project_id": "project-b1", "tenant_id": "tenant-b", "members": ["user-carol"]}
+  ],
+  "sources": [
+    {"source_id": "source-a1", "tenant_id": "tenant-a", "project_id": "project-a1", "owner_id": "user-alice", "content": "Synthetic waveguide transmission at 1550 nm is 0.84."},
+    {"source_id": "source-a2", "tenant_id": "tenant-a", "project_id": "project-a2", "owner_id": "user-bob", "content": "Synthetic ring-resonator linewidth fixture for reviewer access."},
+    {"source_id": "source-b1", "tenant_id": "tenant-b", "project_id": "project-b1", "owner_id": "user-carol", "content": "Synthetic control result for tenant B only."}
+  ]
+}
