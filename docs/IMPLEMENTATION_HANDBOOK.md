@@ -27,17 +27,17 @@ This handbook answers four questions: what is actually runnable now, exactly how
 
 | 对象 / Object | 状态 / State |
 | --- | --- |
-| Parent default branch / 父默认分支 | `main` at `9aa1a292`; Enterprise E0 is merged. / `main` 为 `9aa1a292`；Enterprise E0 已合并。 |
+| Parent default branch / 父默认分支 | `main` at `51635a1`; Enterprise E0 and the Stage 1A pin are merged. / `main` 为 `51635a1`；Enterprise E0 和 Stage 1A pin 已合并。 |
 | Parent E0 branch / 父 E0 分支 | `docs/2-enterprise-boundaries` at `72c5a44`, historical source branch for merged PR #3. / `72c5a44` 是已合并 PR #3 的历史源分支。 |
 | Handbook branch / 本手册分支 | `docs/4-implementation-handbook`; this refresh is retargeted to parent `main`. / 本次刷新将 PR base 改为父仓库 `main`。 |
-| Parent submodule pin / 父 gitlink | `components/stage1a-good-story-agent` -> `4e3bdda`; target `efea263` is tracked by parent [Issue #9](https://github.com/Juggernautsst/Industrial_Local_Agent/issues/9). |
-| Child default branch / 子默认分支 | `main` at `efea263`, component version `0.2.0`; merged stack includes E1 provider boundary, MCP C1, and material-optional Web chat. |
+| Parent submodule pin / 父 gitlink | `components/stage1a-good-story-agent` -> `efea263da1b803a74a6a91c0e592949b3237203c`, merged through parent PR #11 / Issue #9. |
+| Child default branch / 子默认分支 | `main` at `efea263`, component version `0.2.0`; this is also the parent pin. Merged stack includes E1 provider boundary, MCP C1, and material-optional Web chat. |
 | Child historical baseline / 子历史基线 | `4e3bdda`, component `0.1.1`, recorded baseline `38 passed`; retained only for pin history. |
 | Child historical E1 source / 子历史 E1 源码 | `367f971`, superseded by merged child main and retained only as historical review evidence. |
 
-在本快照中，父仓库 index 仍固定 `4e3bdda`，而 child `main` 已前进到 `efea263`；这两个事实只有在 Issue #9 的独立 parent PR 合并后才会一致。父工作树中出现 modified submodule 仍可能只是本地 checkout 漂移，不等于 gitlink 更新。
+在本快照中，父仓库 index 与 child `main` 都固定到 `efea263`；本地 submodule 若显示 modified，仍可能只是 checkout 漂移，不等于新的 gitlink 更新。
 
-In this snapshot the parent index remains at `4e3bdda` while child `main` has advanced to `efea263`; they become consistent only after the separate parent PR for Issue #9 is merged. A modified submodule in a parent worktree may still be local checkout drift, not a gitlink update.
+In this snapshot both the parent index and child `main` point to `efea263`; a modified submodule in a parent worktree may still be local checkout drift, not a new gitlink update.
 
 ### 0.3 权威来源优先级 / Authority Order
 
@@ -139,10 +139,10 @@ git submodule update --init --recursive
 
 | 能力 / Capability | 当前状态 / Current status | 关键事实 / Key fact |
 | --- | --- | --- |
-| Stage 1A engineering | **MERGED CHILD / PARENT PIN PENDING** | Child `main` `efea263` provides the provider boundary, MCP `STDIO` facade, and material-optional Web research chat; parent integration is tracked by Issue #9. / 子 `main` 的 `efea263` 提供 provider boundary、MCP `STDIO` facade 和 material-optional Web chat；父仓库集成由 Issue #9 跟踪。 |
+| Stage 1A engineering | **PINNED** | Parent and child both point to `efea263`, providing the provider boundary, MCP `STDIO` facade, and material-optional Web research chat. / 父子仓库均固定到 `efea263`，提供 provider boundary、MCP `STDIO` facade 和 material-optional Web chat。 |
 | Stage 1A scientific acceptance | **NOT COMPLETE** | 只有 1/5 合成光子学案例；还缺四个案例和双人独立评价。 / One of five synthetic photonics cases; four cases and two independent evaluators remain. |
 | Enterprise E0 | **DESIGN ONLY** | local/enterprise 模式、契约和威胁模型已定义；没有生产控制。 / Modes, contracts, and threat model are defined; production controls are absent. |
-| Enterprise E1 provider boundary | **MERGED CHILD / PARENT PIN PENDING** | Child PR #2 is merged; parent gitlink remains unchanged until Issue #9. / 子 PR #2 已合并；父 gitlink 仍待 Issue #9。 |
+| Enterprise E1 provider boundary | **PINNED** | Child PR #2 is merged and parent PR #11 pins the resulting child main. / 子 PR #2 已合并，父 PR #11 已固定 child main。 |
 | Enterprise E2 | **NOT IMPLEMENTED / ISSUE OPEN** | Parent Issue #10 defines the synthetic vertical slice; no implementation is delivered yet, and it must remain model-free until acceptance. / 父 Issue #10 定义合成 vertical slice；当前尚无实现，验收前必须保持无模型调用。 |
 | Enterprise E3 | **NOT IMPLEMENTED** | 没有集中 model gateway、mTLS、registered provider 或容量控制。 / No centralized model gateway, mTLS, registered provider, or capacity controls. |
 | Enterprise E4 | **NOT IMPLEMENTED** | 没有多 tenant Stage 1A 集成。 / No multitenant Stage 1A integration. |
@@ -156,8 +156,7 @@ git submodule update --init --recursive
 Stage numbers identify capability boundaries, not current scheduling. The serial order under resource and risk constraints is:
 
 ```text
-Parent pin integration
-  -> E2 identity-aware authorized retrieval vertical slice
+E2 identity-aware authorized retrieval vertical slice
   -> Stage 2.0 protocol
   -> separate secure-release implementation slices
   -> Tidy3D Stage 1B read-only adapter
@@ -245,9 +244,9 @@ python -m good_story_agent -> good_story_agent.cli:main
 
 ### 5.2 固定版本源码文件 / Pinned Source Files
 
-以下链接固定到已合并 child `main` commit `efea263`。在 parent Issue #9 合并前，它们描述的是 child 主分支能力，而不是当前 parent gitlink 的递归 clone。
+以下链接固定到 parent 当前 gitlink 与 child `main` 共用的 `efea263` commit。
 
-The following links are pinned to merged child `main` commit `efea263`. Until parent Issue #9 is merged, they describe child-main capability rather than the current parent-gitlink recursive clone.
+The following links are pinned to the `efea263` commit shared by the current parent gitlink and child `main`.
 
 | 文件 / File | 职责 / Responsibility |
 | --- | --- |
@@ -589,11 +588,11 @@ The following are current implementation boundaries, not speculation:
 
 The output is an evidence-bounded candidate analysis, not automated peer review or scientific-truth verification.
 
-## 11. E1 Provider Boundary（已合并到子仓库） / E1 Provider Boundary (Merged on Child Main)
+## 11. E1 Provider Boundary（已合并并固定） / E1 Provider Boundary (Merged and Pinned)
 
-E1 已通过 child PR #2 合并到 child `main` 的 [`efea263`](https://github.com/Juggernautsst/stage1a-good-story-agent/commit/efea263da1b803a74a6a91c0e592949b3237203c)，但在 parent Issue #9 完成前不属于 parent gitlink `4e3bdda`。主要新增文件为 [`providers.py`](https://github.com/Juggernautsst/stage1a-good-story-agent/blob/efea263/src/good_story_agent/providers.py)。
+E1 已通过 child PR #2 合并到 child `main` 的 [`efea263`](https://github.com/Juggernautsst/stage1a-good-story-agent/commit/efea263da1b803a74a6a91c0e592949b3237203c)，并通过 parent PR #11 / Issue #9 固定到 parent gitlink。主要新增文件为 [`providers.py`](https://github.com/Juggernautsst/stage1a-good-story-agent/blob/efea263/src/good_story_agent/providers.py)。
 
-E1 is merged into child `main` at [`efea263`](https://github.com/Juggernautsst/stage1a-good-story-agent/commit/efea263da1b803a74a6a91c0e592949b3237203c) through child PR #2, but it is not part of parent gitlink `4e3bdda` until parent Issue #9 completes. Its main new file is [`providers.py`](https://github.com/Juggernautsst/stage1a-good-story-agent/blob/efea263/src/good_story_agent/providers.py).
+E1 is merged into child `main` at [`efea263`](https://github.com/Juggernautsst/stage1a-good-story-agent/commit/efea263da1b803a74a6a91c0e592949b3237203c) through child PR #2 and pinned into the parent gitlink through parent PR #11 / Issue #9. Its main new file is [`providers.py`](https://github.com/Juggernautsst/stage1a-good-story-agent/blob/efea263/src/good_story_agent/providers.py).
 
 ### 11.1 契约对象 / Contract Objects
 
@@ -837,15 +836,15 @@ The current working copy is a Windows-mounted WSL development checkout whose POS
 
 ### 15.2 创建环境 / Create the Environment
 
-以下命令只适用于父仓库的 clean recursive clone。当前父 `main` 在 Issue #9 合并前仍要求 child checkout 与 gitlink 同为历史 pin `4e3bdda`；Issue #9 合并后应将两处改为 `efea263da1b803a74a6a91c0e592949b3237203c`。当前开发工作副本包含独立工作，不满足部署前提；不要从它执行安装。先在 superproject root 运行双重校验，任一 `test` 失败都应停止并重新创建 clean clone，而不是覆盖含有其他工作的 checkout：
+以下命令只适用于父仓库的 clean recursive clone，并要求 child checkout 与 parent gitlink 同为已固定的 `efea263da1b803a74a6a91c0e592949b3237203c`。当前开发工作副本包含独立工作，不满足部署前提；不要从它执行安装。先在 superproject root 运行双重校验，任一 `test` 失败都应停止并重新创建 clean clone，而不是覆盖含有其他工作的 checkout：
 
-The following commands apply only to a clean recursive clone. Before Issue #9 merges, both parent gitlink and child checkout must equal historical pin `4e3bdda`; after Issue #9 merges, update both checks to `efea263da1b803a74a6a91c0e592949b3237203c`. The current development working copy contains independent work and does not satisfy this deployment prerequisite; do not install from it. Run both checks from the superproject root first. If either `test` fails, stop and create a clean clone rather than overwriting a checkout that may contain other work:
+The following commands apply only to a clean recursive clone and require both the parent gitlink and child checkout to equal the pinned commit `efea263da1b803a74a6a91c0e592949b3237203c`. The current development working copy contains independent work and does not satisfy this deployment prerequisite; do not install from it. Run both checks from the superproject root first. If either `test` fails, stop and create a clean clone rather than overwriting a checkout that may contain other work:
 
 ```bash
 test "$(git rev-parse HEAD:components/stage1a-good-story-agent)" = \
-  "4e3bddaadc5e9331955afa6155a5d0ffbc648e18"
+  "efea263da1b803a74a6a91c0e592949b3237203c"
 test "$(git -C components/stage1a-good-story-agent rev-parse HEAD)" = \
-  "4e3bddaadc5e9331955afa6155a5d0ffbc648e18"
+  "efea263da1b803a74a6a91c0e592949b3237203c"
 cd components/stage1a-good-story-agent
 python3 -m venv .venv
 .venv/bin/python -m pip install --upgrade pip
@@ -1370,7 +1369,7 @@ This table records source-review facts and does not authorize Issue #4 to fix th
 
 After reading, you should be able to answer accurately:
 
-1. 父仓库为什么显示 submodule modified，但 gitlink 仍是 `4e3bdda`？ / Why can the parent show a modified submodule while the gitlink remains `4e3bdda`?
+1. 父仓库为什么可能显示 submodule modified，即使 gitlink 已固定到 `efea263`？ / Why can the parent show a modified submodule even when the gitlink is pinned to `efea263`?
 2. Audit 模式验证了什么，为什么它不算科学故事生成？ / What does audit verify, and why is it not story generation?
 3. 一个 CSV row 如何变成 source hash、locator 和 evidence ID？ / How does a CSV row become a source hash, locator, and evidence ID?
 4. 哪些规则由代码机械强制，哪些只在 prompt 中？ / Which rules are mechanically enforced and which are prompt-only?
