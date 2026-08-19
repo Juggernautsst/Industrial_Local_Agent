@@ -29,6 +29,7 @@
 | --- | --- | --- | --- |
 | `components/stage1a-good-story-agent/` | Git submodule | 本地科研 Agent、MCP facade 和 material-optional chat / Local research agent, MCP facade, and material-optional chat | `efea263` |
 | `src/industrial_local_agent/e2/` | 父仓库合成实现 / Parent synthetic implementation | E2 身份、策略、forced scope、bundle 和 audit vertical slice / E2 identity, policy, forced scope, bundle, and audit vertical slice | Issue #10 branch |
+| `scripts/e2_demo.py` | 父仓库演示辅助 / Parent demo helper | 可交互的 synthetic E2 权限与审计演示 / Interactive synthetic E2 authorization and audit demo | Issue #10 branch |
 | `docs/E2_IMPLEMENTATION.md` | 父仓库文档 / Parent documentation | E2 实施边界、运行命令和限制 / E2 implementation boundary, commands, and limits | Current branch |
 | `docs/ARCHITECTURE.md` | 父仓库文档 / Parent documentation | 组件边界、更新规则和安全模型 / Component boundaries, update rules, and security model | 当前父仓库 / Current parent |
 | `docs/ENTERPRISE_DEPLOYMENT.md` | 父仓库文档 / Parent documentation | 企业部署模式、契约、威胁模型和验收门槛 / Enterprise deployment modes, contracts, threat model, and acceptance gates | E0 + E2 synthetic status |
