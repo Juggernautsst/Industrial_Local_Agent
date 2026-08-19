@@ -4,7 +4,11 @@ import dataclasses
 import hmac
 import ipaddress
 import json
+import math
 import mimetypes
+import socket
+import threading
+import time
 from http import HTTPStatus
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from pathlib import Path
@@ -16,7 +20,10 @@ from .errors import AuditError, BundleVerificationError, E2Error, IdentityError
 
 
 MAX_REQUEST_BYTES = 16 * 1024
-REQUEST_TIMEOUT_SECONDS = 5
+REQUEST_IDLE_TIMEOUT_SECONDS = 5
+REQUEST_BODY_TIMEOUT_SECONDS = 4
+REQUEST_DEADLINE_SECONDS = 6
+RESPONSE_DEADLINE_MARGIN_SECONDS = 0.25
 
 ACTION_FIELDS = {
     "retrieve": frozenset({"action", "subject_id", "query"}),
@@ -27,6 +34,19 @@ ACTION_FIELDS = {
     "verify_audit": frozenset({"action"}),
     "reset": frozenset({"action"}),
 }
+
+
+class DuplicateJSONFieldError(ValueError):
+    pass
+
+
+def _reject_duplicate_json_fields(pairs: list[tuple[str, Any]]) -> dict[str, Any]:
+    result = {}
+    for key, value in pairs:
+        if key in result:
+            raise DuplicateJSONFieldError(f"Duplicate JSON field: {key}")
+        result[key] = value
+    return result
 
 
 def _bundle_result(response, title: str) -> dict[str, Any]:
@@ -81,7 +101,7 @@ class DemoApplication:
         if action == "retrieve":
             subject_id = payload.get("subject_id")
             query = payload.get("query")
-            if subject_id not in self.ALLOWED_SUBJECTS:
+            if not isinstance(subject_id, str) or subject_id not in self.ALLOWED_SUBJECTS:
                 raise ValueError("Unknown synthetic subject.")
             if not isinstance(query, str) or not query.strip() or len(query) > 500:
                 raise ValueError("Query must contain 1 to 500 characters.")
@@ -167,15 +187,30 @@ class E2DemoHTTPServer(HTTPServer):
         fixture_path: Path,
         asset_directory: Path,
         session_token: str,
+        *,
+        request_deadline_seconds: float = REQUEST_DEADLINE_SECONDS,
     ) -> None:
-        super().__init__(server_address, E2DemoRequestHandler)
-        self.application = DemoApplication(fixture_path)
-        self.asset_directory = asset_directory.resolve()
+        if not math.isfinite(request_deadline_seconds) or request_deadline_seconds <= 0:
+            raise ValueError("request_deadline_seconds must be finite and positive")
+        resolved_asset_directory = asset_directory.resolve()
+        application = DemoApplication(fixture_path)
+        try:
+            super().__init__(server_address, E2DemoRequestHandler)
+        except Exception:
+            application.close()
+            raise
+        self.application = application
+        self.asset_directory = resolved_asset_directory
         self.session_token = session_token
+        self.request_deadline_seconds = request_deadline_seconds
 
     def server_close(self) -> None:
-        self.application.close()
-        super().server_close()
+        application = getattr(self, "application", None)
+        try:
+            if application is not None:
+                application.close()
+        finally:
+            super().server_close()
 
 
 class E2DemoRequestHandler(BaseHTTPRequestHandler):
@@ -183,7 +218,40 @@ class E2DemoRequestHandler(BaseHTTPRequestHandler):
 
     def setup(self) -> None:
         super().setup()
-        self.connection.settimeout(REQUEST_TIMEOUT_SECONDS)
+        self._request_started_at = time.monotonic()
+        self._request_deadline_expired = threading.Event()
+        self.connection.settimeout(REQUEST_IDLE_TIMEOUT_SECONDS)
+        self._deadline_timer = threading.Timer(
+            self.server.request_deadline_seconds,
+            self._expire_request,
+        )
+        self._deadline_timer.daemon = True
+        self._deadline_timer.start()
+
+    def handle(self) -> None:
+        try:
+            super().handle()
+        except (BrokenPipeError, ConnectionResetError):
+            if not self._request_deadline_expired.is_set():
+                raise
+
+    def finish(self) -> None:
+        try:
+            try:
+                super().finish()
+            except (BrokenPipeError, ConnectionResetError):
+                if not self._request_deadline_expired.is_set():
+                    raise
+        finally:
+            self._deadline_timer.cancel()
+
+    def _expire_request(self) -> None:
+        self._request_deadline_expired.set()
+        self.close_connection = True
+        try:
+            self.connection.shutdown(socket.SHUT_RDWR)
+        except OSError:
+            pass
 
     def log_message(self, format: str, *args: object) -> None:
         print(f"E2 demo: {format % args}")
@@ -218,14 +286,49 @@ class E2DemoRequestHandler(BaseHTTPRequestHandler):
         if len(token_headers) != 1:
             return False
         supplied = token_headers[0]
-        return bool(supplied) and hmac.compare_digest(supplied, self.server.session_token)
+        return bool(supplied) and supplied.isascii() and hmac.compare_digest(
+            supplied,
+            self.server.session_token,
+        )
+
+    def _read_request_body(self, length: int) -> bytes:
+        response_margin = min(
+            RESPONSE_DEADLINE_MARGIN_SECONDS,
+            self.server.request_deadline_seconds / 2,
+        )
+        body_deadline = min(
+            self._request_started_at + self.server.request_deadline_seconds - response_margin,
+            time.monotonic() + REQUEST_BODY_TIMEOUT_SECONDS,
+        )
+        chunks = []
+        remaining = length
+        try:
+            while remaining:
+                timeout = body_deadline - time.monotonic()
+                if timeout <= 0:
+                    raise TimeoutError
+                self.connection.settimeout(timeout)
+                chunk = self.rfile.read1(min(remaining, 8 * 1024))
+                if not chunk:
+                    break
+                chunks.append(chunk)
+                remaining -= len(chunk)
+        finally:
+            self.connection.settimeout(REQUEST_IDLE_TIMEOUT_SECONDS)
+        return b"".join(chunks)
 
     def _request_path(self) -> str | None:
         try:
             parsed = urlsplit(self.path)
         except ValueError:
             return None
-        if parsed.scheme or parsed.netloc or not parsed.path.startswith("/"):
+        if (
+            parsed.scheme
+            or parsed.netloc
+            or parsed.query
+            or parsed.fragment
+            or not parsed.path.startswith("/")
+        ):
             return None
         return parsed.path
 
@@ -309,16 +412,16 @@ class E2DemoRequestHandler(BaseHTTPRequestHandler):
         if len(length_headers) != 1:
             self._fail(HTTPStatus.BAD_REQUEST, "Exactly one Content-Length header is required.")
             return
-        try:
-            length = int(length_headers[0])
-        except ValueError:
+        length_text = length_headers[0]
+        if not length_text.isascii() or not length_text.isdecimal():
             self._fail(HTTPStatus.BAD_REQUEST, "Content-Length is invalid.")
             return
+        length = int(length_text)
         if not 1 <= length <= MAX_REQUEST_BYTES:
             self._fail(HTTPStatus.REQUEST_ENTITY_TOO_LARGE, "Action payload is outside the size limit.")
             return
         try:
-            body = self.rfile.read(length)
+            body = self._read_request_body(length)
         except TimeoutError:
             self._fail(HTTPStatus.REQUEST_TIMEOUT, "Action payload timed out.")
             return
@@ -326,7 +429,10 @@ class E2DemoRequestHandler(BaseHTTPRequestHandler):
             self._fail(HTTPStatus.BAD_REQUEST, "Action payload is incomplete.")
             return
         try:
-            payload = json.loads(body)
+            payload = json.loads(body, object_pairs_hook=_reject_duplicate_json_fields)
+        except DuplicateJSONFieldError:
+            self._fail(HTTPStatus.BAD_REQUEST, "Action payload contains duplicate JSON fields.")
+            return
         except (UnicodeDecodeError, json.JSONDecodeError):
             self._fail(HTTPStatus.BAD_REQUEST, "Action payload is not valid JSON.")
             return
