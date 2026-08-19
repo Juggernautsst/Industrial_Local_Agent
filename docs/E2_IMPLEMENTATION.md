@@ -2,14 +2,15 @@
 
 ## Status / 状态
 
-E2 now has a model-free, synthetic-data vertical slice on the implementation
-branch for parent Issue [#10](https://github.com/Juggernautsst/Industrial_Local_Agent/issues/10).
-It is executable evidence for the authorization and evidence-bundle contracts;
-it is not a production enterprise service.
+E2 has a model-free, synthetic-data vertical slice merged into parent `main`
+under Issue [#10](https://github.com/Juggernautsst/Industrial_Local_Agent/issues/10).
+Its CLI and loopback browser adapters provide executable presentation evidence
+for the authorization and evidence-bundle contracts; they are not production
+enterprise services.
 
-E2 现在已经在父仓库 Issue [#10](https://github.com/Juggernautsst/Industrial_Local_Agent/issues/10)
-对应的实施分支中提供一个不调用模型、只使用合成数据的纵向切片。它是授权和
-evidence bundle 契约的可执行证据，不是生产企业服务。
+E2 已经通过父仓库 Issue [#10](https://github.com/Juggernautsst/Industrial_Local_Agent/issues/10)
+把一个不调用模型、只使用合成数据的纵向切片合并到 `main`。命令行和回环浏览器
+adapter 为授权和 evidence bundle 契约提供可执行演示证据，但都不是生产企业服务。
 
 | Boundary / 边界 | Current implementation / 当前实现 | Production follow-up / 生产后续 |
 | --- | --- | --- |
@@ -66,9 +67,12 @@ bundle 前都必须再次授权。本切片中 LLM 永远不决定访问权限�
 - `src/industrial_local_agent/e2/bundle.py`: canonical signed bundle creation and strict schema, binding, freshness, evidence, hash, and key checks.
 - `src/industrial_local_agent/e2/audit.py`: content-free events, hash-chain receipts, and chain/signature verification.
 - `src/industrial_local_agent/e2/service.py`: model-free orchestration, replay protection, cache scoping, source reauthorization, and fail-closed sequencing.
+- `src/industrial_local_agent/e2/demo.py`: shared isolated runtime used by both presentation adapters.
+- `src/industrial_local_agent/e2/demo_web.py` and `demo_static/`: loopback HTTP boundary and browser console.
 - `fixtures/e2/synthetic_corpus.json`: two synthetic tenants, three users, three projects, and three synthetic sources.
 - `tests/e2/`: identity, authorization, isolation, revocation, replay, cache, bundle-negative, audit, SQL-injection, and no-model tests.
 - `scripts/e2_demo.py`: interactive local demonstration menu; it uses the same synthetic fixture and never calls a model or network.
+- `scripts/e2_web_demo.py`: loopback browser launcher with a random per-process API token.
 
 ## Authorization matrix / 授权矩阵
 
@@ -92,7 +96,7 @@ From the repository root:
 
 ```bash
 pytest -q tests/e2
-python3 -m compileall -q src tests
+python3 -m compileall -q src tests scripts
 git diff --check
 ```
 
@@ -133,6 +137,38 @@ policy decisions, but deliberately omits research content.
 身份或 PostgreSQL。需要展示 Stage 1A 聊天界面时，使用 child component 的
 `scripts/start-local.sh`；两条演示路径应分别说明。
 
+For a more visual presentation, start the browser console:
+
+```bash
+python3 scripts/e2_web_demo.py
+```
+
+Open the complete `READY http://127.0.0.1:8780/#token=...` URL printed by the
+launcher. The console supports identity selection, retrieval presets,
+same-tenant share/revoke, forged-claim and bundle-tamper checks, audit-chain
+verification, and state reset. It returns source IDs and security metadata only;
+research content is deliberately omitted.
+
+如需更直观的现场演示，运行上述浏览器控制台命令，并打开 launcher 输出的完整
+`READY http://127.0.0.1:8780/#token=...` URL。控制台支持身份选择、检索预设、
+同 tenant share/revoke、伪造 claim 与 bundle 篡改检查、audit 链验证和状态重置。
+它只返回 source ID 和安全元数据，刻意不返回科研正文。
+
+The Web launcher binds exclusively to `127.0.0.1`; its API requires the random
+startup token, bounds JSON bodies to 16 KiB, enforces a short request timeout and
+strict request framing/action fields, checks loopback client and Host, disables
+caching and framing, and applies a restrictive content-security policy. The
+token is local presentation-session control, not user identity. The identity
+selector and global fixture map are presenter controls over synthetic scenarios,
+not tenant-scoped user views. Do not expose this server to an intranet or treat
+it as Stage 1A/E4 integration.
+
+Web launcher 只绑定 `127.0.0.1`；API 要求随机启动令牌，将 JSON body 限制为
+16 KiB，设置短请求 timeout，严格验证 framing 与 action 字段，检查回环 client
+与 Host，禁止缓存和 frame，并设置严格 CSP。该 token 只是本机演示会话控制，
+不是用户身份；身份 selector 和全局 fixture map 是主讲人控制的合成场景，不是
+tenant-scoped 用户视图。不得把该服务暴露到内网，也不得把它当作 Stage 1A/E4 集成。
+
 ## Security interpretation / 安全解释
 
 This implementation demonstrates fail-closed sequencing and stable data
@@ -158,9 +194,9 @@ The following production claims remain prohibited until separately accepted:
 
 ## Next gates / 下一步门槛
 
-1. Review and merge this synthetic E2 implementation with the Issue #10 evidence.
-   审查并合并本合成 E2 实施，并在 Issue #10 留存验收证据。
-2. Create a separate Stage 2.0 secure-release protocol Issue only after E2 acceptance.
+1. Keep presentation adapters separate from production OIDC/PostgreSQL/E4 work and retain synthetic-only evidence under Issue #10.
+   保持演示 adapter 与生产 OIDC/PostgreSQL/E4 工作分离，并在 Issue #10 中只留存合成证据。
+2. Create a separate Stage 2.0 secure-release protocol Issue after the synthetic E2 acceptance evidence.
    仅在 E2 验收后创建独立的 Stage 2.0 secure-release protocol Issue。
 3. Implement PostgreSQL/OIDC and Stage 1A integration as separate E3/E4 work; do not silently replace the synthetic adapters.
    将 PostgreSQL/OIDC 和 Stage 1A 集成作为独立 E3/E4 工作，不要静默替换合成 adapter。

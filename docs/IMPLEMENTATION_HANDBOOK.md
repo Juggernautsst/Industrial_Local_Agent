@@ -27,7 +27,7 @@ This handbook answers four questions: what is actually runnable now, exactly how
 
 | 对象 / Object | 状态 / State |
 | --- | --- |
-| Parent default branch / 父默认分支 | `main` at `2deb350`; Enterprise E0, the Stage 1A pin, and the handbook refresh are merged. / `main` 为 `2deb350`；Enterprise E0、Stage 1A pin 和手册刷新已合并。 |
+| Parent default branch / 父默认分支 | `main` includes Enterprise E0, the Stage 1A pin, the handbook refresh, and the synthetic E2 core through PR #14 (`6217ef9`). / `main` 已包含 Enterprise E0、Stage 1A pin、手册刷新，以及通过 PR #14（`6217ef9`）合并的 E2 合成核心。 |
 | Parent E0 branch / 父 E0 分支 | `docs/2-enterprise-boundaries` at `72c5a44`, historical source branch for merged PR #3. / `72c5a44` 是已合并 PR #3 的历史源分支。 |
 | Handbook branch / 本手册分支 | `docs/4-implementation-handbook`; this refresh is retargeted to parent `main`. / 本次刷新将 PR base 改为父仓库 `main`。 |
 | Parent submodule pin / 父 gitlink | `components/stage1a-good-story-agent` -> `efea263da1b803a74a6a91c0e592949b3237203c`, merged through parent PR #11 / Issue #9. |
@@ -120,6 +120,7 @@ Industrial_Local_Agent/                       parent repository
 ├── src/industrial_local_agent/e2/               synthetic E2 implementation
 ├── tests/e2/                                    synthetic E2 tests
 ├── scripts/e2_demo.py                           interactive E2 demonstration
+├── scripts/e2_web_demo.py                       loopback E2 browser console
 └── components/
     └── stage1a-good-story-agent/               private Git submodule
 ```
@@ -157,7 +158,7 @@ git submodule update --init --recursive
 | Stage 1A scientific acceptance | **NOT COMPLETE** | 只有 1/5 合成光子学案例；还缺四个案例和双人独立评价。 / One of five synthetic photonics cases; four cases and two independent evaluators remain. |
 | Enterprise E0 | **DESIGN ONLY** | local/enterprise 模式、契约和威胁模型已定义；没有生产控制。 / Modes, contracts, and threat model are defined; production controls are absent. |
 | Enterprise E1 provider boundary | **PINNED** | Child PR #2 is merged and parent PR #11 pins the resulting child main. / 子 PR #2 已合并，父 PR #11 已固定 child main。 |
-| Enterprise E2 | **UNDER REVIEW / SYNTHETIC IMPLEMENTED** | Issue #10 branch contains a model-free synthetic identity/policy/forced-scope/bundle/audit slice; production OIDC/PostgreSQL/E4 integration remains unimplemented. / Issue #10 分支包含无模型的合成身份/策略/forced-scope/bundle/audit 切片；生产 OIDC/PostgreSQL/E4 集成仍未实现。 |
+| Enterprise E2 | **MERGED SYNTHETIC CORE** | Parent `main` contains the model-free synthetic identity/policy/forced-scope/bundle/audit slice and local presentation adapters; production OIDC/PostgreSQL/E4 integration remains unimplemented. / 父仓库 `main` 已包含无模型的合成身份/策略/forced-scope/bundle/audit 切片和本机演示 adapter；生产 OIDC/PostgreSQL/E4 集成仍未实现。 |
 | Enterprise E3 | **NOT IMPLEMENTED** | 没有集中 model gateway、mTLS、registered provider 或容量控制。 / No centralized model gateway, mTLS, registered provider, or capacity controls. |
 | Enterprise E4 | **NOT IMPLEMENTED** | 没有多 tenant Stage 1A 集成。 / No multitenant Stage 1A integration. |
 | Stage 2 secure release | **DESIGN ONLY** | 协议基线已起草；加密包、审批、outbox 和交付尚无实现。 / Protocol baseline drafted; package, approval, outbox, and delivery are unimplemented. |
@@ -974,7 +975,7 @@ Default run storage is under the user's Linux data directory, not repository `ru
 | Live MCP acceptance | `qwen2.5:3b`: `1 passed`; synthetic fixtures only, local `STDIO`, no cloud/Tidy3D. / `qwen2.5:3b`：`1 passed`；仅合成 fixture、本地 `STDIO`，无云端/Tidy3D。 |
 | Live Web smoke | Material-free chat: `721` response characters, `0` sources. Synthetic attachment chat: `808` response characters, `2` sources, `3` context references. Both report `evidence_verified=false` and `local_transport_only=true`. / 无材料 chat 为 `721` 字符、`0` source；合成附件 chat 为 `808` 字符、`2` source、`3` context references；两者均为 `evidence_verified=false`、`local_transport_only=true`。 |
 | Historical E1 review | Child PR #2 originally recorded `47 passed`; it was superseded by the merged child-main stack. / 子 PR #2 曾记录 `47 passed`，现已被 child-main 合并栈取代。 |
-| Parent E2 implementation branch | E2 suite: `20 passed`; includes the interactive `scripts/e2_demo.py` smoke test, model/tool dependency check, tenant isolation, share/revoke, source reauthorization race, replay/cache, bundle negative matrix, SQL parameterization, content-free audit validation, and audit-chain verification. Synthetic fixture only; no cloud/model/Tidy3D calls. / E2 测试为 `20 passed`；包含交互式 `scripts/e2_demo.py` smoke test，并覆盖模型/工具依赖检查、tenant 隔离、share/revoke、source reauthorization race、replay/cache、bundle 负向矩阵、SQL 参数化、无正文 audit 校验和 audit 链验证。仅合成 fixture，无云端/模型/Tidy3D 调用。 |
+| Parent E2 implementation | E2 suite: `21 passed`; includes CLI and loopback-browser smoke tests, token/Host boundary checks, model/tool dependency checks, tenant isolation, share/revoke, source reauthorization race, replay/cache, bundle negative matrix, SQL parameterization, content-free audit validation, and audit-chain verification. Synthetic fixture only; no cloud/model/Tidy3D calls. / E2 测试为 `21 passed`；包含 CLI 与回环浏览器 smoke、token/Host 边界检查，并覆盖模型/工具依赖检查、tenant 隔离、share/revoke、source reauthorization race、replay/cache、bundle 负向矩阵、SQL 参数化、无正文 audit 校验和 audit 链验证。仅合成 fixture，无云端/模型/Tidy3D 调用。 |
 
 这些事实不能互换：旧 pin 的测试、child main 的离线测试和 live smoke 分别证明不同边界；live smoke 也不证明科学正确性或企业部署安全。
 
@@ -1005,9 +1006,9 @@ E2 测试位于父仓库 `tests/e2/`，并由 [E2 implementation note](E2_IMPLEM
 
 The E2 tests are under the parent `tests/e2/` and their execution and production limits are documented in the [E2 implementation note](E2_IMPLEMENTATION.md). They are parent-repository tests and do not invoke child Stage 1A recursively.
 
-现场 E2 演示使用父仓库的 `python3 scripts/e2_demo.py` 菜单；Stage 1A Web/MCP 演示仍使用 child component 的本地 launcher。两条路径目前没有端到端集成。
+现场 E2 演示可使用父仓库的 `python3 scripts/e2_demo.py` 终端菜单，或运行 `python3 scripts/e2_web_demo.py` 打开回环浏览器控制台。Stage 1A Web/MCP 演示仍使用 child component 的本地 launcher；E2 与 Stage 1A 两条路径目前没有端到端集成。
 
-The live E2 demonstration uses the parent `python3 scripts/e2_demo.py` menu; Stage 1A Web/MCP demonstrations still use the child component's local launcher. The two paths are not end-to-end integrated yet.
+The live E2 demonstration can use the parent `python3 scripts/e2_demo.py` terminal menu or `python3 scripts/e2_web_demo.py` for the loopback browser console. Stage 1A Web/MCP demonstrations still use the child component's local launcher; the E2 and Stage 1A paths are not end-to-end integrated yet.
 
 ### 17.3 当前测试未覆盖 / Current Test Gaps
 
@@ -1021,7 +1022,7 @@ The live E2 demonstration uses the parent `python3 scripts/e2_demo.py` menu; Sta
 - Web report/bundle download、security headers、413、malformed/corrupted run 和 error logging。 / Web downloads, security headers, 413, malformed/corrupted runs, and error logging.
 - 并发 run、disk-full、permission race、cleanup failure 和 process interruption。 / Concurrent runs, disk-full behavior, permission races, cleanup failure, and process interruption.
 - CLI subprocess 的 exit/traceback matrix、console-script packaging，以及 wheel/sdist 安装。 / CLI subprocess exit/traceback behavior, console-script packaging, and wheel/sdist installation.
-- 浏览器真实 E2E、accessibility，以及 launcher/Ollama 的功能性 process lifecycle、工具依赖和跨平台行为。 / Real browser E2E, accessibility, and functional launcher/Ollama process lifecycle, tool dependencies, and cross-platform behavior.
+- 完整浏览器 action E2E、accessibility，以及 launcher/Ollama 的功能性 process lifecycle、工具依赖和跨平台行为。 / Comprehensive browser-action E2E, accessibility, and functional launcher/Ollama process lifecycle, tool dependencies, and cross-platform behavior.
 - 模型科学质量：至少五案例、两名独立评价者、预先定义评分标准。 / Model scientific quality: at least five cases, two independent evaluators, and a predefined rubric.
 
 自动测试通过只证明上述覆盖范围内的工程行为，不证明论文质量提升、科学正确性或企业安全性。

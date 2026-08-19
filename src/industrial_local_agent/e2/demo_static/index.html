@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="color-scheme" content="light">
+    <title>Enterprise E2 Security Console</title>
+    <link rel="icon" href="data:,">
+    <link rel="stylesheet" href="/app.css">
+    <script src="/app.js" defer></script>
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="brand-block">
+        <span class="brand-mark" aria-hidden="true">IL</span>
+        <div>
+          <p class="product-name">Industrial Local Agent</p>
+          <p class="product-context">Enterprise E2 Security Console / 企业 E2 安全控制台</p>
+        </div>
+      </div>
+      <div class="environment-status">
+        <span class="status-dot" aria-hidden="true"></span>
+        <span>Loopback / 本机</span>
+        <span class="status-divider" aria-hidden="true"></span>
+        <span>No model / 无模型</span>
+      </div>
+    </header>
+
+    <main class="shell">
+      <section class="summary-band" aria-labelledby="console-title">
+        <div>
+          <p class="eyebrow">SYNTHETIC AUTHORIZATION WORKSPACE</p>
+          <h1 id="console-title">Access control demonstration / 权限控制演示</h1>
+        </div>
+        <dl class="live-metrics" aria-label="Live synthetic state">
+          <div>
+            <dt>Policy / 策略版本</dt>
+            <dd id="policy-version">-</dd>
+          </div>
+          <div>
+            <dt>Audit / 审计事件</dt>
+            <dd id="audit-count">-</dd>
+          </div>
+          <div>
+            <dt>Model / 模型连接</dt>
+            <dd id="model-state">None</dd>
+          </div>
+        </dl>
+      </section>
+
+      <div id="access-error" class="access-error" role="alert" hidden></div>
+
+      <section class="workspace-grid">
+        <div class="controls-panel">
+          <div class="section-heading">
+            <span class="step-number">01</span>
+            <div>
+              <h2>Identity scenario / 身份场景</h2>
+              <p>Presenter-selected synthetic subject</p>
+            </div>
+          </div>
+          <div id="identity-selector" class="segmented-control" role="group" aria-label="Synthetic identity"></div>
+
+          <div class="section-heading section-spaced">
+            <span class="step-number">02</span>
+            <div>
+              <h2>Retrieval / 检索</h2>
+              <p>Query inside the authorized source set</p>
+            </div>
+          </div>
+          <label class="field-label" for="query-preset">Query preset / 查询预设</label>
+          <select id="query-preset" class="field-control">
+            <option value="waveguide transmission">Waveguide transmission</option>
+            <option value="linewidth reviewer">Ring linewidth</option>
+            <option value="control result">Control result</option>
+          </select>
+          <button id="retrieve-button" class="button primary full-width" type="button">Run retrieval / 执行检索</button>
+
+          <div class="section-heading section-spaced">
+            <span class="step-number">03</span>
+            <div>
+              <h2>Policy / 策略</h2>
+              <p>Explicit same-tenant source access</p>
+            </div>
+          </div>
+          <div class="button-row">
+            <button class="button secondary" type="button" data-action="share">Share source-a2 / 授权</button>
+            <button class="button danger-outline" type="button" data-action="revoke">Revoke / 撤销</button>
+          </div>
+
+          <div class="section-heading section-spaced">
+            <span class="step-number">04</span>
+            <div>
+              <h2>Negative checks / 负向检查</h2>
+              <p>Fail-closed contract verification</p>
+            </div>
+          </div>
+          <div class="action-stack">
+            <button class="button secondary full-width" type="button" data-action="forged_claim">Submit forged tenant claim / 伪造权限</button>
+            <button class="button secondary full-width" type="button" data-action="tamper_bundle">Tamper signed bundle / 篡改数据包</button>
+            <button class="button secondary full-width" type="button" data-action="verify_audit">Verify audit chain / 验证审计链</button>
+          </div>
+        </div>
+
+        <div class="result-panel" aria-live="polite">
+          <div class="result-header">
+            <div>
+              <p class="eyebrow">DECISION STREAM</p>
+              <h2>Observed outcomes / 运行结果</h2>
+            </div>
+            <button id="reset-button" class="button quiet" type="button">Reset / 重置</button>
+          </div>
+          <div id="empty-result" class="empty-result">
+            <span class="empty-code">READY</span>
+            <p>Waiting for a synthetic authorization action.</p>
+            <p>等待合成权限操作。</p>
+          </div>
+          <div id="result-stream" class="result-stream"></div>
+        </div>
+      </section>
+
+      <section class="state-band">
+        <div class="topology-panel">
+          <div class="state-heading">
+            <div>
+              <p class="eyebrow">SYNTHETIC SCENARIO MAP</p>
+              <h2>Global test fixture / 全局测试数据</h2>
+            </div>
+            <span id="share-state" class="state-label">source-a2: private</span>
+          </div>
+          <div id="tenant-map" class="tenant-map"></div>
+        </div>
+
+        <div class="audit-panel">
+          <div class="state-heading">
+            <div>
+              <p class="eyebrow">CONTENT-FREE RECORD</p>
+              <h2>Audit events / 审计事件</h2>
+            </div>
+          </div>
+          <div class="audit-table-wrap">
+            <table class="audit-table">
+              <thead>
+                <tr>
+                  <th>Seq</th>
+                  <th>Subject</th>
+                  <th>Tenant</th>
+                  <th>Sources</th>
+                  <th>Hash</th>
+                </tr>
+              </thead>
+              <tbody id="audit-table-body"></tbody>
+            </table>
+            <p id="audit-empty" class="table-empty">No audit events / 暂无审计事件</p>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <span>Synthetic data only / 仅合成数据</span>
+      <span>No LLM, cloud, UQ, Tidy3D, or blockchain calls</span>
+    </footer>
+  </body>
+</html>

@@ -5,102 +5,18 @@ from __future__ import annotations
 
 import argparse
 import dataclasses
-import json
 import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
-from industrial_local_agent.e2.audit import ContentFreeAuditSink
-from industrial_local_agent.e2.crypto import HmacKeyRing, SigningKey
+from industrial_local_agent.e2.demo import DemoRuntime
 from industrial_local_agent.e2.errors import (
     AuditError,
     BundleVerificationError,
     IdentityError,
 )
-from industrial_local_agent.e2.identity import IdentityTokenAuthority, IdentityTokenVerifier
-from industrial_local_agent.e2.policy import SyntheticPolicyStore
-from industrial_local_agent.e2.service import E2RetrievalService
-from industrial_local_agent.e2.storage import SQLiteForcedScopeAdapter, synthetic_source
-
-
-NOW = 1_700_000_000
-
-
-class DemoRuntime:
-    """Build one isolated synthetic E2 runtime for a live demonstration."""
-
-    def __init__(self) -> None:
-        raw = json.loads((ROOT / "fixtures/e2/synthetic_corpus.json").read_text("utf-8"))
-        sources = [
-            synthetic_source(
-                item["source_id"],
-                item["tenant_id"],
-                item["project_id"],
-                item["owner_id"],
-                item["content"],
-            )
-            for item in raw["sources"]
-        ]
-        self.policy = SyntheticPolicyStore(
-            subject_tenants={item["subject_id"]: item["tenant_id"] for item in raw["users"]},
-            project_members={item["project_id"]: set(item["members"]) for item in raw["projects"]},
-            project_tenants={item["project_id"]: item["tenant_id"] for item in raw["projects"]},
-            source_records={
-                item["source_id"]: (
-                    item["tenant_id"],
-                    item["project_id"],
-                    item["owner_id"],
-                    "internal",
-                )
-                for item in raw["sources"]
-            },
-        )
-        self.storage = SQLiteForcedScopeAdapter(sources)
-        idp_keys = HmacKeyRing([SigningKey("idp-key-1", b"demo-idp-secret")])
-        delegation_keys = HmacKeyRing([SigningKey("delegation-key-1", b"demo-delegation-secret")])
-        bundle_keys = HmacKeyRing([SigningKey("bundle-key-1", b"demo-bundle-secret")])
-        audit_keys = HmacKeyRing([SigningKey("audit-key-1", b"demo-audit-secret")])
-        self.authority = IdentityTokenAuthority(idp_keys)
-        self.verifier = IdentityTokenVerifier(idp_keys)
-        self.audit = ContentFreeAuditSink(audit_keys)
-        self.bundle_keys = bundle_keys
-        self.service = E2RetrievalService(
-            policy=self.policy,
-            storage=self.storage,
-            token_verifier=self.verifier,
-            delegation_keyring=delegation_keys,
-            bundle_keyring=bundle_keys,
-            audit_sink=self.audit,
-            clock=lambda: NOW,
-        )
-        self.request_number = 0
-
-    def token(self, subject_id: str) -> str:
-        return self.authority.issue(subject_id, now=NOW)
-
-    def retrieve(self, subject_id: str, query: str, label: str):
-        self.request_number += 1
-        request_id = f"demo-{label}-{self.request_number}"
-        return self.service.retrieve(
-            self.token(subject_id),
-            request_id=request_id,
-            query=query,
-        )
-
-    def context_for(self, subject_id: str, request_id: str, delegation_id: str):
-        identity = self.verifier.verify(self.token(subject_id), now=NOW)
-        context = self.service._delegator.delegate(
-            identity,
-            request_id=request_id,
-            purpose_of_use="research-retrieval",
-            now=NOW,
-        )
-        return dataclasses.replace(context, delegation_id=delegation_id)
-
-    def close(self) -> None:
-        self.storage.close()
 
 
 def print_header(title: str) -> None:
@@ -236,7 +152,7 @@ def main() -> int:
     args = parser.parse_args()
     print("Industrial Local Agent - Enterprise E2 demonstration")
     print("Synthetic data only; no LLM, cloud, UQ, Tidy3D, or blockchain calls.")
-    runtime = DemoRuntime()
+    runtime = DemoRuntime(ROOT / "fixtures/e2/synthetic_corpus.json")
     try:
         if args.all:
             run_all(runtime)
