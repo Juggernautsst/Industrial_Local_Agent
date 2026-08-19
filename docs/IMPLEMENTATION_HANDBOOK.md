@@ -119,6 +119,7 @@ Industrial_Local_Agent/                       parent repository
 │   └── ROADMAP.md                              stages and exit gates
 ├── src/industrial_local_agent/e2/               synthetic E2 implementation
 ├── tests/e2/                                    synthetic E2 tests
+├── scripts/e2_demo.py                           interactive E2 demonstration
 └── components/
     └── stage1a-good-story-agent/               private Git submodule
 ```
@@ -973,7 +974,7 @@ Default run storage is under the user's Linux data directory, not repository `ru
 | Live MCP acceptance | `qwen2.5:3b`: `1 passed`; synthetic fixtures only, local `STDIO`, no cloud/Tidy3D. / `qwen2.5:3b`：`1 passed`；仅合成 fixture、本地 `STDIO`，无云端/Tidy3D。 |
 | Live Web smoke | Material-free chat: `721` response characters, `0` sources. Synthetic attachment chat: `808` response characters, `2` sources, `3` context references. Both report `evidence_verified=false` and `local_transport_only=true`. / 无材料 chat 为 `721` 字符、`0` source；合成附件 chat 为 `808` 字符、`2` source、`3` context references；两者均为 `evidence_verified=false`、`local_transport_only=true`。 |
 | Historical E1 review | Child PR #2 originally recorded `47 passed`; it was superseded by the merged child-main stack. / 子 PR #2 曾记录 `47 passed`，现已被 child-main 合并栈取代。 |
-| Parent E2 implementation branch | E2 suite: `19 passed`; model/tool dependency check, tenant isolation, share/revoke, source reauthorization race, replay/cache, bundle negative matrix, SQL parameterization, content-free audit validation, and audit-chain verification. Synthetic fixture only; no cloud/model/Tidy3D calls. / E2 测试为 `19 passed`；覆盖模型/工具依赖检查、tenant 隔离、share/revoke、source reauthorization race、replay/cache、bundle 负向矩阵、SQL 参数化、无正文 audit 校验和 audit 链验证。仅合成 fixture，无云端/模型/Tidy3D 调用。 |
+| Parent E2 implementation branch | E2 suite: `20 passed`; includes the interactive `scripts/e2_demo.py` smoke test, model/tool dependency check, tenant isolation, share/revoke, source reauthorization race, replay/cache, bundle negative matrix, SQL parameterization, content-free audit validation, and audit-chain verification. Synthetic fixture only; no cloud/model/Tidy3D calls. / E2 测试为 `20 passed`；包含交互式 `scripts/e2_demo.py` smoke test，并覆盖模型/工具依赖检查、tenant 隔离、share/revoke、source reauthorization race、replay/cache、bundle 负向矩阵、SQL 参数化、无正文 audit 校验和 audit 链验证。仅合成 fixture，无云端/模型/Tidy3D 调用。 |
 
 这些事实不能互换：旧 pin 的测试、child main 的离线测试和 live smoke 分别证明不同边界；live smoke 也不证明科学正确性或企业部署安全。
 
@@ -1003,6 +1004,10 @@ The current child-main tests are under [`tests/`](https://github.com/Juggernauts
 E2 测试位于父仓库 `tests/e2/`，并由 [E2 implementation note](E2_IMPLEMENTATION.md) 解释运行方式和生产限制。它们是父仓库测试，不会递归调用 child Stage 1A。
 
 The E2 tests are under the parent `tests/e2/` and their execution and production limits are documented in the [E2 implementation note](E2_IMPLEMENTATION.md). They are parent-repository tests and do not invoke child Stage 1A recursively.
+
+现场 E2 演示使用父仓库的 `python3 scripts/e2_demo.py` 菜单；Stage 1A Web/MCP 演示仍使用 child component 的本地 launcher。两条路径目前没有端到端集成。
+
+The live E2 demonstration uses the parent `python3 scripts/e2_demo.py` menu; Stage 1A Web/MCP demonstrations still use the child component's local launcher. The two paths are not end-to-end integrated yet.
 
 ### 17.3 当前测试未覆盖 / Current Test Gaps
 

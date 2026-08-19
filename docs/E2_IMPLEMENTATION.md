@@ -68,6 +68,7 @@ bundle 前都必须再次授权。本切片中 LLM 永远不决定访问权限�
 - `src/industrial_local_agent/e2/service.py`: model-free orchestration, replay protection, cache scoping, source reauthorization, and fail-closed sequencing.
 - `fixtures/e2/synthetic_corpus.json`: two synthetic tenants, three users, three projects, and three synthetic sources.
 - `tests/e2/`: identity, authorization, isolation, revocation, replay, cache, bundle-negative, audit, SQL-injection, and no-model tests.
+- `scripts/e2_demo.py`: interactive local demonstration menu; it uses the same synthetic fixture and never calls a model or network.
 
 ## Authorization matrix / 授权矩阵
 
@@ -101,6 +102,36 @@ endpoint, FlexCredits, or a blockchain node.
 
 E2 测试必须保持离线，只使用仓库内的合成 fixture。它们不得依赖 Ollama、Tidy3D、
 MCP、PostgreSQL、UQ 凭据、云端 endpoint、FlexCredits 或区块链节点。
+
+## Interactive demonstration / 交互式演示
+
+From the repository root, run:
+
+```bash
+python3 scripts/e2_demo.py
+```
+
+Choose a menu item during the presentation, or run every scenario non-interactively:
+
+```bash
+python3 scripts/e2_demo.py --all
+```
+
+The menu demonstrates the observable sequence below. It prints source IDs and
+policy decisions, but deliberately omits research content.
+
+| Action / 操作 | Observable result / 可观察结果 |
+| --- | --- |
+| Alice retrieves `waveguide transmission` | `tenant-a`, `source-a1`, signed bundle |
+| Carol retrieves `control result` | `tenant-b`, `source-b1`; Alice cannot see it |
+| Alice tries Bob's linewidth source | No evidence before share; evidence after same-tenant share; no evidence after revoke |
+| Client sends `tenant-b`/`admin` claims | Request rejected |
+| Bundle content is modified | Signature/content-hash verification rejected |
+| Audit verification | Hash chain passes and research content is absent from recorded fields |
+
+这个菜单是演示辅助工具，不是生产 Web UI，也不代表 E2 已经连接 Stage 1A、真实
+身份或 PostgreSQL。需要展示 Stage 1A 聊天界面时，使用 child component 的
+`scripts/start-local.sh`；两条演示路径应分别说明。
 
 ## Security interpretation / 安全解释
 
