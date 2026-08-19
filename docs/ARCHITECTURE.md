@@ -13,7 +13,7 @@ Industrial_Local_Agent
         |
         +-- Tidy3D result adapter                [planned, not created]
         |
-        +-- identity-aware retrieval service    [planned, not created]
+        +-- identity-aware retrieval service    [synthetic E2 slice in parent; production planned]
         |
         +-- controlled model gateway            [planned, not created]
         |
@@ -24,17 +24,27 @@ Industrial_Local_Agent
 
 ## 2. 当前组件 / Current Component
 
-`components/stage1a-good-story-agent` 是当前唯一组件。它接收研究者明确选择的 TXT、Markdown、CSV、JSON 或可提取文本的 PDF，建立 SHA-256、来源定位和 evidence ID，再通过材料审计或本地 Ollama 生成受证据约束的暂定报告。
+`components/stage1a-good-story-agent` 是当前唯一独立 submodule。父仓库还包含一个不连接模型的 E2 合成 vertical slice，位于 `src/industrial_local_agent/e2/`，用于验证身份、策略、强制 scope、bundle 和 audit 契约。Stage 1A 接收研究者明确选择的 TXT、Markdown、CSV、JSON 或可提取文本的 PDF，建立 SHA-256、来源定位和 evidence ID，再通过材料审计或本地 Ollama 生成受证据约束的暂定报告。
 
-`components/stage1a-good-story-agent` is the only current component. It accepts researcher-selected TXT, Markdown, CSV, JSON, or text-extractable PDF inputs; builds SHA-256 values, source locators, and evidence IDs; then produces a provisional evidence-governed report through either material audit or local Ollama synthesis.
+`components/stage1a-good-story-agent` is the only independent submodule. The parent also contains a model-free synthetic E2 vertical slice under `src/industrial_local_agent/e2/` for the identity, policy, forced-scope, bundle, and audit contracts. Stage 1A accepts researcher-selected TXT, Markdown, CSV, JSON, or text-extractable PDF inputs; builds SHA-256 values, source locators, and evidence IDs; then produces a provisional evidence-governed report through either material audit or local Ollama synthesis.
 
 Stage 1A 不执行仿真、外部检索、云模型、自动代码、区块链或安全发布。形式正确的引用也不能证明科学解释正确，因此领域专家复核仍是强制步骤。
 
 Stage 1A does not execute simulations, external retrieval, cloud models, generated code, blockchain, or secure release. Formally valid citations do not prove a scientific interpretation is correct, so domain-expert review remains mandatory.
 
-父仓库当前固定 `4e3bdda`。子仓库的 Enterprise E1 工作建立 synthesis-provider contract，但在子 PR 合并并按版本更新规则单独更新 gitlink 前，它只是待审查实施，不是父仓库已固定能力。即使 provider contract 合并，它也仍只允许 audit 与回环 Ollama，不等于远端模型 gateway。
+父仓库当前固定 child `efea263`。子仓库的 Enterprise E1 provider boundary 已合并并通过 parent gitlink 固定；它仍只允许 audit 与回环 Ollama，不等于远端模型 gateway。父仓库的 E2 代码是当前分支上的 synthetic implementation，尚未构成生产部署。
 
-The parent currently pins `4e3bdda`. Enterprise E1 work in the child establishes a synthesis-provider contract, but it remains an implementation under review rather than a parent-pinned capability until the child PR is merged and the gitlink is updated through the version rules. Even after that provider contract merges, it still permits only audit and loopback Ollama and is not a remote model gateway.
+The parent currently pins child `efea263`. The child Enterprise E1 provider boundary is merged and pinned through the parent gitlink; it still permits only audit and loopback Ollama and is not a remote model gateway. The parent E2 code is a synthetic implementation on the current branch and is not a production deployment.
+
+### 2.1 E2 synthetic boundary / E2 合成边界
+
+E2 的运行时顺序是：synthetic token verification -> server-derived tenant mapping -> signed `DelegatedIdentityContext` -> policy-selected source set -> SQLite forced scope -> relevance ranking -> source reauthorization -> signed `AuthorizedEvidenceBundle` -> content-free hash-chain audit。它不调用 Stage 1A、LLM、MCP、Tidy3D、PostgreSQL、云端或区块链。
+
+The E2 runtime order is synthetic token verification -> server-derived tenant mapping -> signed `DelegatedIdentityContext` -> policy-selected source set -> SQLite forced scope -> relevance ranking -> source reauthorization -> signed `AuthorizedEvidenceBundle` -> content-free hash-chain audit. It calls no Stage 1A, LLM, MCP, Tidy3D, PostgreSQL, cloud, or blockchain service.
+
+SQLite and HMAC are deliberately test adapters. Production E2 still requires institutional OIDC, durable policy ownership, PostgreSQL `FORCE ROW LEVEL SECURITY`, asymmetric key custody, durable audit verification, and E4 integration; those are separate implementation work.
+
+SQLite 和 HMAC 是有意保留的测试 adapter。生产 E2 仍需要机构 OIDC、持久化 policy owner、PostgreSQL `FORCE ROW LEVEL SECURITY`、非对称密钥托管、持久化 audit verifier 和 E4 集成；这些属于独立实施工作。
 
 ## 3. Stage 1B 边界 / Stage 1B Boundary
 

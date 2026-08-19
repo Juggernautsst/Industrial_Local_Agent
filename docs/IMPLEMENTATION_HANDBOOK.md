@@ -27,7 +27,7 @@ This handbook answers four questions: what is actually runnable now, exactly how
 
 | 对象 / Object | 状态 / State |
 | --- | --- |
-| Parent default branch / 父默认分支 | `main` at `51635a1`; Enterprise E0 and the Stage 1A pin are merged. / `main` 为 `51635a1`；Enterprise E0 和 Stage 1A pin 已合并。 |
+| Parent default branch / 父默认分支 | `main` at `2deb350`; Enterprise E0, the Stage 1A pin, and the handbook refresh are merged. / `main` 为 `2deb350`；Enterprise E0、Stage 1A pin 和手册刷新已合并。 |
 | Parent E0 branch / 父 E0 分支 | `docs/2-enterprise-boundaries` at `72c5a44`, historical source branch for merged PR #3. / `72c5a44` 是已合并 PR #3 的历史源分支。 |
 | Handbook branch / 本手册分支 | `docs/4-implementation-handbook`; this refresh is retargeted to parent `main`. / 本次刷新将 PR base 改为父仓库 `main`。 |
 | Parent submodule pin / 父 gitlink | `components/stage1a-good-story-agent` -> `efea263da1b803a74a6a91c0e592949b3237203c`, merged through parent PR #11 / Issue #9. |
@@ -47,6 +47,7 @@ In this snapshot both the parent index and child `main` point to `efea263`; a mo
 | 当前阶段、顺序和 exit gate / Current stage, sequence, and exit gate | [ROADMAP.md](ROADMAP.md) |
 | 组件与信任边界 / Component and trust boundaries | [ARCHITECTURE.md](ARCHITECTURE.md) |
 | Enterprise 字段契约与威胁测试 / Enterprise field contracts and threat tests | [ENTERPRISE_DEPLOYMENT.md](ENTERPRISE_DEPLOYMENT.md) |
+| E2 synthetic implementation / E2 合成实现 | [E2_IMPLEMENTATION.md](E2_IMPLEMENTATION.md) |
 | Git/GitHub 工作流程 / Git and GitHub workflow | [AGENTS.md](../AGENTS.md) |
 | 机密漏洞报告路径 / Confidential vulnerability reporting | [SECURITY.md](../SECURITY.md) |
 
@@ -77,6 +78,15 @@ Stage 1A local Web or CLI
         v
 validated analysis + deterministic report + provenance + redacted export ZIP
 
+Current E2 evidence path / 当前 E2 证据路径
+
+Synthetic verified token
+        -> server-derived tenant and policy
+        -> forced-scope SQLite retrieval
+        -> source reauthorization
+        -> signed AuthorizedEvidenceBundle
+        -> content-free audit hash chain
+
 Future target / 未来目标
 
 Institutional identity -> authorized retrieval -> signed evidence bundle
@@ -105,7 +115,10 @@ Industrial_Local_Agent/                       parent repository
 │   ├── ARCHITECTURE.md                        component boundaries
 │   ├── ENTERPRISE_DEPLOYMENT.md               E0 design and threat model
 │   ├── IMPLEMENTATION_HANDBOOK.md              this document
+│   ├── E2_IMPLEMENTATION.md                    synthetic E2 implementation note
 │   └── ROADMAP.md                              stages and exit gates
+├── src/industrial_local_agent/e2/               synthetic E2 implementation
+├── tests/e2/                                    synthetic E2 tests
 └── components/
     └── stage1a-good-story-agent/               private Git submodule
 ```
@@ -143,7 +156,7 @@ git submodule update --init --recursive
 | Stage 1A scientific acceptance | **NOT COMPLETE** | 只有 1/5 合成光子学案例；还缺四个案例和双人独立评价。 / One of five synthetic photonics cases; four cases and two independent evaluators remain. |
 | Enterprise E0 | **DESIGN ONLY** | local/enterprise 模式、契约和威胁模型已定义；没有生产控制。 / Modes, contracts, and threat model are defined; production controls are absent. |
 | Enterprise E1 provider boundary | **PINNED** | Child PR #2 is merged and parent PR #11 pins the resulting child main. / 子 PR #2 已合并，父 PR #11 已固定 child main。 |
-| Enterprise E2 | **NOT IMPLEMENTED / ISSUE OPEN** | Parent Issue #10 defines the synthetic vertical slice; no implementation is delivered yet, and it must remain model-free until acceptance. / 父 Issue #10 定义合成 vertical slice；当前尚无实现，验收前必须保持无模型调用。 |
+| Enterprise E2 | **UNDER REVIEW / SYNTHETIC IMPLEMENTED** | Issue #10 branch contains a model-free synthetic identity/policy/forced-scope/bundle/audit slice; production OIDC/PostgreSQL/E4 integration remains unimplemented. / Issue #10 分支包含无模型的合成身份/策略/forced-scope/bundle/audit 切片；生产 OIDC/PostgreSQL/E4 集成仍未实现。 |
 | Enterprise E3 | **NOT IMPLEMENTED** | 没有集中 model gateway、mTLS、registered provider 或容量控制。 / No centralized model gateway, mTLS, registered provider, or capacity controls. |
 | Enterprise E4 | **NOT IMPLEMENTED** | 没有多 tenant Stage 1A 集成。 / No multitenant Stage 1A integration. |
 | Stage 2 secure release | **DESIGN ONLY** | 协议基线已起草；加密包、审批、outbox 和交付尚无实现。 / Protocol baseline drafted; package, approval, outbox, and delivery are unimplemented. |
@@ -960,6 +973,7 @@ Default run storage is under the user's Linux data directory, not repository `ru
 | Live MCP acceptance | `qwen2.5:3b`: `1 passed`; synthetic fixtures only, local `STDIO`, no cloud/Tidy3D. / `qwen2.5:3b`：`1 passed`；仅合成 fixture、本地 `STDIO`，无云端/Tidy3D。 |
 | Live Web smoke | Material-free chat: `721` response characters, `0` sources. Synthetic attachment chat: `808` response characters, `2` sources, `3` context references. Both report `evidence_verified=false` and `local_transport_only=true`. / 无材料 chat 为 `721` 字符、`0` source；合成附件 chat 为 `808` 字符、`2` source、`3` context references；两者均为 `evidence_verified=false`、`local_transport_only=true`。 |
 | Historical E1 review | Child PR #2 originally recorded `47 passed`; it was superseded by the merged child-main stack. / 子 PR #2 曾记录 `47 passed`，现已被 child-main 合并栈取代。 |
+| Parent E2 implementation branch | E2 suite: `18 passed`; model/tool dependency check, tenant isolation, share/revoke, replay/cache, bundle negative matrix, SQL parameterization, content-free audit validation, and audit-chain verification. Synthetic fixture only; no cloud/model/Tidy3D calls. / E2 测试为 `18 passed`；覆盖模型/工具依赖检查、tenant 隔离、share/revoke、replay/cache、bundle 负向矩阵、SQL 参数化、无正文 audit 校验和 audit 链验证。仅合成 fixture，无云端/模型/Tidy3D 调用。 |
 
 这些事实不能互换：旧 pin 的测试、child main 的离线测试和 live smoke 分别证明不同边界；live smoke 也不证明科学正确性或企业部署安全。
 
@@ -985,6 +999,10 @@ The current child-main tests are under [`tests/`](https://github.com/Juggernauts
 | `test_chat.py` | 无材料/可选材料 chat、历史和 prompt budget、无工具请求、provider capability、模型可用性与 response 校验。 / Material-free/optional-context chat, history and prompt budgets, tool-free requests, provider capabilities, model availability, and response validation. |
 | `test_mcp_server.py` / `test_agent_facade.py` | MCP tool schema、redaction、run ID/path boundary、error handling 和 client-neutral facade。 / MCP tool schema, redaction, run-ID/path boundaries, error handling, and client-neutral facade. |
 | `test_mcp_live.py` | opt-in local `STDIO -> Ollama -> validated report/provenance` smoke path。 / Opt-in local `STDIO -> Ollama -> validated report/provenance` smoke path. |
+
+E2 测试位于父仓库 `tests/e2/`，并由 [E2 implementation note](E2_IMPLEMENTATION.md) 解释运行方式和生产限制。它们是父仓库测试，不会递归调用 child Stage 1A。
+
+The E2 tests are under the parent `tests/e2/` and their execution and production limits are documented in the [E2 implementation note](E2_IMPLEMENTATION.md). They are parent-repository tests and do not invoke child Stage 1A recursively.
 
 ### 17.3 当前测试未覆盖 / Current Test Gaps
 
@@ -1061,9 +1079,9 @@ Only the reverse proxy/API gateway is exposed to the user network. Database, ret
 
 ## 19. 身份感知 RAG 和授权 / Identity-Aware RAG and Authorization
 
-本节是父 Issue [#10](https://github.com/Juggernautsst/Industrial_Local_Agent/issues/10) 下 E2 的 **DESIGN ONLY** 契约；E2 implementation 仍为 **NOT IMPLEMENTED**，当前程序没有 SSO、policy service、RLS database、retrieval service 或 signed evidence bundle。
+本节是父 Issue [#10](https://github.com/Juggernautsst/Industrial_Local_Agent/issues/10) 下 E2 的契约与实施状态：synthetic model-free vertical slice 已在当前分支实现；生产 SSO、policy service、RLS database、持久化 retrieval/audit 和 signed bundle key custody 仍未实现。
 
-This section is the **DESIGN ONLY** E2 contract under parent Issue [#10](https://github.com/Juggernautsst/Industrial_Local_Agent/issues/10); E2 implementation remains **NOT IMPLEMENTED**, and the current program has no SSO, policy service, RLS database, retrieval service, or signed evidence bundle.
+This section records the E2 contract and implementation status under parent Issue [#10](https://github.com/Juggernautsst/Industrial_Local_Agent/issues/10): the synthetic model-free vertical slice is implemented on the current branch; production SSO, policy service, RLS database, durable retrieval/audit, and signed-bundle key custody remain unimplemented.
 
 核心不变量：**RAG performs relevance retrieval, never authorization; the LLM never decides access.**
 
