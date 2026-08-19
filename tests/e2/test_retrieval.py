@@ -7,6 +7,7 @@ import pytest
 from industrial_local_agent.e2.errors import (
     AuditError,
     AuditUnavailable,
+    AuthorizationDenied,
     BundleVerificationError,
     IdentityError,
     PolicyUnavailable,
@@ -70,6 +71,31 @@ def test_same_tenant_explicit_share_and_revoke_invalidate_context(e2_fixture):
     )
     assert revoked.bundle.evidence == ()
     assert revoked.bundle.policy_version > shared.bundle.policy_version
+
+
+def test_source_is_reauthorized_after_candidate_selection(e2_fixture, monkeypatch):
+    policy = e2_fixture["policy"]
+    original_authorize = policy.authorize_source
+
+    def mutate_acl_before_reauthorization(subject_id, tenant_id, source_id, *, expected_policy_version):
+        # Simulate an ACL update after storage returned the candidate source.
+        if source_id == "source-a1":
+            policy.source_records[source_id] = ("tenant-a", "project-a2", "user-bob", "internal")
+        return original_authorize(
+            subject_id,
+            tenant_id,
+            source_id,
+            expected_policy_version=expected_policy_version,
+        )
+
+    monkeypatch.setattr(policy, "authorize_source", mutate_acl_before_reauthorization)
+    with pytest.raises(AuthorizationDenied, match="authorization changed"):
+        e2_fixture["service"].retrieve(
+            token_for(e2_fixture, "user-alice"),
+            request_id="req-source-race",
+            query="waveguide",
+        )
+    assert e2_fixture["audit"].events == ()
 
 
 def test_bundle_mutation_wrong_audience_expiry_and_revoked_key_fail(e2_fixture):
