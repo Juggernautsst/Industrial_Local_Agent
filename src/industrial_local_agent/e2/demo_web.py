@@ -205,8 +205,10 @@ class E2DemoHTTPServer(HTTPServer):
         self.request_deadline_seconds = request_deadline_seconds
 
     def server_close(self) -> None:
+        application = getattr(self, "application", None)
         try:
-            self.application.close()
+            if application is not None:
+                application.close()
         finally:
             super().server_close()
 

@@ -267,6 +267,28 @@ def test_browser_demo_resolves_assets_before_binding(monkeypatch):
         replacement.close()
 
 
+def test_browser_demo_preserves_bind_failure():
+    root = Path(__file__).parents[2]
+    blocker = socket.socket()
+    blocker.bind(("127.0.0.1", 0))
+    blocker.listen()
+    host, port = blocker.getsockname()
+    try:
+        try:
+            E2DemoHTTPServer(
+                (host, port),
+                root / "fixtures/e2/synthetic_corpus.json",
+                root / "src/industrial_local_agent/e2/demo_static",
+                "test-token",
+            )
+        except OSError as error:
+            assert error.errno is not None
+        else:
+            raise AssertionError("Server unexpectedly bound to an occupied port.")
+    finally:
+        blocker.close()
+
+
 def test_browser_demo_releases_socket_when_application_close_fails():
     root = Path(__file__).parents[2]
     server = E2DemoHTTPServer(
