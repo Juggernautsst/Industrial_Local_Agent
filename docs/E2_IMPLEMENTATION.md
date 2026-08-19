@@ -155,17 +155,18 @@ research content is deliberately omitted.
 它只返回 source ID 和安全元数据，刻意不返回科研正文。
 
 The Web launcher binds exclusively to `127.0.0.1`; its API requires the random
-startup token, bounds JSON bodies to 16 KiB, enforces a short request timeout and
-strict request framing/action fields, checks loopback client and Host, disables
-caching and framing, and applies a restrictive content-security policy. The
+startup token, bounds JSON bodies to 16 KiB, enforces an independent whole-connection
+deadline and body deadline, rejects ambiguous framing and duplicate JSON fields,
+checks loopback client and Host, disables caching and framing, and applies a
+restrictive content-security policy. The
 token is local presentation-session control, not user identity. The identity
 selector and global fixture map are presenter controls over synthetic scenarios,
 not tenant-scoped user views. Do not expose this server to an intranet or treat
 it as Stage 1A/E4 integration.
 
 Web launcher 只绑定 `127.0.0.1`；API 要求随机启动令牌，将 JSON body 限制为
-16 KiB，设置短请求 timeout，严格验证 framing 与 action 字段，检查回环 client
-与 Host，禁止缓存和 frame，并设置严格 CSP。该 token 只是本机演示会话控制，
+16 KiB，分别设置独立的全连接 deadline 与 body deadline，拒绝歧义 framing 和
+重复 JSON 字段，检查回环 client 与 Host，禁止缓存和 frame，并设置严格 CSP。该 token 只是本机演示会话控制，
 不是用户身份；身份 selector 和全局 fixture map 是主讲人控制的合成场景，不是
 tenant-scoped 用户视图。不得把该服务暴露到内网，也不得把它当作 Stage 1A/E4 集成。
 
