@@ -106,9 +106,13 @@ The current lightweight Stage 1A demonstration uses local Ollama `qwen2.5:3b`. W
 
 ## 企业内网共享与权限检索 / Enterprise Intranet and Authorized Retrieval
 
-一台服务器可以为多个内网用户提供较小的本地模型，但不能直接暴露当前 Flask 服务。企业目标需要机构 SSO、可信 API gateway、服务端身份委托、RBAC+ABAC、PostgreSQL/pgvector `FORCE ROW LEVEL SECURITY`、top-K source 重新授权、tenant-scoped storage/cache、model gateway 和最小 audit。只有入口 gateway 对用户网络开放。
+一台服务器可以为多个内网用户提供较小的本地模型，但不能直接暴露当前 Flask 服务。企业目标需要机构 SSO、可信入口 API gateway、服务端身份委托、RBAC+ABAC、PostgreSQL/pgvector `FORCE ROW LEVEL SECURITY`、top-K source 重新授权、tenant-scoped storage/cache、model gateway 和最小 audit。外发时还需要独立的 Secure-Release/KMS 边界和 DMZ outbound egress relay；只有入口 gateway 对用户网络开放，只有 egress relay 允许建立公网连接。该网关/MCP/加密/传输组合目前仍是设计，不是已部署能力。
 
-One server can provide a smaller local model to multiple intranet users, but the current Flask service cannot be directly exposed. The enterprise target requires institutional SSO, a trusted API gateway, server-side identity delegation, RBAC+ABAC, PostgreSQL/pgvector `FORCE ROW LEVEL SECURITY`, top-K source reauthorization, tenant-scoped storage/cache, a model gateway, and minimal audit. Only the entry gateway is exposed to the user network.
+One server can provide a smaller local model to multiple intranet users, but the current Flask service cannot be directly exposed. The enterprise target requires institutional SSO, a trusted ingress API gateway, server-side identity delegation, RBAC+ABAC, PostgreSQL/pgvector `FORCE ROW LEVEL SECURITY`, top-K source reauthorization, tenant-scoped storage/cache, a model gateway, and minimal audit. External release additionally requires a separate Secure-Release/KMS boundary and a DMZ outbound egress relay. Only the ingress gateway is exposed to the user network, and only the egress relay may establish Internet connections. This gateway/MCP/cryptography/transfer combination remains design-only, not a deployed capability.
+
+推荐的外发工作流见 [安全发布与唯一出网图](docs/figures/intranet-secure-release-egress.svg) 和 [架构说明](docs/ARCHITECTURE.md#73-外发网关与-mcp-工作流--external-egress-gateway-and-mcp-workflow)。MCP 只生成受限的 `ReleaseCandidate`；Secure-Release Service 在 KMS/HSM 支持下于内网完成应用层加密和签名；egress relay 只转发已经审批、审计并进入 `delivery_pending` 的 encrypted + signed package。TLS/mTLS 不能替代包级加密，区块链也不能替代审批、密钥托管或回执。
+
+The recommended external-release workflow is shown in the [secure-release and sole-egress figure](docs/figures/intranet-secure-release-egress.svg) and [architecture notes](docs/ARCHITECTURE.md#73-外发网关与-mcp-工作流--external-egress-gateway-and-mcp-workflow). MCP only creates a restricted `ReleaseCandidate`; the Secure-Release Service performs application-level encryption and signing inside the intranet with KMS/HSM support; the egress relay forwards only an approved, audited, `delivery_pending` encrypted and signed package. TLS/mTLS cannot replace package encryption, and blockchain cannot replace approval, key custody, or delivery receipts.
 
 RAG 只在已经授权的 source set 内排序相关内容；metadata filter 不是授权，LLM 也不能批准访问。retrieval gateway 生成短期签名 `AuthorizedEvidenceBundle`，Stage 1A 只能使用该 bundle，并验证所有输出 citation 都属于它。当前 startup token 只是本地会话控制，不是 user identity。
 
