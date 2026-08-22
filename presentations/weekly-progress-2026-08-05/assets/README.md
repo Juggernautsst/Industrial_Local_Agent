@@ -16,3 +16,7 @@ These assets are intended only for this internal thesis-progress presentation. P
 截图仅用于说明候选模型及其公开模型卡，不表示这些模型已经集成、验证或获准处理保密数据。Kimi K3 按官方资料描述为采用自定义许可证的 open-weight 模型。
 
 The captures illustrate candidate models and their public model cards only; they do not imply integration, validation, or approval to process confidential data. Kimi K3 is described from official material as an open-weight model under a custom license.
+
+## PlantUML Figures / PlantUML 图
+
+`diagrams/*.pdf` 是从上级 `diagrams/*.puml` 生成的矢量图，供 `weekly-progress.tex` 使用；同名 PNG 是预览文件。图使用 PlantUML `1.2025.4` 的 Smetana 布局，避免依赖 Graphviz。 / `diagrams/*.pdf` are vector figures generated from the corresponding `diagrams/*.puml` sources for use by `weekly-progress.tex`; the same-named PNG files are previews. The figures use PlantUML `1.2025.4` with Smetana layout and do not require Graphviz.

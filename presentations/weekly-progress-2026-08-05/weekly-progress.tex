@@ -139,42 +139,14 @@
 \begin{frame}[plain,t]
 \UQFrameHeader{Target Workflow}{}{}
 \begin{uqbody}
-  \UQTakeaway{MCP is the controlled bridge between the local AI, research software, and external collaboration.}
+  \UQTakeaway{MCP is the controlled bridge between local AI, approved scientific software exports, and controlled external release.}
 
   \vspace{1.6mm}
   \UQStatusBadge{StatusDesign}{TARGET DESIGN}
 
-  \vspace{1.1mm}
+  \vspace{3.2mm}
   \centering
-  \begin{tikzpicture}[x=0.98cm,y=1cm]
-    \fill[StatusReview!4,rounded corners=2mm] (-6.65,-2.05) rectangle (4.05,1.85);
-    \draw[StatusReview!35,rounded corners=2mm,line width=0.55pt] (-6.65,-2.05) rectangle (4.05,1.85);
-    \fill[StatusLocal!5,rounded corners=2mm] (4.20,-2.05) rectangle (6.65,1.85);
-    \draw[StatusLocal!35,rounded corners=2mm,line width=0.55pt] (4.20,-2.05) rectangle (6.65,1.85);
-    \node[anchor=west,text=StatusReview,font=\fontsize{6.8}{8.0}\selectfont\bfseries] at (-6.40,1.60) {PROTECTED INTRANET};
-    \node[anchor=west,text=StatusLocal,font=\fontsize{6.8}{8.0}\selectfont\bfseries] at (4.42,1.60) {PARTNER / EXTERNAL};
-
-    \node[currentbox,text width=17mm,minimum height=9mm] (researcher) at (-5.65,0.55) {Researcher};
-    \node[targetbox,text width=19mm,minimum height=9mm] (rag) at (-3.45,0.55) {Authorized\\RAG};
-    \node[targetbox,text width=17mm,minimum height=9mm] (llm) at (-1.25,0.55) {Local\\LLM};
-    \node[targetbox,text width=16mm,minimum height=9mm] (mcp) at (0.85,0.55) {MCP};
-    \node[proposedbox,text width=21mm,minimum height=9mm] (software) at (2.75,1.25) {Local research\\software};
-    \node[proposedbox,text width=20mm,minimum height=9mm] (release) at (2.70,-0.55) {Secure release\\gate};
-    \node[proposedbox,text width=24mm,minimum height=9mm] (partner) at (5.35,-0.55) {Partner blockchain\\app};
-    \node[neutralbox,text width=21mm,minimum height=9mm] (ledger) at (5.35,-1.55) {External\\blockchain};
-
-    \draw[flowarrow] (researcher) -- (rag);
-    \draw[flowarrow] (rag) -- (llm);
-    \draw[flowarrow] (llm) -- (mcp);
-    \draw[returnarrow] (mcp) -- (software);
-    \draw[returnarrow] (software.south west) to[bend left=18] (mcp.north east);
-    \draw[flowarrow] (mcp) -- (release);
-    \draw[flowarrow] (release) -- (partner);
-    \draw[proofarrow] (partner) -- (ledger);
-    \node[anchor=south,text=StatusPinned,font=\fontsize{6.2}{7.2}\selectfont] at (4.05,-0.15) {encrypted package};
-
-    \node[anchor=west,text=StatusRisk,font=\fontsize{7.2}{8.4}\selectfont\bfseries] at (-6.35,-1.58) {No raw confidential data on-chain.};
-  \end{tikzpicture}
+  \includegraphics[width=\linewidth,height=38mm,keepaspectratio]{assets/diagrams/target-workflow.pdf}
 \end{uqbody}
 \end{frame}
 
@@ -182,34 +154,14 @@
 \begin{frame}[plain,t]
 \UQFrameHeader{Authorize Before Retrieval}{}{}
 \begin{uqbody}
-  \UQTakeaway{Identity and policy grant access; RAG only ranks evidence inside that approved scope.}
+  \UQTakeaway{An identity-aware agent gateway and policy authorize evidence before RAG; a separate model gateway invokes the registered local model.}
 
   \vspace{2.0mm}
   \UQStatusBadge{StatusDesign}{TARGET DESIGN}
 
-  \vspace{3.0mm}
+  \vspace{4.0mm}
   \centering
-  \begin{tikzpicture}
-    \node[targetbox,text width=20mm] (identity) at (0,0) {Verified\\Identity};
-    \node[targetbox,text width=22mm,right=5mm of identity] (scope) {Allowed\\Sources};
-    \node[neutralbox,text width=20mm,right=5mm of scope] (retrieval) {RAG\\Retrieval};
-    \node[neutralbox,text width=22mm,right=5mm of retrieval] (bundle) {Evidence\\Bundle};
-    \node[targetbox,text width=20mm,right=5mm of bundle] (model) {Local\\LLM};
-    \draw[flowarrow] (identity) -- (scope);
-    \draw[flowarrow] (scope) -- (retrieval);
-    \draw[flowarrow] (retrieval) -- (bundle);
-    \draw[flowarrow] (bundle) -- (model);
-    \node[above=3mm of $(identity.north)!0.5!(scope.north)$,text=StatusReview,font=\fontsize{7.1}{8.3}\selectfont\bfseries] {ACCESS DECISION};
-    \node[above=3mm of $(retrieval.north)!0.5!(model.north)$,text=UQMuted,font=\fontsize{7.1}{8.3}\selectfont\bfseries] {RELEVANCE + SYNTHESIS};
-  \end{tikzpicture}
-
-  \vspace{5.2mm}
-  \begin{minipage}[t]{0.47\linewidth}
-    {\fontsize{10.2}{12.0}\selectfont\bfseries The model never decides access.}\par
-  \end{minipage}\hfill
-  \begin{minipage}[t]{0.47\linewidth}
-    {\fontsize{10.2}{12.0}\selectfont\bfseries Failed authorization stops retrieval.}\par
-  \end{minipage}
+  \includegraphics[width=\linewidth,height=38mm,keepaspectratio]{assets/diagrams/authorize-before-retrieval.pdf}
 \end{uqbody}
 \end{frame}
 
@@ -217,34 +169,14 @@
 \begin{frame}[plain,t]
 \UQFrameHeader{MCP as the Tool Boundary}{}{}
 \begin{uqbody}
-  \UQTakeaway{The model proposes a bounded tool call; approved local software performs the scientific operation.}
+  \UQTakeaway{The model may request a bounded read-only import through a scientific software adapter; Tidy3D is the initial validation case.}
 
   \vspace{2.0mm}
-  \UQStatusBadge{StatusLocal}{PROPOSED; NOT IMPLEMENTED}
+  \UQStatusBadge{StatusLocal}{PROPOSED; INITIAL CASE: TIDY3D}
 
-  \vspace{2.5mm}
+  \vspace{4.2mm}
   \centering
-  \begin{tikzpicture}
-    \node[targetbox,text width=21mm] (llm) at (0,0) {Local LLM};
-    \node[proposedbox,text width=25mm,right=6.5mm of llm] (mcp) {MCP Tool\\Boundary};
-    \node[proposedbox,text width=31mm,right=6.5mm of mcp] (software) {Approved Local\\Scientific Software};
-    \node[neutralbox,text width=25mm,right=6.5mm of software] (result) {Structured\\Result};
-    \draw[flowarrow] (llm) -- node[above,font=\fontsize{6.8}{7.8}\selectfont] {request} (mcp);
-    \draw[flowarrow] (mcp) -- (software);
-    \draw[flowarrow] (software) -- (result);
-    \draw[returnarrow] (result.south) -- ++(0,-0.65) -| node[pos=0.55,below,font=\fontsize{6.8}{7.8}\selectfont,text=StatusReview] {result returns for interpretation} (llm.south);
-  \end{tikzpicture}
-
-  \vspace{5.8mm}
-  \begin{minipage}[t]{0.30\linewidth}
-    {\fontsize{10.0}{11.7}\selectfont\bfseries Approved tools}\par
-  \end{minipage}\hfill
-  \begin{minipage}[t]{0.30\linewidth}
-    {\fontsize{10.0}{11.7}\selectfont\bfseries Structured I/O}\par
-  \end{minipage}\hfill
-  \begin{minipage}[t]{0.30\linewidth}
-    {\fontsize{10.0}{11.7}\selectfont\bfseries Human review}\par
-  \end{minipage}
+  \includegraphics[width=\linewidth,height=38mm,keepaspectratio]{assets/diagrams/mcp-tool-boundary.pdf}
 
 \end{uqbody}
 \end{frame}
@@ -253,35 +185,14 @@
 \begin{frame}[plain,t]
 \UQFrameHeader{Confidential Collaboration}{}{}
 \begin{uqbody}
-  \UQTakeaway{Confidential payloads move off-chain as protected packages; the ledger stores only a minimal proof.}
+  \UQTakeaway{Confidential payloads stay in protected off-chain packages; the ledger stores only a minimal proof.}
 
   \vspace{2.0mm}
   \UQStatusBadge{StatusLocal}{CONCEPT; INTERFACE UNDEFINED}
 
-  \vspace{3.0mm}
+  \vspace{4.0mm}
   \centering
-  \begin{tikzpicture}[x=1cm,y=1cm]
-    \fill[StatusReview!4,rounded corners=2mm] (-6.65,-0.15) rectangle (3.65,1.45);
-    \draw[StatusReview!35,rounded corners=2mm,line width=0.55pt] (-6.65,-0.15) rectangle (3.65,1.45);
-    \fill[StatusLocal!5,rounded corners=2mm] (3.85,-2.00) rectangle (6.65,1.45);
-    \draw[StatusLocal!35,rounded corners=2mm,line width=0.55pt] (3.85,-2.00) rectangle (6.65,1.45);
-    \node[anchor=west,text=StatusReview,font=\fontsize{6.8}{8.0}\selectfont\bfseries] at (-6.35,1.18) {PROTECTED INTRANET};
-    \node[anchor=west,text=StatusLocal,font=\fontsize{6.8}{8.0}\selectfont\bfseries] at (4.08,1.18) {PARTNER / EXTERNAL};
-
-    \node[proposedbox,text width=18mm,minimum height=9mm] (draft) at (-5.35,0.45) {MCP\\draft};
-    \node[proposedbox,text width=20mm,minimum height=9mm] (approval) at (-2.80,0.45) {Human\\approval};
-    \node[proposedbox,text width=22mm,minimum height=9mm] (protect) at (-0.10,0.45) {Encrypt\\+ sign};
-    \node[neutralbox,text width=19mm,minimum height=9mm] (egress) at (2.55,0.45) {Sole\\egress};
-    \node[proposedbox,text width=26mm,minimum height=9mm] (partner) at (5.25,0.25) {Partner blockchain\\app};
-    \node[neutralbox,text width=22mm,minimum height=9mm] (ledger) at (5.25,-1.28) {External\\blockchain};
-    \draw[flowarrow] (draft) -- (approval);
-    \draw[flowarrow] (approval) -- (protect);
-    \draw[flowarrow] (protect) -- (egress);
-    \draw[flowarrow] (egress) -- (partner);
-    \draw[proofarrow] (partner) -- node[left,xshift=-1mm,font=\fontsize{6.2}{7.2}\selectfont,text=StatusLocal] {hash + receipt} (ledger);
-    \node[anchor=north,text=StatusPinned,font=\fontsize{6.2}{7.2}\selectfont] at (1.25,0.08) {encrypted package};
-    \node[anchor=west,text=StatusRisk,font=\fontsize{7.1}{8.2}\selectfont\bfseries] at (-6.35,-1.72) {No research content or keys go on-chain.};
-  \end{tikzpicture}
+  \includegraphics[width=\linewidth,height=38mm,keepaspectratio]{assets/diagrams/confidential-collaboration.pdf}
 
 \end{uqbody}
 \end{frame}
@@ -352,7 +263,12 @@
     \fill[black!3,rounded corners=1pt] (0,-3.20) rectangle (13.75,-1.95);
     \draw[black!25,rounded corners=1pt,line width=0.55pt] (0,-3.20) rectangle (13.75,-1.95);
     \node[anchor=west,text=StatusDesign,font=\fontsize{7.2}{8.4}\selectfont\bfseries] at (0.35,-2.28) {NOT BUILT};
-    \node[anchor=west,align=left,text width=105mm,text=UQInk,font=\fontsize{9.3}{10.7}\selectfont\bfseries] at (2.15,-2.58) {Authorized RAG \quad|\quad MCP tools\\Secure release \quad|\quad Partner ledger};
+    \node[anchor=west,text=UQInk,font=\fontsize{9.3}{10.7}\selectfont\bfseries] at (2.15,-2.58) {%
+      \begin{tabular}{@{}l@{\hspace{3mm}\vrule\hspace{3mm}}l@{}}
+        Authorized RAG & MCP tools\\
+        Secure release & External ledger
+      \end{tabular}%
+    };
   \end{tikzpicture}
 \end{uqbody}
 \end{frame}
@@ -363,7 +279,7 @@
 \begin{uqbody}
   \UQTakeaway{Validate each trust boundary before connecting scientific tools or external networks.}
 
-  \vspace{3.2mm}
+  \vspace{9.5mm}
   \centering
   \begin{tikzpicture}[
     stepbox/.style={
@@ -380,40 +296,83 @@
     steparrow/.style={draw=UQMuted,line width=0.8pt,-{Stealth[length=1.8mm]}}
   ]
     \node[stepbox] (s1) {%
-      {\color{StatusReview}\fontsize{6.8}{8.0}\selectfont\bfseries 01 NOW}\par\vspace{1.2mm}
-      {\fontsize{8.8}{10.2}\selectfont\bfseries Local model\\interface}\par\vspace{1.2mm}
-      Finish review; record which model produced each output.
+      \parbox[t][28mm][t]{22.2mm}{%
+        \vspace{0pt}{\color{StatusReview}\fontsize{6.8}{8.0}\selectfont\bfseries 01 NOW}\par\vspace{1.2mm}
+        {\fontsize{8.8}{10.2}\selectfont\bfseries Local model\\interface}\par\vspace{1.2mm}
+        Finish review; record which model produced each output.%
+      }%
     };
     \node[stepbox,right=2.7mm of s1] (s2) {%
-      {\color{StatusReview}\fontsize{6.8}{8.0}\selectfont\bfseries 02 NEXT}\par\vspace{1.2mm}
-      {\fontsize{8.8}{10.2}\selectfont\bfseries Authorized\\retrieval}\par\vspace{1.2mm}
-      Test access with\\synthetic data.
+      \parbox[t][28mm][t]{22.2mm}{%
+        \vspace{0pt}{\color{StatusReview}\fontsize{6.8}{8.0}\selectfont\bfseries 02 NEXT}\par\vspace{1.2mm}
+        {\fontsize{8.8}{10.2}\selectfont\bfseries Authorized\\retrieval}\par\vspace{1.2mm}
+        Test access with\\synthetic data.%
+      }%
     };
     \node[stepbox,right=2.7mm of s2] (s3) {%
-      {\color{StatusLocal}\fontsize{6.8}{8.0}\selectfont\bfseries 03 THEN}\par\vspace{1.2mm}
-      {\fontsize{8.8}{10.2}\selectfont\bfseries Release\\protocol}\par\vspace{1.2mm}
-      Define approval, encryption, and receipts.
+      \parbox[t][28mm][t]{22.2mm}{%
+        \vspace{0pt}{\color{StatusLocal}\fontsize{6.8}{8.0}\selectfont\bfseries 03 THEN}\par\vspace{1.2mm}
+        {\fontsize{8.8}{10.2}\selectfont\bfseries Release\\protocol}\par\vspace{1.2mm}
+        Define approval, encryption, and receipts.%
+      }%
     };
     \node[stepbox,right=2.7mm of s3] (s4) {%
-      {\color{StatusDesign}\fontsize{6.8}{8.0}\selectfont\bfseries 04 GATED}\par\vspace{1.2mm}
-      {\fontsize{8.8}{10.2}\selectfont\bfseries Science tool\\adapter}\par\vspace{1.2mm}
-      Connect one read-only local adapter.
+      \parbox[t][28mm][t]{22.2mm}{%
+        \vspace{0pt}{\color{StatusDesign}\fontsize{6.8}{8.0}\selectfont\bfseries 04 GATED}\par\vspace{1.2mm}
+        {\fontsize{8.8}{10.2}\selectfont\bfseries Science tool\\adapter}\par\vspace{1.2mm}
+        Connect one read-only local adapter.%
+      }%
     };
     \node[stepbox,right=2.7mm of s4] (s5) {%
-      {\color{StatusDesign}\fontsize{6.8}{8.0}\selectfont\bfseries 05 LAST}\par\vspace{1.2mm}
-      {\fontsize{8.8}{10.2}\selectfont\bfseries Ledger\\checkpoint}\par\vspace{1.2mm}
-      Use a ledger proof only if a real need remains.
+      \parbox[t][28mm][t]{22.2mm}{%
+        \vspace{0pt}{\color{StatusDesign}\fontsize{6.8}{8.0}\selectfont\bfseries 05 LAST}\par\vspace{1.2mm}
+        {\fontsize{8.8}{10.2}\selectfont\bfseries Ledger\\checkpoint}\par\vspace{1.2mm}
+        Use a ledger proof only if a real need remains.%
+      }%
     };
     \draw[steparrow] (s1) -- (s2);
     \draw[steparrow] (s2) -- (s3);
     \draw[steparrow] (s3) -- (s4);
     \draw[steparrow] (s4) -- (s5);
-  \end{tikzpicture}
+  \end{tikzpicture}\par
+\end{uqbody}
+\end{frame}
 
-  \vspace{1.8mm}
-  \UQStatusBadge{StatusReview}{IMMEDIATE CHECKPOINT}\par
-  \vspace{0.8mm}
-  {\fontsize{10.4}{12.2}\selectfont\bfseries Complete the local model-interface review.}\par
+% 10. Seven-day usage and cost
+\begin{frame}[plain,t]
+\UQFrameHeader{Seven-Day Usage and Cost}{}{}
+\begin{uqbody}
+  \UQTakeaway{01--07 Aug: usage is cache-heavy; a zero price estimate is not a zero operating cost.}
+
+  \vspace{2.6mm}
+  \begin{minipage}[t]{0.245\linewidth}
+    {\color{StatusReview}\fontsize{6.8}{8.0}\selectfont\bfseries LOCAL CC-SWITCH}\par
+    \vspace{1.2mm}
+    {\color{StatusReview}\fontsize{16.5}{18.4}\selectfont\bfseries 4,635}\par
+    {\fontsize{7.3}{8.6}\selectfont\bfseries requests}\par
+    \vspace{1.8mm}
+    {\color{StatusLocal}\fontsize{16.5}{18.4}\selectfont\bfseries 597M}\par
+    {\fontsize{7.3}{8.6}\selectfont\bfseries total tokens}\par
+    \vspace{1.8mm}
+    {\color{StatusPinned}\fontsize{16.5}{18.4}\selectfont\bfseries 547M}\par
+    {\fontsize{7.3}{8.6}\selectfont\bfseries cache reads}\par
+    \vspace{1.8mm}
+    {\color{StatusRisk}\fontsize{16.5}{18.4}\selectfont\bfseries \$0.00}\par
+    {\fontsize{7.3}{8.6}\selectfont\bfseries interface estimate}\par
+  \end{minipage}\hfill
+  \begin{minipage}[t]{0.71\linewidth}
+    {\fontsize{8.5}{10.0}\selectfont\bfseries Daily token trend from cc-switch}\par
+    \vspace{1.3mm}
+    \centering
+    \includegraphics[width=\linewidth]{assets/cc-switch-usage-plot-7d-en.png}\par
+    \vspace{0.8mm}
+    {\fontsize{6.8}{8.0}\selectfont \textcolor{StatusReview}{Blue} = input tokens \quad
+      \textcolor{purple}{purple} = cache reads \quad
+      \textcolor{StatusRisk}{red} = estimated cost}\par
+    \vspace{1.1mm}
+    {\color{StatusRisk}\fontsize{7.1}{8.5}\selectfont\bfseries Cost interpretation:}\,
+    {\fontsize{7.1}{8.5}\selectfont the \$0.00 interface estimate does not include hardware, cluster, or solver costs.}
+  \end{minipage}
 \end{uqbody}
 \end{frame}
 

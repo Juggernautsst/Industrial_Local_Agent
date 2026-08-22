@@ -21,7 +21,6 @@
   \setbeamercolor{normal text}{fg=UQInk,bg=white}
   \setbeamercolor{structure}{fg=StatusReview}
   \setbeamercolor{alerted text}{fg=StatusRisk}
-  \setbeamercolor{uq takeaway}{fg=UQInk,bg=black!5}
   \setbeamerfont{normal text}{size=\fontsize{9.7}{11.7}\selectfont}
 }
 
@@ -57,9 +56,20 @@
 }
 
 \newcommand{\UQTakeaway}[1]{%
-  \begin{beamercolorbox}[wd=\linewidth,sep=1.55mm]{uq takeaway}
-    \color{UQInk}\bfseries #1
-  \end{beamercolorbox}%
+  \par\noindent
+  \begin{tikzpicture}[baseline=(takeaway.base)]
+    \node[
+      anchor=west,
+      align=left,
+      text width=134.8mm,
+      inner sep=0pt,
+      text=UQMuted,
+      font=\fontsize{8.6}{10.2}\selectfont\bfseries
+    ] (takeaway) at (2.9mm,0) {#1};
+    \draw[StatusReview,line width=0.85pt]
+      ([xshift=-2.9mm,yshift=-0.45mm]takeaway.south west) --
+      ([xshift=-2.9mm,yshift=0.45mm]takeaway.north west);
+  \end{tikzpicture}\par
 }
 
 \newcommand{\UQEnglishChinese}[2]{%
@@ -81,12 +91,12 @@
 \newcommand{\UQFrameHeader}[3]{%
   \begin{tikzpicture}[remember picture,overlay]
     \node[
-      anchor=north,
+      anchor=center,
       align=center,
       text width=119mm,
       inner sep=0pt,
       text=black
-    ] at ([yshift=-5.4mm]current page.north) {%
+    ] at ([yshift=-10.4mm]current page.north) {%
       {\fontsize{16.2}{18.2}\selectfont\bfseries #1}%
     };
     \node[
