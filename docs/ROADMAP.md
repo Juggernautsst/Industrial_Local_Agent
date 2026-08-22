@@ -21,14 +21,14 @@ The enterprise track addresses deployment on one controlled server or cluster fo
 | Enterprise stage | 交付内容 / Deliverable | 当前状态 / Current status | Exit gate / 退出门槛 |
 | --- | --- | --- | --- |
 | E0 | Local/enterprise 模式、威胁模型、identity/bundle/provider/audit 契约 / Local/enterprise modes, threat model, and identity/bundle/provider/audit contracts | 设计基线已定义；生产控制未实现 / Design baseline defined; production controls not implemented | README、架构、路线与 [企业部署文档](ENTERPRISE_DEPLOYMENT.md) 一致，非目标清楚 / README, architecture, roadmap, and [enterprise deployment document](ENTERPRISE_DEPLOYMENT.md) agree with explicit non-goals |
-| E1 | Stage 1A 稳定 synthesis-provider boundary / Stable Stage 1A synthesis-provider boundary | 子仓库实施已提交审查；父 pin 仍为 `4e3bdda` / Child implementation is under review; parent pin remains `4e3bdda` | audit/Ollama 统一 contract tests、preflight、真实 provenance、no fallback、CLI/Web/manifest 兼容 / Shared audit/Ollama contract tests, preflight, truthful provenance, no fallback, and CLI/Web/manifest compatibility |
-| E2 | Identity-aware retrieval service / 身份感知检索服务 | 未实现 / Not implemented | OIDC delegation、RBAC+ABAC、PostgreSQL/pgvector forced RLS、source reauthorization、revocation/cache isolation 和 threat tests / OIDC delegation, RBAC+ABAC, PostgreSQL/pgvector forced RLS, source reauthorization, revocation/cache isolation, and threat tests |
+| E1 | Stage 1A 稳定 synthesis-provider boundary / Stable Stage 1A synthesis-provider boundary | 已合并并固定到 child `efea263` / Merged and pinned at child `efea263` | audit/Ollama 统一 contract tests、preflight、真实 provenance、no fallback、CLI/Web/manifest 兼容 / Shared audit/Ollama contract tests, preflight, truthful provenance, no fallback, and CLI/Web/manifest compatibility |
+| E2 | Identity-aware retrieval service / 身份感知检索服务 | 合成 model-free vertical slice 已实现；生产集成未实现 / Synthetic model-free vertical slice implemented; production integration not implemented | 先验收 Issue #10 的 synthetic contract；后续 OIDC、RBAC+ABAC、PostgreSQL/pgvector forced RLS、持久化 policy/audit 和 E4 集成 / First accept the Issue #10 synthetic contract; later add OIDC, RBAC+ABAC, PostgreSQL/pgvector forced RLS, durable policy/audit, and E4 integration |
 | E3 | Controlled model gateway / 受控模型 gateway | 未实现 / Not implemented | registered/pinned provider、mTLS/service identity、endpoint/egress policy、capacity、digest provenance、no content logs、no fallback / Registered and pinned providers, mTLS/service identity, endpoint/egress policy, capacity, digest provenance, no content logs, and no fallback |
 | E4 | Enterprise Stage 1A integration / 企业 Stage 1A 集成 | 未实现 / Not implemented | 只有 `AuthorizedEvidenceBundle` 进入 Stage 1A，citation subset 与 tenant run/list/read/export 隔离通过，并保持 secure-release 独立 / Only `AuthorizedEvidenceBundle` enters Stage 1A, citation subset and tenant run/list/read/export isolation pass, and secure release remains separate |
 
 E0 的完成只代表设计决策和验收标准可复核，不代表 enterprise system 已经可部署。E1 子仓库 PR 在合并和父 gitlink 单独更新前也不属于当前固定版本。
 
-Completion of E0 means only that design decisions and acceptance criteria are reviewable; it does not mean the enterprise system is deployable. The E1 child PR is also outside the current pinned version until it is merged and the parent gitlink is updated separately.
+Completion of E0 means only that design decisions and acceptance criteria are reviewable; it does not mean the enterprise system is deployable. E2's synthetic slice is executable evidence, but it is not a production deployment or a completed E4 integration.
 
 `deploy/bunya/` 中的 Qwen3.8-27B-FP8 试点是独立的模型可运行性验证，不是 E3 model gateway，也不表示 Bunya、SSO、RAG、Stage 1A remote provider 或多用户服务已经部署。Codex 只用于辅助部署和检查。
 
@@ -36,10 +36,10 @@ The Qwen3.8-27B-FP8 pilot in `deploy/bunya/` is an independent model feasibility
 
 ## 当前实施优先级 / Current Implementation Priority
 
-1. 完成 E1 provider boundary 的审查；合并后通过独立父仓库 Issue 更新 gitlink。
-   Complete review of the E1 provider boundary; after merge, update the gitlink through a separate parent-repository issue.
-2. 仅用合成数据实现 E2 最小 vertical slice：可信身份委托、同 tenant/跨 tenant 授权、forced RLS、source reauthorization 与签名 `AuthorizedEvidenceBundle`，暂不连接模型。
-   Using synthetic data only, implement the smallest E2 vertical slice: trusted identity delegation, same-tenant and cross-tenant authorization, forced RLS, source reauthorization, and signed `AuthorizedEvidenceBundle`, without connecting a model.
+1. 审查并固定已合并的 E1 provider boundary；父 gitlink 已指向 child `efea263`。
+   Review the merged E1 provider boundary; the parent gitlink now points to child `efea263`.
+2. 仅用合成数据验收 E2 最小 vertical slice：可信身份委托、同 tenant/跨 tenant 授权、forced scope、source reauthorization、签名 `AuthorizedEvidenceBundle` 和 content-free audit，暂不连接模型。
+   Accept the smallest E2 vertical slice using synthetic data only: trusted identity delegation, same-tenant/cross-tenant authorization, forced scope, source reauthorization, signed `AuthorizedEvidenceBundle`, and content-free audit, without connecting a model.
 3. 先完成 Stage 2.0 secure-release 协议：明确 researcher input/output、`ReleaseCandidate`、`SecureReleasePackage`、签名 receipt、撤销时间边界和 synthetic test vectors；先不使用区块链。
    First complete the Stage 2.0 secure-release protocol: define researcher input/output, `ReleaseCandidate`, `SecureReleasePackage`, signed receipts, time-bounded revocation semantics, and synthetic test vectors; do not use blockchain initially.
 4. 协议通过后，用独立 Issue 依次实现审批与接收者密钥验证、加密 envelope/verifier、audit-committed transactional outbox 和幂等交付对账。
@@ -74,14 +74,14 @@ Preparation of Stage 1A human evaluation on public/synthetic cases may continue;
 
 ## 安全优先工程细目 / Security-first Engineering Details
 
-1. 审查并合并 Stage 1A E1 provider boundary；完成后通过单独父仓库 Issue 更新 gitlink，不在文档 PR 中混入指针变化。
-   Review and merge the Stage 1A E1 provider boundary; afterward update the gitlink through a separate parent issue rather than mixing a pin change into the documentation PR.
-2. 在 E2 implementation Issue 前确定机构 IdP、tenant 定义、数据分类、policy owner、retention、RTO/RPO 和 audit reader。
-   Before an E2 implementation issue, decide the institutional IdP, tenant definition, data classification, policy owner, retention, RTO/RPO, and audit readers.
-3. 只用 synthetic fixtures 建立两个 tenant、每个 tenant 多个 user/project/owner/source 的 threat-test matrix；验证 `retrieve/list/read/export` 的 allow、deny、explicit share 和 revoke，不得先导入真实科研数据。
-   Using synthetic fixtures only, build a threat-test matrix with two tenants and multiple users/projects/owners/sources per tenant; test allow, deny, explicit share, and revoke for `retrieve/list/read/export`, and do not ingest real research data first.
-4. 做 E2 最小 vertical slice：SSO mock/verified token -> delegated identity -> forced RLS retrieval -> signed `AuthorizedEvidenceBundle`，不连接模型。
-   Build the smallest E2 vertical slice: SSO mock/verified token -> delegated identity -> forced-RLS retrieval -> signed `AuthorizedEvidenceBundle`, without connecting a model.
+1. 审查并固定已合并的 Stage 1A E1 provider boundary；父 gitlink 已指向 child `efea263`。
+   Review and pin the merged Stage 1A E1 provider boundary; the parent gitlink now points to child `efea263`.
+2. 在生产 E2 implementation 前确定机构 IdP、tenant 定义、数据分类、policy owner、retention、RTO/RPO 和 audit reader；synthetic Issue #10 不假装完成这些机构决策。
+   Before production E2 implementation, decide the institutional IdP, tenant definition, data classification, policy owner, retention, RTO/RPO, and audit readers; synthetic Issue #10 does not pretend these institutional decisions are complete.
+3. 先用 synthetic fixtures 建立两个 tenant、多个 user/project/source 的 threat-test matrix；当前 vertical slice 验证 retrieve、share、revoke、bundle 和 audit，生产 E2 仍需补齐 `list/read/export` 与数据库级测试，不得导入真实科研数据。
+   Using synthetic fixtures only, build a threat-test matrix with two tenants and multiple users/projects/sources; the current slice tests retrieve/share/revoke/bundle/audit, while production E2 still needs list/read/export and database-level tests; do not ingest real research data.
+4. E2 vertical slice 已完成：synthetic verified token -> delegated identity -> forced-scope retrieval -> signed `AuthorizedEvidenceBundle` -> content-free audit，不连接模型。
+   The E2 vertical slice is implemented: synthetic verified token -> delegated identity -> forced-scope retrieval -> signed `AuthorizedEvidenceBundle` -> content-free audit, without connecting a model.
 5. E2 通过同 tenant 项目隔离、跨 tenant、撤销、pool identity、cache、bundle 负向验证和 audit failure tests 后，创建 Stage 2.0 协议 Issue；验收协议和 synthetic vectors 后，才拆分 secure-release implementation Issues。
    After E2 passes same-tenant project isolation, cross-tenant, revocation, pooled-identity, cache, negative bundle-validation, and audit-failure tests, create the Stage 2.0 protocol issue; split secure-release implementation issues only after the protocol and synthetic vectors are accepted.
 6. E3 model gateway 与 E4 enterprise integration 保持独立 Issue，在机构 provider、容量和运维边界确定后排期；它们不与本轮 E2/Stage 2/Tidy3D 代码同时启动。

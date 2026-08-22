@@ -1,6 +1,6 @@
 # 项目完整实现手册 / Complete Implementation Handbook
 
-> 快照日期 / Snapshot date: `2026-07-29`
+> 快照日期 / Snapshot date: `2026-08-19`
 >
 > Canonical work item / 规范工作项: [Industrial_Local_Agent#4](https://github.com/Juggernautsst/Industrial_Local_Agent/issues/4)
 >
@@ -17,6 +17,7 @@ This handbook answers four questions: what is actually runnable now, exactly how
 | 标签 / Label | 精确定义 / Exact meaning |
 | --- | --- |
 | **PINNED / 已固定** | 父仓库 gitlink 指向的子仓库 commit；递归克隆会得到该实现。 / The child commit referenced by the parent gitlink; a recursive clone obtains this implementation. |
+| **MERGED CHILD / 子已合并** | 子仓库默认分支已包含该实现，但父 gitlink 尚未指向它；不能作为当前父递归 clone 的运行版本。 / The child default branch contains the implementation, but the parent gitlink does not yet point to it; it is not the current parent recursive-clone runtime. |
 | **UNDER REVIEW / 待审** | 代码已存在于未合并 branch/PR，但不属于父仓库固定版本。 / Code exists on an unmerged branch/PR but is not part of the parent-pinned version. |
 | **DESIGN ONLY / 仅设计** | 契约、威胁模型或验收门槛已写入文档，但没有可部署实现。 / Contracts, threat models, or acceptance gates are documented, but no deployable implementation exists. |
 | **NOT IMPLEMENTED / 未实现** | 没有满足当前验收标准的代码或服务。 / No code or service satisfies the current acceptance criteria. |
@@ -26,16 +27,17 @@ This handbook answers four questions: what is actually runnable now, exactly how
 
 | 对象 / Object | 状态 / State |
 | --- | --- |
-| Parent default branch / 父默认分支 | `main` at `b63bf38`; Enterprise E0 尚未合并到 `main`。 / Enterprise E0 is not yet merged into `main`. |
-| Parent E0 branch / 父 E0 分支 | `docs/2-enterprise-boundaries` at `72c5a44`, [PR #3](https://github.com/Juggernautsst/Industrial_Local_Agent/pull/3) open. |
-| Handbook branch / 本手册分支 | `docs/4-implementation-handbook`, based on the E0 branch so the handbook can reference the current E0 documents without duplicating them in its PR diff. / 基于 E0 分支，以便引用当前 E0 文档且不在本 PR 重复其 diff。 |
-| Parent submodule pin / 父 gitlink | `components/stage1a-good-story-agent` -> `4e3bdda`. |
-| Child default branch / 子默认分支 | `main` at `4e3bdda`, Stage 1A `0.1.1`, recorded baseline `38 passed`. |
-| Child E1 branch / 子 E1 分支 | `refactor/1-provider-boundary` at `367f971`, [PR #2](https://github.com/Juggernautsst/stage1a-good-story-agent/pull/2) open, recorded and independently reproduced `47 passed`. |
+| Parent default branch / 父默认分支 | `main` includes Enterprise E0, the Stage 1A pin, the handbook refresh, and the synthetic E2 core through PR #14 (`6217ef9`). / `main` 已包含 Enterprise E0、Stage 1A pin、手册刷新，以及通过 PR #14（`6217ef9`）合并的 E2 合成核心。 |
+| Parent E0 branch / 父 E0 分支 | `docs/2-enterprise-boundaries` at `72c5a44`, historical source branch for merged PR #3. / `72c5a44` 是已合并 PR #3 的历史源分支。 |
+| Handbook branch / 本手册分支 | `docs/4-implementation-handbook`; this refresh is retargeted to parent `main`. / 本次刷新将 PR base 改为父仓库 `main`。 |
+| Parent submodule pin / 父 gitlink | `components/stage1a-good-story-agent` -> `efea263da1b803a74a6a91c0e592949b3237203c`, merged through parent PR #11 / Issue #9. |
+| Child default branch / 子默认分支 | `main` at `efea263`, component version `0.2.0`; this is also the parent pin. Merged stack includes E1 provider boundary, MCP C1, and material-optional Web chat. |
+| Child historical baseline / 子历史基线 | `4e3bdda`, component `0.1.1`, recorded baseline `38 passed`; retained only for pin history. |
+| Child historical E1 source / 子历史 E1 源码 | `367f971`, superseded by merged child main and retained only as historical review evidence. |
 
-父工作树显示 submodule 为 modified，是因为本地子目录检出了 `367f971`，而父 index 仍固定 `4e3bdda`。这不是 gitlink 更新，也不是已发布状态。
+在本快照中，父仓库 index 与 child `main` 都固定到 `efea263`；本地 submodule 若显示 modified，仍可能只是 checkout 漂移，不等于新的 gitlink 更新。
 
-The parent worktree shows the submodule as modified because the local child checkout is at `367f971` while the parent index remains pinned to `4e3bdda`. This is neither a gitlink update nor a released state.
+In this snapshot both the parent index and child `main` point to `efea263`; a modified submodule in a parent worktree may still be local checkout drift, not a new gitlink update.
 
 ### 0.3 权威来源优先级 / Authority Order
 
@@ -45,6 +47,7 @@ The parent worktree shows the submodule as modified because the local child chec
 | 当前阶段、顺序和 exit gate / Current stage, sequence, and exit gate | [ROADMAP.md](ROADMAP.md) |
 | 组件与信任边界 / Component and trust boundaries | [ARCHITECTURE.md](ARCHITECTURE.md) |
 | Enterprise 字段契约与威胁测试 / Enterprise field contracts and threat tests | [ENTERPRISE_DEPLOYMENT.md](ENTERPRISE_DEPLOYMENT.md) |
+| E2 synthetic implementation / E2 合成实现 | [E2_IMPLEMENTATION.md](E2_IMPLEMENTATION.md) |
 | Git/GitHub 工作流程 / Git and GitHub workflow | [AGENTS.md](../AGENTS.md) |
 | 机密漏洞报告路径 / Confidential vulnerability reporting | [SECURITY.md](../SECURITY.md) |
 
@@ -75,6 +78,15 @@ Stage 1A local Web or CLI
         v
 validated analysis + deterministic report + provenance + redacted export ZIP
 
+Current E2 evidence path / 当前 E2 证据路径
+
+Synthetic verified token
+        -> server-derived tenant and policy
+        -> forced-scope SQLite retrieval
+        -> source reauthorization
+        -> signed AuthorizedEvidenceBundle
+        -> content-free audit hash chain
+
 Future target / 未来目标
 
 Institutional identity -> authorized retrieval -> signed evidence bundle
@@ -103,7 +115,12 @@ Industrial_Local_Agent/                       parent repository
 │   ├── ARCHITECTURE.md                        component boundaries
 │   ├── ENTERPRISE_DEPLOYMENT.md               E0 design and threat model
 │   ├── IMPLEMENTATION_HANDBOOK.md              this document
+│   ├── E2_IMPLEMENTATION.md                    synthetic E2 implementation note
 │   └── ROADMAP.md                              stages and exit gates
+├── src/industrial_local_agent/e2/               synthetic E2 implementation
+├── tests/e2/                                    synthetic E2 tests
+├── scripts/e2_demo.py                           interactive E2 demonstration
+├── scripts/e2_web_demo.py                       loopback E2 browser console
 └── components/
     └── stage1a-good-story-agent/               private Git submodule
 ```
@@ -137,11 +154,11 @@ git submodule update --init --recursive
 
 | 能力 / Capability | 当前状态 / Current status | 关键事实 / Key fact |
 | --- | --- | --- |
-| Stage 1A engineering | **PINNED** | 单用户、回环、本地证据可追溯科研故事 MVP。 / Single-user, loopback, local evidence-traceable story MVP. |
+| Stage 1A engineering | **PINNED** | Parent and child both point to `efea263`, providing the provider boundary, MCP `STDIO` facade, and material-optional Web research chat. / 父子仓库均固定到 `efea263`，提供 provider boundary、MCP `STDIO` facade 和 material-optional Web chat。 |
 | Stage 1A scientific acceptance | **NOT COMPLETE** | 只有 1/5 合成光子学案例；还缺四个案例和双人独立评价。 / One of five synthetic photonics cases; four cases and two independent evaluators remain. |
 | Enterprise E0 | **DESIGN ONLY** | local/enterprise 模式、契约和威胁模型已定义；没有生产控制。 / Modes, contracts, and threat model are defined; production controls are absent. |
-| Enterprise E1 provider boundary | **UNDER REVIEW** | 子 PR #2 已实现；父 gitlink 尚未更新。 / Implemented in child PR #2; parent pin is unchanged. |
-| Enterprise E2 | **NOT IMPLEMENTED** | 没有 SSO delegation、RBAC+ABAC、forced RLS 或签名 bundle 服务。 / No SSO delegation, RBAC+ABAC, forced RLS, or signed-bundle service. |
+| Enterprise E1 provider boundary | **PINNED** | Child PR #2 is merged and parent PR #11 pins the resulting child main. / 子 PR #2 已合并，父 PR #11 已固定 child main。 |
+| Enterprise E2 | **MERGED SYNTHETIC CORE** | Parent `main` contains the model-free synthetic identity/policy/forced-scope/bundle/audit slice and local presentation adapters; production OIDC/PostgreSQL/E4 integration remains unimplemented. / 父仓库 `main` 已包含无模型的合成身份/策略/forced-scope/bundle/audit 切片和本机演示 adapter；生产 OIDC/PostgreSQL/E4 集成仍未实现。 |
 | Enterprise E3 | **NOT IMPLEMENTED** | 没有集中 model gateway、mTLS、registered provider 或容量控制。 / No centralized model gateway, mTLS, registered provider, or capacity controls. |
 | Enterprise E4 | **NOT IMPLEMENTED** | 没有多 tenant Stage 1A 集成。 / No multitenant Stage 1A integration. |
 | Stage 2 secure release | **DESIGN ONLY** | 协议基线已起草；加密包、审批、outbox 和交付尚无实现。 / Protocol baseline drafted; package, approval, outbox, and delivery are unimplemented. |
@@ -154,8 +171,7 @@ git submodule update --init --recursive
 Stage numbers identify capability boundaries, not current scheduling. The serial order under resource and risk constraints is:
 
 ```text
-E1 review
-  -> E2 identity-aware authorized retrieval vertical slice
+E2 identity-aware authorized retrieval vertical slice
   -> Stage 2.0 protocol
   -> separate secure-release implementation slices
   -> Tidy3D Stage 1B read-only adapter
@@ -243,30 +259,32 @@ python -m good_story_agent -> good_story_agent.cli:main
 
 ### 5.2 固定版本源码文件 / Pinned Source Files
 
-以下链接固定到 child commit `4e3bdda`，避免把本地待审 checkout 误当成父仓库版本。
+以下链接固定到 parent 当前 gitlink 与 child `main` 共用的 `efea263` commit。
 
-The following links are pinned to child commit `4e3bdda` so the local review checkout is not confused with the parent-pinned version.
+The following links are pinned to the `efea263` commit shared by the current parent gitlink and child `main`.
 
 | 文件 / File | 职责 / Responsibility |
 | --- | --- |
-| [`pyproject.toml`](https://github.com/Juggernautsst/stage1a-good-story-agent/blob/4e3bdda/pyproject.toml) | 包 metadata、依赖、console script、package data、pytest 配置。 / Package metadata, dependencies, console script, package data, and pytest configuration. |
-| [`__init__.py`](https://github.com/Juggernautsst/stage1a-good-story-agent/blob/4e3bdda/src/good_story_agent/__init__.py) | 包说明和 `__version__ = "0.1.1"`。 / Package description and version. |
-| [`__main__.py`](https://github.com/Juggernautsst/stage1a-good-story-agent/blob/4e3bdda/src/good_story_agent/__main__.py) | `python -m` 入口。 / Module entry point. |
-| [`cli.py`](https://github.com/Juggernautsst/stage1a-good-story-agent/blob/4e3bdda/src/good_story_agent/cli.py) | `analyze`/`serve` 参数解析、输入读取和命令分派。 / `analyze`/`serve` argument parsing, input reads, and command dispatch. |
-| [`config.py`](https://github.com/Juggernautsst/stage1a-good-story-agent/blob/4e3bdda/src/good_story_agent/config.py) | 常量、环境变量、私有目录和回环 URL 校验。 / Constants, environment settings, private directories, and loopback URL validation. |
-| [`models.py`](https://github.com/Juggernautsst/stage1a-good-story-agent/blob/4e3bdda/src/good_story_agent/models.py) | 运行时 dataclass。 / Runtime dataclasses. |
-| [`ingest.py`](https://github.com/Juggernautsst/stage1a-good-story-agent/blob/4e3bdda/src/good_story_agent/ingest.py) | 文件校验、解析、哈希、locator 和 evidence 分配。 / File validation, parsing, hashes, locators, and evidence allocation. |
-| [`pdf_worker.py`](https://github.com/Juggernautsst/stage1a-good-story-agent/blob/4e3bdda/src/good_story_agent/pdf_worker.py) | 资源受限的 PDF 文本提取子进程。 / Resource-bounded PDF text-extraction subprocess. |
-| [`backends.py`](https://github.com/Juggernautsst/stage1a-good-story-agent/blob/4e3bdda/src/good_story_agent/backends.py) | audit、prompt 构造、本地 Ollama transport、修整和一次 repair。 / Audit, prompt construction, local Ollama transport, calibration, and one repair. |
-| [`schema.py`](https://github.com/Juggernautsst/stage1a-good-story-agent/blob/4e3bdda/src/good_story_agent/schema.py) | JSON response schema 和手工语义校验。 / JSON response schema and manual semantic validation. |
-| [`service.py`](https://github.com/Juggernautsst/stage1a-good-story-agent/blob/4e3bdda/src/good_story_agent/service.py) | 端到端编排、运行存储、读取和导出。 / End-to-end orchestration, run storage, reads, and export. |
-| [`report.py`](https://github.com/Juggernautsst/stage1a-good-story-agent/blob/4e3bdda/src/good_story_agent/report.py) | 确定性 Markdown renderer。 / Deterministic Markdown renderer. |
-| [`web.py`](https://github.com/Juggernautsst/stage1a-good-story-agent/blob/4e3bdda/src/good_story_agent/web.py) | Flask app、安全检查和 HTTP routes。 / Flask app, security checks, and HTTP routes. |
-| [`index.html`](https://github.com/Juggernautsst/stage1a-good-story-agent/blob/4e3bdda/src/good_story_agent/templates/index.html) | 单页工作界面。 / Single-page work interface. |
-| [`app.js`](https://github.com/Juggernautsst/stage1a-good-story-agent/blob/4e3bdda/src/good_story_agent/static/app.js) | 浏览器状态、token、上传、API、历史和下载。 / Browser state, token, uploads, API calls, history, and downloads. |
-| [`app.css`](https://github.com/Juggernautsst/stage1a-good-story-agent/blob/4e3bdda/src/good_story_agent/static/app.css) | 工作台布局、状态、表单、结果和移动响应式样式。 / Workspace layout, states, forms, results, and responsive styles. |
-| [`good_story_stage1a.md`](https://github.com/Juggernautsst/stage1a-good-story-agent/blob/4e3bdda/src/good_story_agent/prompts/good_story_stage1a.md) | 固定科研故事 system prompt。 / Pinned scientific-story system prompt. |
-| [`start-local.sh`](https://github.com/Juggernautsst/stage1a-good-story-agent/blob/4e3bdda/scripts/start-local.sh) | 带隐私环境变量的 Ollama 和 Web 生命周期。 / Ollama and Web lifecycle with privacy-oriented environment settings. |
+| [`pyproject.toml`](https://github.com/Juggernautsst/stage1a-good-story-agent/blob/efea263/pyproject.toml) | 包 metadata、依赖、console script、package data、pytest 配置。 / Package metadata, dependencies, console script, package data, and pytest configuration. |
+| [`__init__.py`](https://github.com/Juggernautsst/stage1a-good-story-agent/blob/efea263/src/good_story_agent/__init__.py) | 包说明和 `__version__ = "0.2.0"`。 / Package description and version. |
+| [`__main__.py`](https://github.com/Juggernautsst/stage1a-good-story-agent/blob/efea263/src/good_story_agent/__main__.py) | `python -m` 入口。 / Module entry point. |
+| [`cli.py`](https://github.com/Juggernautsst/stage1a-good-story-agent/blob/efea263/src/good_story_agent/cli.py) | `analyze`/`serve` 参数解析、输入读取和命令分派。 / `analyze`/`serve` argument parsing, input reads, and command dispatch. |
+| [`config.py`](https://github.com/Juggernautsst/stage1a-good-story-agent/blob/efea263/src/good_story_agent/config.py) | 常量、环境变量、私有目录和回环 URL 校验。 / Constants, environment settings, private directories, and loopback URL validation. |
+| [`models.py`](https://github.com/Juggernautsst/stage1a-good-story-agent/blob/efea263/src/good_story_agent/models.py) | 运行时 dataclass。 / Runtime dataclasses. |
+| [`ingest.py`](https://github.com/Juggernautsst/stage1a-good-story-agent/blob/efea263/src/good_story_agent/ingest.py) | 文件校验、解析、哈希、locator 和 evidence 分配。 / File validation, parsing, hashes, locators, and evidence allocation. |
+| [`pdf_worker.py`](https://github.com/Juggernautsst/stage1a-good-story-agent/blob/efea263/src/good_story_agent/pdf_worker.py) | 资源受限的 PDF 文本提取子进程。 / Resource-bounded PDF text-extraction subprocess. |
+| [`backends.py`](https://github.com/Juggernautsst/stage1a-good-story-agent/blob/efea263/src/good_story_agent/backends.py) | audit、prompt 构造、本地 Ollama transport、修整和一次 repair。 / Audit, prompt construction, local Ollama transport, calibration, and one repair. |
+| [`schema.py`](https://github.com/Juggernautsst/stage1a-good-story-agent/blob/efea263/src/good_story_agent/schema.py) | JSON response schema 和手工语义校验。 / JSON response schema and manual semantic validation. |
+| [`service.py`](https://github.com/Juggernautsst/stage1a-good-story-agent/blob/efea263/src/good_story_agent/service.py) | 端到端编排、运行存储、读取和导出。 / End-to-end orchestration, run storage, reads, and export. |
+| [`report.py`](https://github.com/Juggernautsst/stage1a-good-story-agent/blob/efea263/src/good_story_agent/report.py) | 确定性 Markdown renderer。 / Deterministic Markdown renderer. |
+| [`web.py`](https://github.com/Juggernautsst/stage1a-good-story-agent/blob/efea263/src/good_story_agent/web.py) | Flask app、安全检查和 HTTP routes，包括 material-optional chat。 / Flask app, security checks, HTTP routes, including material-optional chat. |
+| [`chat.py`](https://github.com/Juggernautsst/stage1a-good-story-agent/blob/efea263/src/good_story_agent/chat.py) | 无工具、回环 Ollama 的 research-chat provider 和可选附件上下文。 / Tool-free loopback Ollama research-chat provider with optional attachment context. |
+| [`mcp_server.py`](https://github.com/Juggernautsst/stage1a-good-story-agent/blob/efea263/src/good_story_agent/mcp_server.py) | client-neutral MCP `STDIO` facade；只暴露最小分析、报告和 provenance 工具。 / Client-neutral MCP `STDIO` facade with minimal analysis, report, and provenance tools. |
+| [`index.html`](https://github.com/Juggernautsst/stage1a-good-story-agent/blob/efea263/src/good_story_agent/templates/index.html) | 单页工作界面。 / Single-page work interface. |
+| [`app.js`](https://github.com/Juggernautsst/stage1a-good-story-agent/blob/efea263/src/good_story_agent/static/app.js) | 浏览器状态、token、chat、可选附件、上传、API、历史和下载。 / Browser state, token, chat, optional attachments, uploads, APIs, history, and downloads. |
+| [`app.css`](https://github.com/Juggernautsst/stage1a-good-story-agent/blob/efea263/src/good_story_agent/static/app.css) | 工作台布局、chat 状态、表单、结果和移动响应式样式。 / Workspace layout, chat states, forms, results, and responsive styles. |
+| [`good_story_stage1a.md`](https://github.com/Juggernautsst/stage1a-good-story-agent/blob/efea263/src/good_story_agent/prompts/good_story_stage1a.md) | 固定科研故事 system prompt。 / Pinned scientific-story system prompt. |
+| [`start-local.sh`](https://github.com/Juggernautsst/stage1a-good-story-agent/blob/efea263/scripts/start-local.sh) | 带隐私环境变量的 Ollama 和 Web 生命周期。 / Ollama and Web lifecycle with privacy-oriented environment settings. |
 
 ## 6. 配置、环境变量和硬限制 / Configuration, Environment Variables, and Hard Limits
 
@@ -274,10 +292,10 @@ The following links are pinned to child commit `4e3bdda` so the local review che
 
 | 常量 / Constant | 值 / Value | 行为 / Behavior |
 | --- | ---: | --- |
-| `APP_VERSION` | `0.1.1` | 与 package version 由测试保持一致。 / Kept equal to package version by a test. |
+| `APP_VERSION` | `0.2.0` | 与 package version 由测试保持一致。 / Kept equal to package version by a test. |
 | `PROMPT_VERSION` | `stage1a-2026-07-28` | 写入 provenance；实际 prompt 还计算 SHA-256。 / Written to provenance; the actual prompt contract is also SHA-256 hashed. |
 | `DEFAULT_OLLAMA_URL` | `http://127.0.0.1:11434` | 只能改为合法回环 URL。 / May only be changed to a valid loopback URL. |
-| `DEFAULT_MODEL` | `qwen2.5:7b` | Ollama 模式未显式选模型时使用。 / Used when Ollama mode does not specify a model. |
+| `DEFAULT_MODEL` | `qwen2.5:3b` | Ollama/chat 模式未显式选模型时使用。 / Used when Ollama/chat mode does not specify a model. |
 | `MAX_FILES` | `10` | 每个 run 文件数上限。 / File-count limit per run. |
 | `MAX_FILE_BYTES` | `5 MiB` | 单文件上限。 / Per-file limit. |
 | `MAX_TOTAL_BYTES` | `20 MiB` | 全部上传合计上限。 / Combined upload limit. |
@@ -295,7 +313,7 @@ The following links are pinned to child commit `4e3bdda` so the local review che
 | `OLLAMA_MODELS` | `$XDG_DATA_HOME/ollama/models` | launcher 使用并尝试设为 `0700` 的模型目录；模型权重本身是受控 artifact。 / Model directory used and chmodded to `0700` by the launcher; model weights are controlled artifacts. |
 | `GOOD_STORY_RUNS_DIR` | `$XDG_DATA_HOME/good-story-agent/runs` | 改变运行产物目录；POSIX 上必须能强制 `0700`。 / Changes run storage; POSIX must enforce `0700`. |
 | `GOOD_STORY_OLLAMA_URL` | `http://127.0.0.1:11434` | 必须含 `http/https`、host、port，无 credentials/query/fragment，host 必须是 loopback。 / Requires scheme, host, and port; forbids credentials/query/fragment and non-loopback hosts. |
-| `GOOD_STORY_MODEL` | `qwen2.5:7b` | 非空且最多 160 字符；后端还有字符 allowlist。 / Nonempty and at most 160 characters; backend applies another character allowlist. |
+| `GOOD_STORY_MODEL` | `qwen2.5:3b` | 非空且最多 160 字符；后端还有字符 allowlist。 / Nonempty and at most 160 characters; backend applies another character allowlist. |
 | `GOOD_STORY_SESSION_TOKEN` | 随机 32-byte URL-safe token / random 32-byte URL-safe token | 可选固定 Web 启动 token；长度必须为 32-256 字符。 / Optional fixed startup token; must be 32-256 characters. |
 | `GOOD_STORY_OLLAMA_BIN` | `command -v ollama` | launcher 使用的 Ollama 可执行文件。 / Ollama executable used by the launcher. |
 
@@ -585,11 +603,11 @@ The following are current implementation boundaries, not speculation:
 
 The output is an evidence-bounded candidate analysis, not automated peer review or scientific-truth verification.
 
-## 11. E1 Provider Boundary（待审） / E1 Provider Boundary (Under Review)
+## 11. E1 Provider Boundary（已合并并固定） / E1 Provider Boundary (Merged and Pinned)
 
-E1 的源码只存在于 child commit [`367f971`](https://github.com/Juggernautsst/stage1a-good-story-agent/commit/367f971a3b7464d216b8c3727a10f064ad2b253d)，不在父 gitlink `4e3bdda`。主要新增文件为 [`providers.py`](https://github.com/Juggernautsst/stage1a-good-story-agent/blob/367f971a3b7464d216b8c3727a10f064ad2b253d/src/good_story_agent/providers.py)。
+E1 已通过 child PR #2 合并到 child `main` 的 [`efea263`](https://github.com/Juggernautsst/stage1a-good-story-agent/commit/efea263da1b803a74a6a91c0e592949b3237203c)，并通过 parent PR #11 / Issue #9 固定到 parent gitlink。主要新增文件为 [`providers.py`](https://github.com/Juggernautsst/stage1a-good-story-agent/blob/efea263/src/good_story_agent/providers.py)。
 
-E1 source exists only at child commit [`367f971`](https://github.com/Juggernautsst/stage1a-good-story-agent/commit/367f971a3b7464d216b8c3727a10f064ad2b253d), not at parent pin `4e3bdda`. Its main new file is [`providers.py`](https://github.com/Juggernautsst/stage1a-good-story-agent/blob/367f971a3b7464d216b8c3727a10f064ad2b253d/src/good_story_agent/providers.py).
+E1 is merged into child `main` at [`efea263`](https://github.com/Juggernautsst/stage1a-good-story-agent/commit/efea263da1b803a74a6a91c0e592949b3237203c) through child PR #2 and pinned into the parent gitlink through parent PR #11 / Issue #9. Its main new file is [`providers.py`](https://github.com/Juggernautsst/stage1a-good-story-agent/blob/efea263/src/good_story_agent/providers.py).
 
 ### 11.1 契约对象 / Contract Objects
 
@@ -620,6 +638,20 @@ The default factory is an explicit allowlist that creates only `AuditProvider` o
 E1 的价值是把当前两种本地行为放到稳定、可测试的内部接口后面，为未来 E3 独立进程/服务 gateway 保留接入点，而不是交付 gateway 本身。
 
 E1's value is a stable, testable internal interface around the two local behaviors, leaving an integration point for a future E3 process/service gateway rather than delivering that gateway.
+
+### 11.3 当前子仓库新增的 Chat 与 MCP / Current Child-Main Chat and MCP Additions
+
+child `main` 还包含两个与 evidence-story pipeline 分离的能力：material-optional Web research chat，以及 client-neutral MCP `STDIO` facade。它们共享回环 Ollama provider boundary，但不会把聊天输出伪装成已验证的 structured story，也不会新增远程 endpoint、SSO、RAG 或外发能力。
+
+Child `main` also contains two capabilities separate from the evidence-story pipeline: material-optional Web research chat and a client-neutral MCP `STDIO` facade. They share the loopback Ollama provider boundary, but chat output is not presented as a validated structured story and these additions do not add remote endpoints, SSO, RAG, or egress.
+
+| Capability | Current behavior |
+| --- | --- |
+| `POST /api/chat` | Tool-free local research question answering; optional explicitly uploaded TXT/Markdown/CSV/JSON/PDF context; no run directory or evidence report is created for chat. / 无工具本地科研问答；可附加明确选择的材料；聊天不创建 run 或 evidence report。 |
+| Chat result metadata | Returns `evidence_verified=false` for material-free or attachment-assisted chat, with `local_transport_only=true`; attachments are context, not authorization. / 返回 `evidence_verified=false` 和 `local_transport_only=true`；附件只是上下文，不是授权。 |
+| `good-story-agent-mcp` | Local `STDIO` only; `analyze_materials`, `read_run_report`, and `read_run_provenance`. No server paths, arbitrary URLs, shell, release, or simulation tools. / 仅本机 `STDIO`；不接受服务器路径、任意 URL、shell、发布或仿真工具。 |
+| Client integration | Codex Desktop/CLI and other MCP clients can invoke the same command; configuration is client-side and contains no secret. / Codex Desktop/CLI 和其他 MCP 客户端可调用同一命令；配置不含 secret。 |
+| Enterprise boundary | No remote Streamable HTTP, OAuth, multiuser identity, tenant authorization, or laptop-to-server transport. / 尚无远程 Streamable HTTP、OAuth、多用户身份、租户授权或笔记本到服务器传输。 |
 
 ## 12. Service 编排、Provenance 和本地持久化 / Service Orchestration, Provenance, and Local Persistence
 
@@ -819,15 +851,15 @@ The current working copy is a Windows-mounted WSL development checkout whose POS
 
 ### 15.2 创建环境 / Create the Environment
 
-以下命令只适用于父仓库的 clean recursive clone，并要求工作树中的 child checkout 与父 gitlink 同为本手册固定的 `4e3bdda`。当前开发工作副本故意检出了 E1 待审分支，不满足该部署前提；不要从它执行安装。先在 superproject root 运行双重校验，任一 `test` 失败都应停止并重新创建 clean clone，而不是覆盖含有其他工作的 checkout：
+以下命令只适用于父仓库的 clean recursive clone，并要求 child checkout 与 parent gitlink 同为已固定的 `efea263da1b803a74a6a91c0e592949b3237203c`。当前开发工作副本包含独立工作，不满足部署前提；不要从它执行安装。先在 superproject root 运行双重校验，任一 `test` 失败都应停止并重新创建 clean clone，而不是覆盖含有其他工作的 checkout：
 
-The following commands apply only to a clean recursive clone of the parent and require both the parent gitlink and checked-out child to equal this handbook's pin, `4e3bdda`. The current development working copy intentionally has the E1 review branch checked out and does not satisfy this deployment prerequisite; do not install from it. Run both checks from the superproject root first. If either `test` fails, stop and create a clean clone rather than overwriting a checkout that may contain other work:
+The following commands apply only to a clean recursive clone and require both the parent gitlink and child checkout to equal the pinned commit `efea263da1b803a74a6a91c0e592949b3237203c`. The current development working copy contains independent work and does not satisfy this deployment prerequisite; do not install from it. Run both checks from the superproject root first. If either `test` fails, stop and create a clean clone rather than overwriting a checkout that may contain other work:
 
 ```bash
 test "$(git rev-parse HEAD:components/stage1a-good-story-agent)" = \
-  "4e3bddaadc5e9331955afa6155a5d0ffbc648e18"
+  "efea263da1b803a74a6a91c0e592949b3237203c"
 test "$(git -C components/stage1a-good-story-agent rev-parse HEAD)" = \
-  "4e3bddaadc5e9331955afa6155a5d0ffbc648e18"
+  "efea263da1b803a74a6a91c0e592949b3237203c"
 cd components/stage1a-good-story-agent
 python3 -m venv .venv
 .venv/bin/python -m pip install --upgrade pip
@@ -867,7 +899,7 @@ Installing Ollama and pulling a model downloads several gigabytes and requires s
 When the model is absent on first use, run in another terminal:
 
 ```bash
-ollama pull qwen2.5:7b
+ollama pull qwen2.5:3b
 ```
 
 打开 launcher 打印的完整 `http://127.0.0.1:8765/#token=...`，不能只打开无 fragment 地址。先选择 audit 检查材料，再选择 Ollama。
@@ -889,7 +921,7 @@ With the launcher running and the model installed:
   examples/synthetic_waveguide_notes.md \
   examples/synthetic_transmission_sweep.csv \
   --backend ollama \
-  --model qwen2.5:7b \
+  --model qwen2.5:3b \
   --language zh-CN \
   --context "Synthetic tolerance-study fixture; do not infer experimental validation."
 ```
@@ -938,19 +970,22 @@ Default run storage is under the user's Linux data directory, not repository `ru
 
 | 版本 / Version | 证据 / Evidence |
 | --- | --- |
-| Parent-pinned child `4e3bdda` | Stage 1A completion record reports `38 passed`; this belongs to the pinned engineering MVP. / Stage 1A 完成记录为 `38 passed`，属于固定工程 MVP。 |
-| E1 child `367f971` | Child PR #2 reports `47 passed`, compileall, shell syntax, JavaScript syntax, and `pip check`; real Ollama and browser E2E were not rerun. / 子 PR #2 记录 `47 passed`、编译与语法检查和 `pip check`；未重跑真实 Ollama 与浏览器 E2E。 |
-| Issue #4 read-only audit | 当前 submodule 本身没有 `.venv`；plain system Python 首先无法 import src-layout package，显式加入当前 `PYTHONPATH` 后又缺少 Flask。独立审查因此使用兼容的已有 virtualenv 加当前 `PYTHONPATH`，复现 `47 passed`，并通过 `pip check` 与 `sh -n`。 / The checkout lacks its own `.venv`; plain system Python first cannot import the src-layout package, and exposing the current `PYTHONPATH` then reveals missing Flask. The independent review therefore used a compatible existing virtualenv with the current source, reproduced `47 passed`, and passed `pip check` and `sh -n`. |
+| Parent-pinned child `4e3bdda` (historical) | Stage 1A baseline reports `38 passed`; this belongs to the old pinned engineering MVP and is not the current child-main result. / `38 passed` 属于旧父 pin 的历史工程 MVP，不是当前 child-main 结果。 |
+| Child merged main `efea263` | Offline suite: `117 passed, 1 skipped`; includes provider, MCP, and chat tests. / 离线测试为 `117 passed, 1 skipped`，包含 provider、MCP 和 chat 测试。 |
+| Live MCP acceptance | `qwen2.5:3b`: `1 passed`; synthetic fixtures only, local `STDIO`, no cloud/Tidy3D. / `qwen2.5:3b`：`1 passed`；仅合成 fixture、本地 `STDIO`，无云端/Tidy3D。 |
+| Live Web smoke | Material-free chat: `721` response characters, `0` sources. Synthetic attachment chat: `808` response characters, `2` sources, `3` context references. Both report `evidence_verified=false` and `local_transport_only=true`. / 无材料 chat 为 `721` 字符、`0` source；合成附件 chat 为 `808` 字符、`2` source、`3` context references；两者均为 `evidence_verified=false`、`local_transport_only=true`。 |
+| Historical E1 review | Child PR #2 originally recorded `47 passed`; it was superseded by the merged child-main stack. / 子 PR #2 曾记录 `47 passed`，现已被 child-main 合并栈取代。 |
+| Parent E2 implementation | E2 suite: `26 passed`; includes CLI and loopback-browser smoke tests, token/Host/framing/deadline/cleanup boundary checks, model/tool dependency checks, tenant isolation, share/revoke, source reauthorization race, replay/cache, bundle negative matrix, SQL parameterization, content-free audit validation, and audit-chain verification. Synthetic fixture only; no cloud/model/Tidy3D calls. / E2 测试为 `26 passed`；包含 CLI 与回环浏览器 smoke、token/Host/framing/deadline/cleanup 边界检查，并覆盖模型/工具依赖检查、tenant 隔离、share/revoke、source reauthorization race、replay/cache、bundle 负向矩阵、SQL 参数化、无正文 audit 校验和 audit 链验证。仅合成 fixture，无云端/模型/Tidy3D 调用。 |
 
-这三个事实不能互换：`47 passed` 不属于父 gitlink，缺少本地 `.venv` 也不推翻 PR 中保留的验收证据。
+这些事实不能互换：旧 pin 的测试、child main 的离线测试和 live smoke 分别证明不同边界；live smoke 也不证明科学正确性或企业部署安全。
 
-These facts are not interchangeable: `47 passed` does not belong to the parent pin, and the missing local `.venv` does not invalidate acceptance evidence retained in the PR.
+These facts are not interchangeable: historical pin tests, child-main offline tests, and live smoke cover different boundaries; live smoke does not prove scientific correctness or enterprise deployment security.
 
 ### 17.2 测试文件和覆盖 / Test Files and Coverage
 
-固定版本测试入口可在 child [`tests/`](https://github.com/Juggernautsst/stage1a-good-story-agent/tree/4e3bdda/tests) 查看；E1 新 provider tests 在 [`test_providers.py`](https://github.com/Juggernautsst/stage1a-good-story-agent/blob/367f971a3b7464d216b8c3727a10f064ad2b253d/tests/test_providers.py)。
+当前 child-main 测试入口可在 [`tests/`](https://github.com/Juggernautsst/stage1a-good-story-agent/tree/efea263/tests) 查看；provider、chat、MCP 和 live MCP 测试也固定在该快照。
 
-Pinned tests are available under child [`tests/`](https://github.com/Juggernautsst/stage1a-good-story-agent/tree/4e3bdda/tests); E1 provider tests are in [`test_providers.py`](https://github.com/Juggernautsst/stage1a-good-story-agent/blob/367f971a3b7464d216b8c3727a10f064ad2b253d/tests/test_providers.py).
+The current child-main tests are under [`tests/`](https://github.com/Juggernautsst/stage1a-good-story-agent/tree/efea263/tests); provider, chat, MCP, and live-MCP tests are part of this snapshot.
 
 | Test module | 覆盖 / Coverage |
 | --- | --- |
@@ -963,6 +998,17 @@ Pinned tests are available under child [`tests/`](https://github.com/Juggernauts
 | `test_service.py` | audit artifacts、manifest hashes/provenance、exact ZIP-member hashes，以及 fixture raw input/original-name metadata 在 export 中的排除。 / Artifacts, provenance, exact ZIP hashes, and exclusion of fixture raw input/original-name metadata from export. |
 | `test_web.py` | audit upload flow、write header、loopback client、unknown route、startup token、trusted Host。 / Web audit flow and main local security controls. |
 | `test_providers.py` (E1) | shared contract、factory allowlist、injection、no fallback、metadata inconsistency、pre-evidence endpoint refusal。 / Shared provider contract, allowlist, injection, no fallback, metadata consistency, and pre-evidence refusal. |
+| `test_chat.py` | 无材料/可选材料 chat、历史和 prompt budget、无工具请求、provider capability、模型可用性与 response 校验。 / Material-free/optional-context chat, history and prompt budgets, tool-free requests, provider capabilities, model availability, and response validation. |
+| `test_mcp_server.py` / `test_agent_facade.py` | MCP tool schema、redaction、run ID/path boundary、error handling 和 client-neutral facade。 / MCP tool schema, redaction, run-ID/path boundaries, error handling, and client-neutral facade. |
+| `test_mcp_live.py` | opt-in local `STDIO -> Ollama -> validated report/provenance` smoke path。 / Opt-in local `STDIO -> Ollama -> validated report/provenance` smoke path. |
+
+E2 测试位于父仓库 `tests/e2/`，并由 [E2 implementation note](E2_IMPLEMENTATION.md) 解释运行方式和生产限制。它们是父仓库测试，不会递归调用 child Stage 1A。
+
+The E2 tests are under the parent `tests/e2/` and their execution and production limits are documented in the [E2 implementation note](E2_IMPLEMENTATION.md). They are parent-repository tests and do not invoke child Stage 1A recursively.
+
+现场 E2 演示可使用父仓库的 `python3 scripts/e2_demo.py` 终端菜单，或运行 `python3 scripts/e2_web_demo.py` 打开回环浏览器控制台。Stage 1A Web/MCP 演示仍使用 child component 的本地 launcher；E2 与 Stage 1A 两条路径目前没有端到端集成。
+
+The live E2 demonstration can use the parent `python3 scripts/e2_demo.py` terminal menu or `python3 scripts/e2_web_demo.py` for the loopback browser console. Stage 1A Web/MCP demonstrations still use the child component's local launcher; the E2 and Stage 1A paths are not end-to-end integrated yet.
 
 ### 17.3 当前测试未覆盖 / Current Test Gaps
 
@@ -976,7 +1022,7 @@ Pinned tests are available under child [`tests/`](https://github.com/Juggernauts
 - Web report/bundle download、security headers、413、malformed/corrupted run 和 error logging。 / Web downloads, security headers, 413, malformed/corrupted runs, and error logging.
 - 并发 run、disk-full、permission race、cleanup failure 和 process interruption。 / Concurrent runs, disk-full behavior, permission races, cleanup failure, and process interruption.
 - CLI subprocess 的 exit/traceback matrix、console-script packaging，以及 wheel/sdist 安装。 / CLI subprocess exit/traceback behavior, console-script packaging, and wheel/sdist installation.
-- 浏览器真实 E2E、accessibility，以及 launcher/Ollama 的功能性 process lifecycle、工具依赖和跨平台行为。 / Real browser E2E, accessibility, and functional launcher/Ollama process lifecycle, tool dependencies, and cross-platform behavior.
+- 完整浏览器 action E2E、accessibility，以及 launcher/Ollama 的功能性 process lifecycle、工具依赖和跨平台行为。 / Comprehensive browser-action E2E, accessibility, and functional launcher/Ollama process lifecycle, tool dependencies, and cross-platform behavior.
 - 模型科学质量：至少五案例、两名独立评价者、预先定义评分标准。 / Model scientific quality: at least five cases, two independent evaluators, and a predefined rubric.
 
 自动测试通过只证明上述覆盖范围内的工程行为，不证明论文质量提升、科学正确性或企业安全性。
@@ -1039,9 +1085,9 @@ Only the reverse proxy/API gateway is exposed to the user network. Database, ret
 
 ## 19. 身份感知 RAG 和授权 / Identity-Aware RAG and Authorization
 
-本节是 E2 的 **DESIGN ONLY** 契约；E2 implementation 仍为 **NOT IMPLEMENTED**，当前程序没有 SSO、policy service、RLS database、retrieval service 或 signed evidence bundle。
+本节是父 Issue [#10](https://github.com/Juggernautsst/Industrial_Local_Agent/issues/10) 下 E2 的契约与实施状态：synthetic model-free vertical slice 已在当前分支实现；生产 SSO、policy service、RLS database、持久化 retrieval/audit 和 signed bundle key custody 仍未实现。
 
-This section is the **DESIGN ONLY** E2 contract; E2 implementation remains **NOT IMPLEMENTED**, and the current program has no SSO, policy service, RLS database, retrieval service, or signed evidence bundle.
+This section records the E2 contract and implementation status under parent Issue [#10](https://github.com/Juggernautsst/Industrial_Local_Agent/issues/10): the synthetic model-free vertical slice is implemented on the current branch; production SSO, policy service, RLS database, durable retrieval/audit, and signed-bundle key custody remain unimplemented.
 
 核心不变量：**RAG performs relevance retrieval, never authorization; the LLM never decides access.**
 
@@ -1219,9 +1265,9 @@ The publicly available Tidy3D Python client does not make FDTD solving fully off
 
 ### 23.1 当前默认模型 / Current Default Model
 
-Stage 1A 默认 `qwen2.5:7b`，因为它能在当前 RTX 4070 Ti 12 GB 工作站上作为第一轮本地模型运行。默认不表示它经过完整科研质量 benchmark，也不表示它适合企业并发。模型可替换为其他已安装 Ollama model，只要名称和 loopback policy 通过；每个模型都需要独立质量评估。
+Stage 1A 当前默认 `qwen2.5:3b`，用于轻量本地演示和 live smoke。它能在当前 RTX 4070 Ti 12 GB 工作站运行，但默认不表示它经过完整科研质量 benchmark，也不表示它适合企业并发。模型可替换为其他已安装 Ollama model，只要名称和 loopback policy 通过；每个模型都需要独立质量评估。
 
-Stage 1A defaults to `qwen2.5:7b` because it can run as the first local model on the current RTX 4070 Ti 12 GB workstation. Default does not mean complete scientific-quality benchmarking or enterprise-concurrency suitability. Another installed Ollama model can be selected if its name and loopback policy pass, but every model requires independent quality evaluation.
+Stage 1A currently defaults to `qwen2.5:3b` for lightweight local demonstration and live smoke. It runs on the current RTX 4070 Ti 12 GB workstation, but the default does not mean complete scientific-quality benchmarking or enterprise-concurrency suitability. Another installed Ollama model can be selected if its name and loopback policy pass, but every model requires independent quality evaluation.
 
 ### 23.2 Kimi K3 / Kimi K3
 
@@ -1282,9 +1328,9 @@ Branches use `<type>/<issue-number>-<slug>`. Commits use `Refs #N`; intermediate
 
 Editing does not automatically authorize staging/committing; committing does not authorize pushing; pushing does not authorize a PR/merge; a PR does not authorize merge/release/settings. Do not push the default branch directly, force-push, or mix unrelated dirty files into a commit.
 
-当前 handbook Issue 是 [#4](https://github.com/Juggernautsst/Industrial_Local_Agent/issues/4)，branch 为 `docs/4-implementation-handbook`。它只允许本文件和根 README 导航，不允许 stage submodule 的本地 `367f971` checkout。
+当前 handbook Issue 是 [#4](https://github.com/Juggernautsst/Industrial_Local_Agent/issues/4)，branch 为 `docs/4-implementation-handbook`。它只允许本文件和根 README 导航，不允许把任何本地 child checkout（包括历史 `367f971`）混入提交。
 
-The current handbook Issue is [#4](https://github.com/Juggernautsst/Industrial_Local_Agent/issues/4) on `docs/4-implementation-handbook`. It permits only this document and root README navigation, never staging the local child checkout at `367f971`.
+The current handbook Issue is [#4](https://github.com/Juggernautsst/Industrial_Local_Agent/issues/4) on `docs/4-implementation-handbook`. It permits only this document and root README navigation; no local child checkout, including historical `367f971`, may be staged.
 
 ### 24.3 数据和安全记录 / Data and Security Records
 
@@ -1347,7 +1393,7 @@ This table records source-review facts and does not authorize Issue #4 to fix th
 
 After reading, you should be able to answer accurately:
 
-1. 父仓库为什么显示 submodule modified，但 gitlink 仍是 `4e3bdda`？ / Why can the parent show a modified submodule while the gitlink remains `4e3bdda`?
+1. 父仓库为什么可能显示 submodule modified，即使 gitlink 已固定到 `efea263`？ / Why can the parent show a modified submodule even when the gitlink is pinned to `efea263`?
 2. Audit 模式验证了什么，为什么它不算科学故事生成？ / What does audit verify, and why is it not story generation?
 3. 一个 CSV row 如何变成 source hash、locator 和 evidence ID？ / How does a CSV row become a source hash, locator, and evidence ID?
 4. 哪些规则由代码机械强制，哪些只在 prompt 中？ / Which rules are mechanically enforced and which are prompt-only?

@@ -317,6 +317,14 @@ Blockchain is not a prerequisite for this lifecycle, and raw data is never writt
 
 ### E2: Identity-aware Retrieval / 身份感知检索
 
+当前分支已经实现 Issue #10 的 synthetic model-free vertical slice，验证 synthetic token、服务端 tenant mapping、forced-scope SQLite 检索、source reauthorization、签名 `AuthorizedEvidenceBundle`、replay/cache isolation、bundle negative matrix 和 content-free audit hash chain。它是契约证据，不是 OIDC、PostgreSQL 或生产多租户服务。
+
+The current branch implements the Issue #10 synthetic model-free vertical slice, covering synthetic tokens, server-side tenant mapping, forced-scope SQLite retrieval, source reauthorization, signed `AuthorizedEvidenceBundle`, replay/cache isolation, the bundle-negative matrix, and a content-free audit hash chain. It is contract evidence, not OIDC, PostgreSQL, or a production multi-tenant service.
+
+The following are the remaining production E2 exit gates:
+
+以下是生产 E2 尚未满足的退出门槛：
+
 - valid、missing、expired、forged、wrong issuer/audience token 行为经过测试 / Test valid, missing, expired, forged, and wrong-issuer/audience tokens
 - 两个 tenant 间的 ingest/list/read/retrieve/delete/export 全隔离 / Isolate ingest/list/read/retrieve/delete/export across two tenants
 - 同一 tenant 内不同 user、project、owner 和 source ACL 的 `retrieve/list/read/export` allow、deny、explicit-share、revoke 矩阵通过 / Pass the `retrieve/list/read/export` allow, deny, explicit-share, and revoke matrix across users, projects, owners, and source ACLs within one tenant

@@ -1,0 +1,24 @@
+@startuml
+!include style.puml
+top to bottom direction
+
+rectangle "UQ NETWORK" as Intranet #F4F8FB {
+  rectangle "Researcher" as User #F1F7F3
+  rectangle "Policy + RAG" as Retrieval #EEF5FA
+  rectangle "Local LLM" as LLM #EEF5FA
+  rectangle "MCP Tool Boundary\nread-only import" as Tool #FFF6E8
+  rectangle "Release Gate" as Release #FFF6E8
+}
+
+rectangle "EXTERNAL" as External #FFF9EF {
+  rectangle "External Application" as ExternalApp #FFF6E8
+  rectangle "External Ledger" as Ledger #F5F5F5
+}
+
+User -right-> Retrieval : request
+Retrieval -right-> LLM : evidence
+LLM -down-> Tool : read request
+Tool -right-> Release : release
+Release -down-> ExternalApp : encrypted package
+ExternalApp -right-> Ledger : hash + receipt
+@enduml

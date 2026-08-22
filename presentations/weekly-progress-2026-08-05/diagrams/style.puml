@@ -1,0 +1,40 @@
+!pragma layout smetana
+left to right direction
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam roundcorner 6
+skinparam dpi 180
+skinparam defaultFontName Arial
+skinparam defaultFontSize 14
+skinparam nodesep 10
+skinparam ranksep 18
+skinparam linetype ortho
+skinparam ArrowColor #606A73
+skinparam ArrowThickness 1.2
+skinparam ArrowFontColor #202124
+skinparam ArrowFontName Arial
+skinparam ArrowFontSize 11
+skinparam rectangle {
+  FontName Arial
+  FontColor #202124
+  FontSize 17
+  FontStyle bold
+  BorderColor #6B7780
+  BackgroundColor #F6F8FA
+  RoundCorner 6
+}
+skinparam package {
+  FontName Arial
+  FontColor #2F668D
+  FontSize 15
+  FontStyle bold
+  BorderColor #B9CAD8
+  RoundCorner 8
+}
+skinparam note {
+  FontName Arial
+  FontColor #202124
+  FontSize 12
+  BorderColor #D5B47B
+  BackgroundColor #FFF8EC
+}
