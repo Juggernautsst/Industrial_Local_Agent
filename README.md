@@ -20,6 +20,8 @@
   The synthetic, model-free Enterprise E2 identity-aware authorized-retrieval vertical slice is merged into parent `main`: server-side tenant mapping, forced-scope SQLite retrieval, source reauthorization, signed bundles, replay protection, and a content-free audit hash chain. A CLI menu and loopback browser console demonstrate these contracts, but neither is production E2.
 - 子仓库的 provider boundary、MCP facade 和 Web chat 已合并并固定到 parent `main`（`efea263`）。这仍是单用户、回环、本地演示能力，不是企业多用户或安全发布完成。
   The provider boundary, MCP facade, and Web chat are merged and pinned in parent `main` (`efea263`). This remains a single-user, loopback, local-demo capability, not completed enterprise multiuser or secure release.
+- Bunya/Codex 部署试点材料已准备，但尚未在 Bunya 执行；Codex 只是部署辅助工具，Qwen3.8 试点不会改变 Stage 1A provider 边界。
+  Bunya/Codex pilot materials are prepared but have not been executed on Bunya; Codex is only a deployment assistant, and the Qwen3.8 pilot does not change the Stage 1A provider boundary.
 - 安全发布、跨机构传输和区块链均未实现。未来必须先建立威胁模型、加密、密钥管理、访问控制和审计，再判断区块链是否解决剩余问题。
   Secure release, cross-institution transfer, and blockchain are not implemented. A future stage must first define threat modeling, encryption, key management, access control, and auditing before deciding whether blockchain solves a remaining problem.
 
@@ -32,6 +34,7 @@
 | `scripts/e2_demo.py` | 父仓库演示辅助 / Parent demo helper | 终端 synthetic E2 权限与审计演示 / Terminal synthetic E2 authorization and audit demo | Parent `main` |
 | `scripts/e2_web_demo.py` | 父仓库演示辅助 / Parent demo helper | 回环浏览器 E2 安全控制台 / Loopback browser E2 security console | Issue #10 continuation |
 | `docs/E2_IMPLEMENTATION.md` | 父仓库文档 / Parent documentation | E2 实施边界、运行命令和限制 / E2 implementation boundary, commands, and limits | Current branch |
+| `deploy/bunya/` | 父仓库部署材料 / Parent deployment materials | Codex 辅助的 Bunya Qwen3.8 GPU 试点 / Codex-assisted Bunya Qwen3.8 GPU pilot | 试点脚本与验收模板；未执行 / Pilot scripts and acceptance templates; not executed |
 | `docs/ARCHITECTURE.md` | 父仓库文档 / Parent documentation | 组件边界、更新规则和安全模型 / Component boundaries, update rules, and security model | 当前父仓库 / Current parent |
 | `docs/ENTERPRISE_DEPLOYMENT.md` | 父仓库文档 / Parent documentation | 企业部署模式、契约、威胁模型和验收门槛 / Enterprise deployment modes, contracts, threat model, and acceptance gates | E0 + E2 synthetic status |
 | `docs/ROADMAP.md` | 父仓库文档 / Parent documentation | Stage 1A 至 Stage 3 的验收路线 / Acceptance roadmap from Stage 1A through Stage 3 | 当前父仓库 / Current parent |
@@ -157,6 +160,7 @@ Ordinary Issues must not contain credentials, real research data, confidential o
 - [项目完整实现手册 / Complete implementation handbook](docs/IMPLEMENTATION_HANDBOOK.md)：从版本状态进入 Stage 1A 源码调用链、运行契约、测试缺口和未来设计的统一阅读地图。 / A unified map from version status into the Stage 1A source call chain, runtime contracts, test gaps, and future design.
 - [总体架构 / Architecture](docs/ARCHITECTURE.md)
 - [企业部署与威胁模型 / Enterprise deployment and threat model](docs/ENTERPRISE_DEPLOYMENT.md)
+- [Bunya/Codex Qwen3.8 试点 / Bunya/Codex Qwen3.8 pilot](deploy/bunya/README.md)
 - [实施路线 / Roadmap](docs/ROADMAP.md)
 - [Stage 1A 历史交接 / Historical Stage 1A handoff](components/stage1a-good-story-agent/STAGE1A_HANDOFF.md)（其中 next-step 顺序已由父仓库 roadmap 取代 / its next-step ordering is superseded by the parent roadmap）
 - [Stage 1A 使用说明 / Stage 1A usage](components/stage1a-good-story-agent/README.md)
