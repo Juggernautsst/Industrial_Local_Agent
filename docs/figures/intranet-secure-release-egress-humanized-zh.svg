@@ -1,0 +1,254 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1920" height="1360" viewBox="0 0 1920 1360" role="img" aria-labelledby="title desc">
+  <title id="title">安全对外发布工作流</title>
+  <desc id="desc">一张中文 XMind 风格架构图，描述从内网 Agent 到外部协作者的人工审批安全发布流程。图中保留身份感知检索、受限 MCP 工具、人工审批、应用层加密与签名、审计 outbox、唯一出网、接收方核验和交付对账。</desc>
+  <defs>
+    <marker id="arrow-blue" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L8,4 L0,8 Z" fill="#3e6f8f"/>
+    </marker>
+    <marker id="arrow-amber" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L8,4 L0,8 Z" fill="#b77a2a"/>
+    </marker>
+    <marker id="arrow-green" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L8,4 L0,8 Z" fill="#4b8067"/>
+    </marker>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="150%">
+      <feDropShadow dx="0" dy="5" stdDeviation="7" flood-color="#1d2d3a" flood-opacity="0.14"/>
+    </filter>
+    <style>
+      text { font-family: "FandolHei", "Droid Sans Fallback", "Noto Sans CJK SC", "Microsoft YaHei", "PingFang SC", "Inter", "Arial", sans-serif !important; }
+      .title { font: 700 38px "Noto Sans CJK SC", "Microsoft YaHei", "PingFang SC", "Inter", "Arial", sans-serif; letter-spacing: 0; fill: #1d2d3a; }
+      .subtitle { font: 400 18px "Noto Sans CJK SC", "Microsoft YaHei", "PingFang SC", "Inter", "Arial", sans-serif; letter-spacing: 0; fill: #5d6e7b; }
+      .status { font: 700 12px "Noto Sans CJK SC", "Microsoft YaHei", "PingFang SC", "Inter", "Arial", sans-serif; letter-spacing: 0.5px; }
+      .zone-label { font: 700 13px "Noto Sans CJK SC", "Microsoft YaHei", "PingFang SC", "Inter", "Arial", sans-serif; letter-spacing: 0.8px; fill: #657986; }
+      .branch-title { font: 700 18px "Noto Sans CJK SC", "Microsoft YaHei", "PingFang SC", "Inter", "Arial", sans-serif; letter-spacing: 0; fill: #ffffff; }
+      .branch-subtitle { font: 400 13px "Noto Sans CJK SC", "Microsoft YaHei", "PingFang SC", "Inter", "Arial", sans-serif; letter-spacing: 0; fill: #ffffff; opacity: 0.88; }
+      .card-title { font: 700 17px "Noto Sans CJK SC", "Microsoft YaHei", "PingFang SC", "Inter", "Arial", sans-serif; letter-spacing: 0; fill: #1d2d3a; }
+      .card-body { font: 400 14px "Noto Sans CJK SC", "Microsoft YaHei", "PingFang SC", "Inter", "Arial", sans-serif; letter-spacing: 0; fill: #526571; }
+      .card-note { font: 600 13px "Noto Sans CJK SC", "Microsoft YaHei", "PingFang SC", "Inter", "Arial", sans-serif; letter-spacing: 0; fill: #526571; }
+      .step { font: 700 11px "Inter", "Arial", sans-serif; letter-spacing: 0; fill: #ffffff; }
+      .root-kicker { font: 700 12px "Noto Sans CJK SC", "Microsoft YaHei", "PingFang SC", "Inter", "Arial", sans-serif; letter-spacing: 1.2px; fill: #b9d2e0; }
+      .root-title { font: 700 34px "Noto Sans CJK SC", "Microsoft YaHei", "PingFang SC", "Inter", "Arial", sans-serif; letter-spacing: 0; fill: #ffffff; }
+      .root-body { font: 500 17px "Noto Sans CJK SC", "Microsoft YaHei", "PingFang SC", "Inter", "Arial", sans-serif; letter-spacing: 0; fill: #e7f0f5; }
+      .root-note { font: 400 14px "Noto Sans CJK SC", "Microsoft YaHei", "PingFang SC", "Inter", "Arial", sans-serif; letter-spacing: 0; fill: #c8d8e2; }
+      .bottom-title { font: 700 15px "Noto Sans CJK SC", "Microsoft YaHei", "PingFang SC", "Inter", "Arial", sans-serif; letter-spacing: 0.8px; fill: #82551f; }
+      .bottom-body { font: 400 13px "Noto Sans CJK SC", "Microsoft YaHei", "PingFang SC", "Inter", "Arial", sans-serif; letter-spacing: 0; fill: #5d6e7b; }
+      .legend { font: 400 12px "Noto Sans CJK SC", "Microsoft YaHei", "PingFang SC", "Inter", "Arial", sans-serif; letter-spacing: 0; fill: #657986; }
+      .connector-blue { fill: none; stroke: #3e6f8f; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+      .connector-amber { fill: none; stroke: #b77a2a; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+      .connector-green { fill: none; stroke: #4b8067; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+      .flow-blue { fill: none; stroke: #3e6f8f; stroke-width: 2.8; stroke-linecap: round; stroke-linejoin: round; marker-end: url(#arrow-blue); }
+      .flow-amber { fill: none; stroke: #b77a2a; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 8 7; marker-end: url(#arrow-amber); }
+      .flow-green { fill: none; stroke: #4b8067; stroke-width: 2.8; stroke-linecap: round; stroke-linejoin: round; marker-end: url(#arrow-green); }
+      .card { stroke-width: 1.4; rx: 16; }
+      .step-blue { fill: #3e6f8f; }
+      .step-amber { fill: #b77a2a; }
+      .step-green { fill: #4b8067; }
+    </style>
+  </defs>
+
+  <rect width="1920" height="1360" fill="#f7f8f6"/>
+
+  <!-- 标题 -->
+  <text x="72" y="64" class="title">安全对外发布</text>
+  <text x="72" y="98" class="subtitle">人工审批、包级加密与唯一公网出口路径</text>
+  <rect x="1450" y="36" width="174" height="32" rx="16" fill="#e7f1f6" stroke="#b8d1df"/>
+  <text x="1537" y="57" text-anchor="middle" class="status" fill="#3e6f8f">设计基线</text>
+  <rect x="1640" y="36" width="208" height="32" rx="16" fill="#fff1dc" stroke="#e2bb80"/>
+  <text x="1744" y="57" text-anchor="middle" class="status" fill="#9a6524">尚未部署</text>
+
+  <!-- 信任区域 -->
+  <rect x="52" y="164" width="666" height="990" rx="24" fill="#edf5f9" stroke="#c7dce7" stroke-width="1.5"/>
+  <rect x="1218" y="164" width="350" height="990" rx="24" fill="#fff5e8" stroke="#edd2a7" stroke-width="1.5"/>
+  <rect x="1598" y="164" width="300" height="990" rx="24" fill="#eef7f0" stroke="#c4dccb" stroke-width="1.5"/>
+  <text x="76" y="205" class="zone-label">受保护内网</text>
+  <text x="790" y="205" class="zone-label">控制平面</text>
+  <text x="1242" y="205" class="zone-label">受控出口</text>
+  <text x="1622" y="205" class="zone-label">外部协作者</text>
+  <line x1="1582" y1="252" x2="1582" y2="1080" stroke="#a8c5b0" stroke-width="1.4" stroke-dasharray="6 7"/>
+  <text x="1590" y="285" class="legend" fill="#6d9278">外部信任边界</text>
+
+  <!-- 中心主题 -->
+  <path d="M670 270 C735 294 748 388 760 500" class="connector-blue"/>
+  <path d="M670 718 C720 704 742 675 760 640" class="connector-amber"/>
+  <path d="M1200 575 C1240 510 1248 316 1280 270" class="connector-green"/>
+  <rect x="760" y="450" width="440" height="240" rx="28" fill="#20394b" filter="url(#shadow)"/>
+  <text x="980" y="497" text-anchor="middle" class="root-kicker">核心控制</text>
+  <text x="980" y="548" text-anchor="middle" class="root-title">安全发布</text>
+  <text x="980" y="588" text-anchor="middle" class="root-body">人工审批 + 包级保护</text>
+  <text x="980" y="625" text-anchor="middle" class="root-body">只有经过审计的加密包可以离开</text>
+  <line x1="840" y1="648" x2="1120" y2="648" stroke="#557489" stroke-width="1"/>
+  <text x="980" y="661" text-anchor="middle" class="root-note">Agent、数据库、模型和 MCP 均无直接公网路径</text>
+
+  <!-- 分支 1：准备 -->
+  <rect x="70" y="232" width="600" height="76" rx="18" fill="#3e6f8f"/>
+  <text x="94" y="263" class="branch-title">1  准备候选发布包</text>
+  <text x="94" y="286" class="branch-subtitle">选择数据、身份与证据</text>
+  <path d="M370 308 V675" class="connector-blue"/>
+  <path d="M370 396 H360" class="connector-blue"/>
+  <path d="M370 403 H390" class="connector-blue"/>
+  <path d="M370 575 H350" class="connector-blue"/>
+
+  <rect x="70" y="340" width="290" height="112" fill="#ffffff" stroke="#a9c4d3" class="card"/>
+  <circle cx="94" cy="364" r="15" class="step-blue"/><text x="94" y="368" text-anchor="middle" class="step">01</text>
+  <text x="120" y="369" class="card-title">研究者意图</text>
+  <text x="94" y="397" class="card-body">选择要分享的内容</text>
+  <text x="94" y="418" class="card-body">自然语言请求</text>
+  <text x="94" y="439" class="card-note">&quot;发送这个文件&quot;</text>
+
+  <rect x="390" y="340" width="280" height="126" fill="#ffffff" stroke="#a9c4d3" class="card"/>
+  <circle cx="414" cy="364" r="15" class="step-blue"/><text x="414" y="368" text-anchor="middle" class="step">02</text>
+  <text x="440" y="369" class="card-title">入口 API 网关</text>
+  <text x="414" y="398" class="card-body">SSO / MFA | 委托身份</text>
+  <text x="414" y="420" class="card-body">策略检查 | 速率限制</text>
+  <text x="414" y="442" class="card-note">检索前先绑定身份</text>
+
+  <path d="M360 396 H390" class="flow-blue"/>
+  <path d="M530 466 C530 488 500 492 500 505" class="flow-blue"/>
+
+  <rect x="70" y="505" width="600" height="170" fill="#ffffff" stroke="#a9c4d3" class="card"/>
+  <circle cx="94" cy="529" r="15" class="step-blue"/><text x="94" y="533" text-anchor="middle" class="step">03</text>
+  <text x="120" y="534" class="card-title">授权检索 + Stage 1A</text>
+  <text x="94" y="566" class="card-body">强制行级安全 (RLS) | 证据包</text>
+  <text x="94" y="589" class="card-body">来源：tenant storage 或 Stage 1A 输出</text>
+  <text x="94" y="612" class="card-body">AuthorizedEvidenceBundle</text>
+  <text x="94" y="635" class="card-note">结果写入 tenant-scoped storage</text>
+  <text x="94" y="658" class="card-note">保留来源数据分级</text>
+
+  <!-- 分支 2：审批与保护 -->
+  <rect x="70" y="680" width="600" height="76" rx="18" fill="#b77a2a"/>
+  <text x="94" y="711" class="branch-title">2  审批并保护</text>
+  <text x="94" y="734" class="branch-subtitle">由人工将发布绑定到接收方</text>
+  <path d="M375 756 V1070" class="connector-amber"/>
+  <path d="M375 815 H360" class="connector-amber"/>
+  <path d="M375 815 H390" class="connector-amber"/>
+  <path d="M375 1058 H360" class="connector-amber"/>
+  <path d="M375 1058 H390" class="connector-amber"/>
+
+  <rect x="70" y="785" width="290" height="142" fill="#fffdf8" stroke="#e4c38e" class="card"/>
+  <circle cx="94" cy="809" r="15" class="step-amber"/><text x="94" y="813" text-anchor="middle" class="step">04</text>
+  <text x="120" y="814" class="card-title">MCP 受限工具</text>
+  <text x="94" y="843" class="card-body">生成 ReleaseCandidate</text>
+  <text x="94" y="865" class="card-body">无 Internet、shell、任意 HTTP，</text>
+  <text x="94" y="887" class="card-body">或 filesystem 访问</text>
+  <text x="94" y="909" class="card-note">不能审批、发送或持有密钥</text>
+
+  <rect x="390" y="785" width="280" height="162" fill="#fffdf8" stroke="#e4c38e" class="card"/>
+  <circle cx="414" cy="809" r="15" class="step-amber"/><text x="414" y="813" text-anchor="middle" class="step">05</text>
+  <text x="440" y="814" class="card-title">可信 UI + 人工审批</text>
+  <text x="414" y="843" class="card-body">核对接收方与 key fingerprint</text>
+  <text x="414" y="865" class="card-body">MFA | 高价值发布需双人审批</text>
+  <text x="414" y="887" class="card-body">审批绑定 manifest、用途、expiry、</text>
+  <text x="414" y="909" class="card-body">policy version；任何变更都会使审批失效</text>
+  <text x="414" y="933" class="card-note">聊天确认不等于审批</text>
+
+  <rect x="70" y="970" width="290" height="176" fill="#fffdf8" stroke="#e4c38e" class="card"/>
+  <circle cx="94" cy="994" r="15" class="step-amber"/><text x="94" y="998" text-anchor="middle" class="step">06</text>
+  <text x="120" y="999" class="card-title">Secure-Release Service</text>
+  <text x="94" y="1028" class="card-body">服务端权威分类</text>
+  <text x="94" y="1050" class="card-body">核验接收方、加密并签名</text>
+  <text x="94" y="1072" class="card-body">明文只在此短暂存在</text>
+  <text x="94" y="1095" class="card-note">KMS / HSM 托管私钥</text>
+  <text x="94" y="1118" class="card-note">私钥不会暴露给 MCP</text>
+
+  <rect x="390" y="970" width="280" height="176" fill="#fffdf8" stroke="#e4c38e" class="card"/>
+  <circle cx="414" cy="994" r="15" class="step-amber"/><text x="414" y="998" text-anchor="middle" class="step">07</text>
+  <text x="440" y="999" class="card-title">审计 + transactional outbox</text>
+  <text x="414" y="1028" class="card-body">approved -&gt; audit_committed</text>
+  <text x="414" y="1050" class="card-body">-&gt; delivery_pending</text>
+  <text x="414" y="1072" class="card-note">只记录 opaque ID、hash 和 status</text>
+  <text x="414" y="1095" class="card-note">Relay 只接受 delivery_pending</text>
+  <text x="414" y="1118" class="card-note">超时后不得盲目重试</text>
+
+  <!-- 分支 3：发送与对账 -->
+  <rect x="1280" y="232" width="280" height="76" rx="18" fill="#4b8067"/>
+  <text x="1304" y="263" class="branch-title">3  发送并对账</text>
+  <text x="1304" y="286" class="branch-subtitle">唯一出口，回执可核验</text>
+  <path d="M1250 308 V865" class="connector-green"/>
+  <path d="M1250 437 H1280" class="connector-green"/>
+  <path d="M1250 634 H1280" class="connector-green"/>
+  <path d="M1250 837 H1280" class="connector-green"/>
+
+  <rect x="1280" y="345" width="280" height="184" fill="#fffaf2" stroke="#dfb978" class="card"/>
+  <circle cx="1304" cy="369" r="15" class="step-green"/><text x="1304" y="373" text-anchor="middle" class="step">08</text>
+  <text x="1330" y="374" class="card-title">外发传输网关</text>
+  <text x="1304" y="404" class="card-body">唯一公网出口</text>
+  <text x="1304" y="426" class="card-body">Default-deny | 目标 allowlist</text>
+  <text x="1304" y="448" class="card-body">mTLS | expiry | idempotency</text>
+  <text x="1304" y="474" class="card-note">只接受已审批、已审计的</text>
+  <text x="1304" y="496" class="card-note">delivery_pending 加密签名包</text>
+  <text x="1304" y="518" class="card-note">不接触明文或解密密钥</text>
+
+  <rect x="1280" y="565" width="280" height="138" fill="#fffaf2" stroke="#dfb978" class="card"/>
+  <circle cx="1304" cy="589" r="15" class="step-green"/><text x="1304" y="593" text-anchor="middle" class="step">09</text>
+  <text x="1330" y="594" class="card-title">出口策略</text>
+  <text x="1304" y="623" class="card-body">固定 DNS / IP / port</text>
+  <text x="1304" y="645" class="card-body">阻断 SSRF、redirect</text>
+  <text x="1304" y="667" class="card-body">和 unsolicited inbound</text>
+  <text x="1304" y="689" class="card-note">其他主机均无公网路由</text>
+
+  <rect x="1280" y="765" width="280" height="164" fill="#fffaf2" stroke="#dfb978" class="card"/>
+  <circle cx="1304" cy="789" r="15" class="step-green"/><text x="1304" y="793" text-anchor="middle" class="step">12</text>
+  <text x="1330" y="794" class="card-title">交付回执</text>
+  <text x="1304" y="823" class="card-body">accepted_by_transport | downloaded</text>
+  <text x="1304" y="846" class="card-body">key_unwrapped</text>
+  <text x="1304" y="869" class="card-body">decryption_acknowledged_by</text>
+  <text x="1304" y="891" class="card-body">recipient</text>
+  <text x="1304" y="914" class="card-note">超时 -&gt; pending_reconciliation</text>
+
+  <!-- 外部协作者 -->
+  <rect x="1620" y="345" width="240" height="130" fill="#f8fcf8" stroke="#a7c9af" class="card"/>
+  <circle cx="1644" cy="369" r="15" class="step-green"/><text x="1644" y="373" text-anchor="middle" class="step">10</text>
+  <text x="1670" y="374" class="card-title">获批传输</text>
+  <text x="1644" y="403" class="card-body">HTTPS / SFTP / AS2</text>
+  <text x="1644" y="426" class="card-body">只接收加密包</text>
+  <text x="1644" y="449" class="card-note">传输端点</text>
+
+  <rect x="1620" y="520" width="240" height="170" fill="#f8fcf8" stroke="#a7c9af" class="card"/>
+  <circle cx="1644" cy="544" r="15" class="step-green"/><text x="1644" y="548" text-anchor="middle" class="step">11</text>
+  <text x="1670" y="549" class="card-title">外部协作者</text>
+  <text x="1644" y="579" class="card-body">核验签名 + hash</text>
+  <text x="1644" y="602" class="card-body">解包 data-encryption key</text>
+  <text x="1644" y="625" class="card-body">解密包</text>
+  <text x="1644" y="647" class="card-body">签署交付回执</text>
+  <text x="1644" y="670" class="card-note">明确绑定接收方身份</text>
+
+  <rect x="1620" y="750" width="240" height="170" fill="#f8fcf8" stroke="#a7c9af" class="card"/>
+  <text x="1644" y="782" class="card-title">可选 ledger checkpoint</text>
+  <text x="1644" y="812" class="card-body">仅记录 opaque hash + timestamp</text>
+  <text x="1644" y="835" class="card-body">不存明文、密钥</text>
+  <text x="1644" y="857" class="card-body">或 ciphertext</text>
+  <text x="1644" y="879" class="card-note">不替代审批、加密、</text>
+  <text x="1644" y="901" class="card-note">或回执</text>
+
+  <!-- 明确的包与回执路径 -->
+  <path d="M670 1058 H1210 V437 H1280" class="flow-green"/>
+  <text x="930" y="1049" text-anchor="middle" class="legend" fill="#4b8067">已审计加密包</text>
+  <path d="M1560 430 H1620" class="flow-green"/>
+  <text x="1590" y="328" text-anchor="middle" class="legend" fill="#4b8067">加密 + 签名包</text>
+  <path d="M1740 475 V520" class="flow-green"/>
+  <path d="M1740 670 V750" class="flow-amber"/>
+  <path d="M1620 595 C1585 630 1580 755 1560 837" class="flow-amber"/>
+  <text x="1584" y="708" text-anchor="end" class="legend" fill="#b77a2a">签名回执</text>
+  <path d="M1280 837 C1090 837 1020 1140 670 1058" class="flow-amber"/>
+  <text x="1000" y="1092" text-anchor="middle" class="legend" fill="#b77a2a">对账状态</text>
+
+  <!-- 必须始终成立 -->
+  <rect x="70" y="1160" width="1780" height="140" rx="18" fill="#fffdf8" stroke="#e4c38e" stroke-width="1.4"/>
+  <text x="96" y="1192" class="bottom-title">必须始终成立</text>
+  <text x="96" y="1225" class="bottom-body">MCP 只提出方案；由人工审批。</text>
+  <text x="96" y="1248" class="bottom-body">审批绑定 manifest、接收方 fingerprint、用途、expiry 与 policy。</text>
+  <text x="96" y="1271" class="bottom-body">任何变更都会使审批失效。</text>
+  <text x="650" y="1225" class="bottom-body">应用层加密 + 签名必须在出网前完成。</text>
+  <text x="650" y="1248" class="bottom-body">TLS / mTLS 只保护传输。</text>
+  <text x="650" y="1271" class="bottom-body">不能替代包级保护。</text>
+  <text x="1320" y="1225" class="bottom-body">只有 relay 可以访问公网。</text>
+  <text x="1320" y="1248" class="bottom-body">超时进入 pending_reconciliation；不得盲目重试。</text>
+  <text x="1320" y="1271" class="bottom-body">ledger 只是可选的完整性见证，不存内容或密钥。</text>
+
+  <!-- 图例与部署说明 -->
+  <line x1="76" y1="1330" x2="145" y2="1330" class="flow-blue"/>
+  <text x="160" y="1335" class="legend">实线 = 包 / 数据路径</text>
+  <line x1="390" y1="1330" x2="459" y2="1330" class="flow-amber"/>
+  <text x="474" y="1335" class="legend">虚线 = 审批 / 策略 / 审计</text>
+  <text x="900" y="1335" class="legend">试点期间也要分离进程、身份、命名空间、端口与 default-deny 防火墙；生产环境分离内网、KMS 与 DMZ relay。</text>
+</svg>

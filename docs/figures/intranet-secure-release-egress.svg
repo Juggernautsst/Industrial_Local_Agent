@@ -1,0 +1,172 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1800" height="1050" viewBox="0 0 1800 1050" role="img" aria-labelledby="title desc">
+  <title id="title">Intranet Agent to External Collaborator Secure-Release Workflow</title>
+  <desc id="desc">A bilingual architecture diagram showing an intranet researcher and Stage 1A agent, a restricted MCP intent adapter, human approval, internal envelope encryption with KMS or HSM, an audited outbox, a single outbound egress gateway in a DMZ, and an external collaborator. Only the egress gateway has an Internet route.</desc>
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L8,4 L0,8 Z" fill="#315a7d"/>
+    </marker>
+    <marker id="arrow-dashed" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L8,4 L0,8 Z" fill="#8a5b2d"/>
+    </marker>
+    <style>
+      .title { font: 700 28px "FandolHei", "Noto Sans CJK SC", "Microsoft YaHei", Arial, sans-serif; fill: #1c2a38; }
+      .subtitle { font: 400 16px "FandolHei", "Noto Sans CJK SC", "Microsoft YaHei", Arial, sans-serif; fill: #536474; }
+      .zone-title { font: 700 18px "FandolHei", "Noto Sans CJK SC", "Microsoft YaHei", Arial, sans-serif; fill: #243447; }
+      .box-title { font: 700 17px "FandolHei", "Noto Sans CJK SC", "Microsoft YaHei", Arial, sans-serif; fill: #1c2a38; }
+      .box-text { font: 400 14px "FandolHei", "Noto Sans CJK SC", "Microsoft YaHei", Arial, sans-serif; fill: #405263; }
+      .small { font: 400 13px "FandolHei", "Noto Sans CJK SC", "Microsoft YaHei", Arial, sans-serif; fill: #536474; }
+      .step { font: 700 15px Arial, sans-serif; fill: #ffffff; }
+      .boundary { font: 700 13px "FandolHei", "Noto Sans CJK SC", "Microsoft YaHei", Arial, sans-serif; fill: #8a5b2d; }
+      .zone { stroke-width: 1.5; }
+      .node { stroke: #6c7d8d; stroke-width: 1.3; rx: 8; }
+      .flow { fill: none; stroke: #315a7d; stroke-width: 2.4; marker-end: url(#arrow); }
+      .control { fill: none; stroke: #8a5b2d; stroke-width: 1.8; stroke-dasharray: 7 6; marker-end: url(#arrow-dashed); }
+      .note { fill: #fffdf7; stroke: #c89a61; stroke-width: 1.2; rx: 7; }
+    </style>
+  </defs>
+
+  <rect width="1800" height="1050" fill="#fbfcfd"/>
+  <text x="60" y="48" class="title">内网 Agent 到外部协作者：安全发布与唯一出网工作流</text>
+  <text x="60" y="77" class="subtitle">Intranet Agent to External Collaborator: Secure Release with a Single Egress Path</text>
+  <text x="1740" y="48" text-anchor="end" class="subtitle">Design baseline / 设计基线</text>
+  <text x="1740" y="77" text-anchor="end" class="subtitle">Implementation pending / 当前未实现</text>
+
+  <!-- Trust zones -->
+  <rect x="40" y="110" width="1020" height="850" rx="14" fill="#eef4f8" stroke="#9db5c7" class="zone"/>
+  <rect x="1080" y="110" width="370" height="850" rx="14" fill="#fbf4e8" stroke="#cfad7b" class="zone"/>
+  <rect x="1470" y="110" width="290" height="850" rx="14" fill="#eef5ef" stroke="#9bb9a3" class="zone"/>
+  <text x="65" y="143" class="zone-title">内网受保护区 / Protected intranet</text>
+  <text x="1105" y="143" class="zone-title">受控出口区 / Controlled egress</text>
+  <text x="1495" y="143" class="zone-title">外部协作者 / External party</text>
+
+  <!-- Internal path -->
+  <rect x="70" y="185" width="205" height="96" fill="#ffffff" class="node"/>
+  <text x="172" y="214" text-anchor="middle" class="box-title">研究人员 / Researcher</text>
+  <text x="172" y="240" text-anchor="middle" class="box-text">自然语言意图 / intent</text>
+  <text x="172" y="262" text-anchor="middle" class="box-text">“发送实验数据”</text>
+
+  <rect x="320" y="185" width="250" height="96" fill="#dceaf3" class="node"/>
+  <text x="445" y="214" text-anchor="middle" class="box-title">入口 API 网关 / Ingress API</text>
+  <text x="445" y="240" text-anchor="middle" class="box-text">SSO/MFA、身份委托、限流</text>
+  <text x="445" y="262" text-anchor="middle" class="box-text">identity, policy, rate limits</text>
+
+  <rect x="320" y="340" width="250" height="132" fill="#ffffff" class="node"/>
+  <text x="445" y="371" text-anchor="middle" class="box-title">Stage 1A + 检索 / retrieval</text>
+  <text x="445" y="398" text-anchor="middle" class="box-text">授权 source set、RLS、证据包</text>
+  <text x="445" y="422" text-anchor="middle" class="box-text">AuthorizedEvidenceBundle</text>
+  <text x="445" y="447" text-anchor="middle" class="box-text">结果写入 tenant storage</text>
+
+  <rect x="630" y="185" width="250" height="96" fill="#f5eee4" class="node"/>
+  <text x="755" y="214" text-anchor="middle" class="box-title">MCP 意图适配器 / MCP</text>
+  <text x="755" y="240" text-anchor="middle" class="box-text">typed tools only</text>
+  <text x="755" y="262" text-anchor="middle" class="box-text">无公网、shell、任意 HTTP</text>
+
+  <rect x="630" y="340" width="250" height="132" fill="#fffdf7" class="node"/>
+  <text x="755" y="371" text-anchor="middle" class="box-title">可信 UI + 人工审批</text>
+  <text x="755" y="398" text-anchor="middle" class="box-text">recipient/key fingerprint</text>
+  <text x="755" y="422" text-anchor="middle" class="box-text">MFA / 双人审批（高价值）</text>
+  <text x="755" y="447" text-anchor="middle" class="box-text">聊天确认不等于批准</text>
+
+  <rect x="630" y="520" width="250" height="156" fill="#e6f0e8" class="node"/>
+  <text x="755" y="551" text-anchor="middle" class="box-title">Secure-Release Service</text>
+  <text x="755" y="578" text-anchor="middle" class="box-text">分类、接收者核验、签名</text>
+  <text x="755" y="602" text-anchor="middle" class="box-text">KMS/HSM envelope encryption</text>
+  <text x="755" y="626" text-anchor="middle" class="box-text">明文只在此短暂驻留</text>
+  <text x="755" y="650" text-anchor="middle" class="box-text">ReleaseCandidate → package</text>
+
+  <rect x="920" y="520" width="110" height="156" fill="#f2f3f4" class="node"/>
+  <text x="975" y="551" text-anchor="middle" class="box-title">KMS/</text>
+  <text x="975" y="574" text-anchor="middle" class="box-title">HSM</text>
+  <text x="975" y="606" text-anchor="middle" class="box-text">密钥托管</text>
+  <text x="975" y="630" text-anchor="middle" class="box-text">Key custody</text>
+  <text x="975" y="654" text-anchor="middle" class="box-text">不向 MCP</text>
+  <text x="975" y="672" text-anchor="middle" class="box-text">暴露私钥</text>
+
+  <rect x="320" y="550" width="250" height="126" fill="#f2f3f4" class="node"/>
+  <text x="445" y="581" text-anchor="middle" class="box-title">Audit + transactional outbox</text>
+  <text x="445" y="608" text-anchor="middle" class="box-text">approved → audit_committed</text>
+  <text x="445" y="632" text-anchor="middle" class="box-text">→ delivery_pending</text>
+  <text x="445" y="656" text-anchor="middle" class="box-text">只记 opaque ID/hash/status</text>
+
+  <!-- Egress path -->
+  <rect x="1120" y="245" width="290" height="190" fill="#f7ead8" class="node"/>
+  <text x="1265" y="278" text-anchor="middle" class="box-title">Outbound Transfer Gateway</text>
+  <text x="1265" y="302" text-anchor="middle" class="box-title">外发传输网关 / relay</text>
+  <text x="1265" y="332" text-anchor="middle" class="box-text">唯一公网路由 / sole Internet route</text>
+  <text x="1265" y="356" text-anchor="middle" class="box-text">default-deny + destination allowlist</text>
+  <text x="1265" y="380" text-anchor="middle" class="box-text">mTLS、expiry、idempotency</text>
+  <text x="1265" y="404" text-anchor="middle" class="box-text">仅接收 encrypted + signed package</text>
+
+  <rect x="1120" y="490" width="290" height="140" fill="#fffdf7" class="node"/>
+  <text x="1265" y="524" text-anchor="middle" class="box-title">出口策略 / Egress policy</text>
+  <text x="1265" y="550" text-anchor="middle" class="box-text">固定 DNS/IP/port；阻断 SSRF/redirect</text>
+  <text x="1265" y="574" text-anchor="middle" class="box-text">禁止 unsolicited inbound</text>
+  <text x="1265" y="598" text-anchor="middle" class="box-text">其他主机：无公网路由</text>
+
+  <rect x="1120" y="680" width="290" height="120" fill="#ffffff" class="node"/>
+  <text x="1265" y="713" text-anchor="middle" class="box-title">回执与对账 / Receipt</text>
+  <text x="1265" y="740" text-anchor="middle" class="box-text">accepted / downloaded / decrypted</text>
+  <text x="1265" y="765" text-anchor="middle" class="box-text">timeout → pending_reconciliation</text>
+
+  <!-- External path -->
+  <rect x="1500" y="245" width="230" height="150" fill="#e2efe4" class="node"/>
+  <text x="1615" y="278" text-anchor="middle" class="box-title">Approved transport</text>
+  <text x="1615" y="305" text-anchor="middle" class="box-text">HTTPS/SFTP/AS2…</text>
+  <text x="1615" y="332" text-anchor="middle" class="box-text">只接收已加密包</text>
+  <text x="1615" y="358" text-anchor="middle" class="box-text">transport endpoint</text>
+
+  <rect x="1500" y="475" width="230" height="150" fill="#ffffff" class="node"/>
+  <text x="1615" y="509" text-anchor="middle" class="box-title">外部协作者 / Recipient</text>
+  <text x="1615" y="537" text-anchor="middle" class="box-text">verify signature/hash</text>
+  <text x="1615" y="563" text-anchor="middle" class="box-text">unwrap key → decrypt</text>
+  <text x="1615" y="589" text-anchor="middle" class="box-text">签名 delivery receipt</text>
+
+  <rect x="1500" y="710" width="230" height="120" fill="#f2f3f4" class="node"/>
+  <text x="1615" y="744" text-anchor="middle" class="box-title">可选 ledger checkpoint</text>
+  <text x="1615" y="772" text-anchor="middle" class="box-text">opaque hash / timestamp only</text>
+  <text x="1615" y="798" text-anchor="middle" class="box-text">不存原文、密钥或密文</text>
+
+  <!-- Main data and control flows -->
+  <path d="M275 233 H320" class="flow"/>
+  <circle cx="294" cy="218" r="13" fill="#315a7d"/><text x="294" y="223" text-anchor="middle" class="step">1</text>
+  <path d="M445 281 V340" class="flow"/>
+  <circle cx="462" cy="310" r="13" fill="#315a7d"/><text x="462" y="315" text-anchor="middle" class="step">2</text>
+  <path d="M570 405 H630 V233" class="flow"/>
+  <circle cx="601" cy="390" r="13" fill="#315a7d"/><text x="601" y="395" text-anchor="middle" class="step">3</text>
+  <path d="M755 281 V340" class="flow"/>
+  <circle cx="773" cy="310" r="13" fill="#315a7d"/><text x="773" y="315" text-anchor="middle" class="step">4</text>
+  <path d="M755 472 V520" class="flow"/>
+  <circle cx="773" cy="496" r="13" fill="#315a7d"/><text x="773" y="501" text-anchor="middle" class="step">5</text>
+  <path d="M880 598 H920" class="control"/>
+  <circle cx="900" cy="580" r="13" fill="#8a5b2d"/><text x="900" y="585" text-anchor="middle" class="step">6</text>
+  <path d="M630 632 H570" class="control"/>
+  <circle cx="601" cy="614" r="13" fill="#8a5b2d"/><text x="601" y="619" text-anchor="middle" class="step">7</text>
+  <path d="M570 613 H1060 V340 H1120" class="flow"/>
+  <circle cx="1058" cy="322" r="13" fill="#315a7d"/><text x="1058" y="327" text-anchor="middle" class="step">8</text>
+  <text x="1015" y="303" text-anchor="middle" class="boundary">encrypted + signed package</text>
+  <path d="M1410 340 H1500" class="flow"/>
+  <circle cx="1455" cy="323" r="13" fill="#315a7d"/><text x="1455" y="328" text-anchor="middle" class="step">9</text>
+  <path d="M1615 395 V475" class="flow"/>
+  <circle cx="1634" cy="438" r="13" fill="#315a7d"/><text x="1634" y="443" text-anchor="middle" class="step">10</text>
+  <path d="M1500 550 H1410" class="control"/>
+  <circle cx="1455" cy="532" r="13" fill="#8a5b2d"/><text x="1455" y="537" text-anchor="middle" class="step">11</text>
+  <path d="M1410 740 H1060 V613 H570" class="control"/>
+  <circle cx="1058" cy="722" r="13" fill="#8a5b2d"/><text x="1058" y="727" text-anchor="middle" class="step">12</text>
+  <path d="M1410 740 H1465 V770 H1500" class="control"/>
+
+  <!-- Notes and legend -->
+  <rect x="70" y="735" width="810" height="160" class="note"/>
+  <text x="92" y="768" class="box-title">关键不变量 / Key invariants</text>
+  <text x="92" y="796" class="box-text">• MCP 只生成待审批 ReleaseCandidate；不能 approve、send_file 或持有私钥。</text>
+  <text x="92" y="820" class="box-text">• 应用层加密/签名在内网 Secure-Release Service 完成；TLS/mTLS 只保护传输。</text>
+  <text x="92" y="844" class="box-text">• 只有 Egress Relay 可以出网；Stage 1A、数据库、模型、MCP 默认 deny。</text>
+  <text x="92" y="868" class="box-text">• 区块链（若需要）只作完整性见证；不能替代审批、加密、密钥托管或回执。</text>
+
+  <rect x="1120" y="850" width="610" height="65" class="note"/>
+  <line x1="1145" y1="878" x2="1205" y2="878" class="flow"/>
+  <text x="1218" y="883" class="small">solid: data path / 实线：数据路径</text>
+  <line x1="1435" y1="878" x2="1495" y2="878" class="control"/>
+  <text x="1508" y="883" class="small">dashed: control/audit / 虚线：控制与审计</text>
+
+  <text x="60" y="1008" class="subtitle">Single-host co-location is pilot-only: keep processes, identities, namespaces, ports, and firewall rules separate. / 单机共址仅适合受控试点：仍需分进程、身份、网络命名空间、端口和防火墙规则。</text>
+</svg>

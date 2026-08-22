@@ -92,24 +92,24 @@ Prefer the structured forms under `.github/ISSUE_TEMPLATE/`. Use only existing l
    **Define**: create or complete the Issue scope, acceptance, validation, risks, dependencies, and budget.
 3. **启动 / Start**：接手已有 Issue、baseline 不明显、任务较长或采用非 PR 交付时，追加简短启动评论，记录 baseline、计划路径和非目标。新建且正文完整的简单 Issue 不重复发布启动评论；不要覆盖用户写的正文。
    **Start**: when taking over an existing Issue, the baseline is unclear, work is long-running, or delivery will not use a PR, append a concise start comment with baseline, planned paths, and non-goals. Do not duplicate a complete new Issue body with another start comment, and do not overwrite user-authored text.
-4. **分支 / Branch**：正常变更使用 `<type>/<issue-number>-<slug>`，例如 `feat/12-tidy3d-adapter` 或 `docs/7-security-boundary`。
-   **Branch**: normal changes use `<type>/<issue-number>-<slug>`, for example `feat/12-tidy3d-adapter` or `docs/7-security-boundary`.
+4. **分支 / Branch**：远端只维护 `develop` 和 `main`。所有日常开发、修复、测试和文档工作直接在 `develop` 上进行；不得为每个 Issue 创建或推送 `feature/*`、`fix/*`、`docs/*`、`test/*` 或 `demo/*` 分支。`main` 只保存稳定、已验证、准备交付的内容。
+   **Branch**: maintain only `develop` and `main` remotely. Perform all routine development, fixes, tests, and documentation work on `develop`; do not create or push per-Issue `feature/*`, `fix/*`, `docs/*`, `test/*`, or `demo/*` branches. Keep `main` limited to stable, validated, releasable content.
 5. **实施 / Implement**：遵循最小改动，保留用户现有工作；只有关键决策、范围变化、真实阻塞或外部副作用才追加 Issue 评论。
    **Implement**: make minimal changes and preserve existing user work; add Issue comments only for material decisions, scope changes, genuine blockers, or external effects.
 6. **验证 / Validate**：按风险运行测试，审查完整 diff、安全和数据影响，并把命令类别与结果摘要写入 PR 或手动关闭所需的完成评论。
    **Validate**: run risk-proportionate tests, inspect the full diff and security/data impact, and record command categories plus result summaries in the PR or in the completion comment required for manual closure.
 7. **交付 / Deliver**：commit 使用 `Refs #N`。仅当验收条件已由变更满足、合并即可完成交付且 PR 正文包含完整完成证据时，PR 才使用 `Closes #N`；需要部署后或合并后验收时使用 `Refs #N`。
    **Deliver**: commits use `Refs #N`. A PR uses `Closes #N` only when the change already satisfies acceptance, merge completes delivery, and the PR body contains complete completion evidence; use `Refs #N` when deployment or post-merge acceptance remains.
-8. **关闭 / Close**：正常 `Closes` 路径由 PR 合并自动关闭。direct-to-main、外部操作或合并后验收路径必须先发布完成评论，再手动关闭。
-   **Close**: the normal `Closes` path closes automatically when the PR merges. Direct-to-main, external-operation, and post-merge-acceptance paths require a completion comment before manual closure.
+8. **关闭 / Close**：日常工作在 `develop` 验证；交付时通过明确授权的 `develop -> main` 合并完成。若合并后仍需部署或验收，使用 `Refs #N` 并在完成后记录证据；只有合并即满足验收条件时才使用 `Closes #N`。
+   **Close**: validate routine work on `develop` and deliver it through an explicitly authorized `develop -> main` merge. Use `Refs #N` when deployment or post-merge acceptance remains, and use `Closes #N` only when the merge itself satisfies acceptance.
 
 中间 commit 和未合并工作只能使用 `Refs #N`，不得使用 `Closes` 或 `Fixes`。本地测试通过、未推送 commit、仅创建 PR 或仅更新 gitlink 都不等于完成。
 
 Intermediate commits and unmerged work use only `Refs #N`, never `Closes` or `Fixes`. Passing local tests, an unpushed commit, a newly opened PR, or a gitlink-only update does not equal completion.
 
-未经明确授权不得直接推送默认分支。只有当前用户明确要求直接交付，并且 Issue 评论记录原因、风险和验证时，才可使用 direct-to-main 例外。Issue `#1` 是建立本规则的一次性 bootstrap 例外，不构成后续先例。
+`develop` 是唯一开发分支，日常实现不得提交到 `main`；`main` 只能通过经过验证的 `develop -> main` 合并更新，不得 force-push。删除历史任务分支前，必须确认其内容已合入 `main` 或已明确放弃，并保留必要的提交历史。
 
-Do not push directly to the default branch without explicit authorization. A direct-to-main exception is allowed only when the current user explicitly requests direct delivery and the Issue records the reason, risk, and validation. Issue `#1` is the one-time bootstrap exception that establishes this policy and is not a precedent.
+`develop` is the sole development branch; routine implementation must not commit to `main`. Update `main` only through a validated `develop -> main` merge, never by force-pushing. Before deleting a historical task branch, confirm that its content is merged into `main` or explicitly abandoned, while preserving necessary commit history.
 
 ## 6. 高信号远端记录 / High-Signal Remote Record
 
@@ -161,20 +161,20 @@ Parent and private child permissions are independent; collaborators and CI need 
 
 ## 8. Git 与 GitHub 规则 / Git and GitHub Rules
 
-- 写操作前检查当前分支、`git status --short`、相关 diff、remote、owner、目标 branch 和 Issue 编号。
-  Before writes, inspect the current branch, `git status --short`, relevant diffs, remote, owner, target branch, and Issue number.
+- 写操作前检查当前分支、`git status --short`、相关 diff、remote、owner、目标 branch（`develop` 或 `main`）和 Issue 编号。
+  Before writes, inspect the current branch, `git status --short`, relevant diffs, remote, owner, target branch (`develop` or `main`), and Issue number.
 - 用户已有修改、暂存内容和未跟踪文件均不得覆盖、隐藏或混入当前提交。
   Never overwrite, hide, or mix user changes, staged content, or untracked files into the current commit.
 - 只暂存当前 Issue 的明确路径；不得在脏工作树中使用 `git add .` 或 `git add -A`。
   Stage only explicit paths belonging to the current Issue; never use `git add .` or `git add -A` in a dirty tree.
 - commit 信息包含 Issue 引用，例如 `docs: add issue workflow (Refs #12)`。
   Commit messages include an Issue reference, for example `docs: add issue workflow (Refs #12)`.
-- PR 应保持单一目的；使用 `.github/pull_request_template.md`，并把未验证项明确标为未完成。
-  Keep each PR single-purpose; use `.github/pull_request_template.md` and mark unverified items as incomplete.
-- Issue、评论、远端 branch 的创建或 push、PR、合并、Release 和设置均是远端写操作，必须符合当前请求的明确授权范围；本地 branch 创建也是仓库状态变更，仍需相应授权，但不是远端写操作。
-  Issues, comments, creation or pushing of remote branches, PRs, merges, releases, and settings are remote writes and must remain within explicit authorization in the current request; local branch creation is still an authorization-bound repository mutation, but not a remote write.
-- 不得因为创建 PR 而推断获得 merge、Release、设置或删除 branch 的授权。
-  Do not infer authorization to merge, release, alter settings, or delete a branch merely from authorization to create a PR.
+- PR（如使用）应保持单一目的；日常工作以 `develop` 为集成目标，稳定交付使用 `develop -> main`，并使用 `.github/pull_request_template.md`，把未验证项明确标为未完成。
+  PRs, when used, remain single-purpose; routine work integrates on `develop`, stable delivery uses `develop -> main`, and `.github/pull_request_template.md` records every unverified item as incomplete.
+- Issue、评论、`develop`/`main` 的 push、PR、合并、Release、设置和历史 branch 删除均是远端写操作，必须符合当前请求的明确授权范围；不得创建第三个长期分支。
+  Issues, comments, pushes to `develop`/`main`, PRs, merges, releases, settings, and historical branch deletion are remote writes and must remain within the current request's explicit authorization; do not create a third long-lived branch.
+- 不得因为 push `develop` 或创建 PR 而推断获得合并 `main`、Release、设置或删除 branch 的授权。
+  Do not infer authorization to merge `main`, release, alter settings, or delete branches merely from pushing `develop` or creating a PR.
 
 ## 9. 科研数据与安全 / Research Data and Security
 
@@ -219,9 +219,9 @@ For a normal PR, put the following in the PR body; for a manual-closure path, pu
 
 Before merging a normal `Closes` PR, confirm that its head commit is pushed, acceptance evidence is complete, required checks and review pass, submodule commits are reachable, and no post-merge acceptance remains; the merge event then auto-closes the Issue. Synchronizing a local checkout after merge is delivery verification, not an auto-closure prerequisite.
 
-direct-to-main、外部操作或合并后验收的手动关闭路径，必须在关闭前确认目标远端状态、本地与远端同步、submodule commit 可达和工作树状态，并发布完成评论。取消任务时说明原因，并使用 GitHub 的 `not planned` reason；不得把取消写成完成。
+`develop -> main` 交付、外部操作或合并后验收的手动关闭路径，必须在关闭前确认目标远端状态、本地与远端同步、submodule commit 可达和工作树状态，并发布完成评论。取消任务时说明原因，并使用 GitHub 的 `not planned` reason；不得把取消写成完成。
 
-For direct-to-main, external-operation, or post-merge-acceptance paths, verify target remote state, local/remote synchronization, submodule reachability, and working-tree status, then publish the completion comment before manual closure. When cancelling, state why and use GitHub's `not planned` reason; never report cancellation as completion.
+For `develop -> main` delivery, external-operation, or post-merge-acceptance paths, verify target remote state, local/remote synchronization, submodule reachability, and working-tree status, then publish the completion comment before manual closure. When cancelling, state why and use GitHub's `not planned` reason; never report cancellation as completion.
 
 ## 11. 可读性与效率 / Readability and Efficiency
 
@@ -243,6 +243,6 @@ For direct-to-main, external-operation, or post-merge-acceptance paths, verify t
 - Pull Request: `.github/pull_request_template.md`
 - 机密安全报告 / Confidential security reporting: `SECURITY.md`
 
-本规则由 [Issue #1](https://github.com/Juggernautsst/Industrial_Local_Agent/issues/1) 建立。后续修改本文件也必须通过新的 canonical Issue，不得持续复用 bootstrap Issue。
+本规则由 [Issue #1](https://github.com/Juggernautsst/Industrial_Local_Agent/issues/1) 建立；本次 `main`/`develop` 双分支迁移由当前用户明确授权。后续修改本文件仍需新的 canonical Issue，不得持续复用 bootstrap Issue。
 
-This policy was established through [Issue #1](https://github.com/Juggernautsst/Industrial_Local_Agent/issues/1). Future changes to this file require a new canonical Issue and must not keep reusing the bootstrap Issue.
+This policy was established through [Issue #1](https://github.com/Juggernautsst/Industrial_Local_Agent/issues/1); the current user explicitly authorized this `main`/`develop` migration. Future changes to this file still require a new canonical Issue and must not keep reusing the bootstrap Issue.

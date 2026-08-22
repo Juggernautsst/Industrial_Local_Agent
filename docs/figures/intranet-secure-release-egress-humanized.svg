@@ -1,0 +1,254 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1920" height="1360" viewBox="0 0 1920 1360" role="img" aria-labelledby="title desc">
+  <title id="title">Secure External Release Workflow</title>
+  <desc id="desc">An English-only XMind-style architecture map for a human-approved secure release from an intranet agent to an external collaborator. The map preserves identity-aware retrieval, restricted MCP tools, human approval, application-level encryption and signing, audited outbox, sole egress, recipient verification, and delivery reconciliation.</desc>
+  <defs>
+    <marker id="arrow-blue" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L8,4 L0,8 Z" fill="#3e6f8f"/>
+    </marker>
+    <marker id="arrow-amber" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L8,4 L0,8 Z" fill="#b77a2a"/>
+    </marker>
+    <marker id="arrow-green" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L8,4 L0,8 Z" fill="#4b8067"/>
+    </marker>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="150%">
+      <feDropShadow dx="0" dy="5" stdDeviation="7" flood-color="#1d2d3a" flood-opacity="0.14"/>
+    </filter>
+    <style>
+      .title { font: 700 38px "Inter", "Aptos", "Arial", sans-serif; letter-spacing: 0; fill: #1d2d3a; }
+      .subtitle { font: 400 18px "Inter", "Aptos", "Arial", sans-serif; letter-spacing: 0; fill: #5d6e7b; }
+      .status { font: 700 12px "Inter", "Aptos", "Arial", sans-serif; letter-spacing: 0.8px; }
+      .zone-label { font: 700 13px "Inter", "Aptos", "Arial", sans-serif; letter-spacing: 1.2px; fill: #657986; }
+      .branch-title { font: 700 18px "Inter", "Aptos", "Arial", sans-serif; letter-spacing: 0; fill: #ffffff; }
+      .branch-subtitle { font: 400 13px "Inter", "Aptos", "Arial", sans-serif; letter-spacing: 0; fill: #ffffff; opacity: 0.88; }
+      .card-title { font: 700 17px "Inter", "Aptos", "Arial", sans-serif; letter-spacing: 0; fill: #1d2d3a; }
+      .card-body { font: 400 14px "Inter", "Aptos", "Arial", sans-serif; letter-spacing: 0; fill: #526571; }
+      .card-note { font: 600 13px "Inter", "Aptos", "Arial", sans-serif; letter-spacing: 0; fill: #526571; }
+      .step { font: 700 11px "Inter", "Aptos", "Arial", sans-serif; letter-spacing: 0; fill: #ffffff; }
+      .root-kicker { font: 700 12px "Inter", "Aptos", "Arial", sans-serif; letter-spacing: 1.6px; fill: #b9d2e0; }
+      .root-title { font: 700 34px "Inter", "Aptos", "Arial", sans-serif; letter-spacing: 0; fill: #ffffff; }
+      .root-body { font: 500 17px "Inter", "Aptos", "Arial", sans-serif; letter-spacing: 0; fill: #e7f0f5; }
+      .root-note { font: 400 14px "Inter", "Aptos", "Arial", sans-serif; letter-spacing: 0; fill: #c8d8e2; }
+      .bottom-title { font: 700 15px "Inter", "Aptos", "Arial", sans-serif; letter-spacing: 0.8px; fill: #82551f; }
+      .bottom-body { font: 400 13px "Inter", "Aptos", "Arial", sans-serif; letter-spacing: 0; fill: #5d6e7b; }
+      .legend { font: 400 12px "Inter", "Aptos", "Arial", sans-serif; letter-spacing: 0; fill: #657986; }
+      .connector-blue { fill: none; stroke: #3e6f8f; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+      .connector-amber { fill: none; stroke: #b77a2a; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+      .connector-green { fill: none; stroke: #4b8067; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+      .flow-blue { fill: none; stroke: #3e6f8f; stroke-width: 2.8; stroke-linecap: round; stroke-linejoin: round; marker-end: url(#arrow-blue); }
+      .flow-amber { fill: none; stroke: #b77a2a; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 8 7; marker-end: url(#arrow-amber); }
+      .flow-green { fill: none; stroke: #4b8067; stroke-width: 2.8; stroke-linecap: round; stroke-linejoin: round; marker-end: url(#arrow-green); }
+      .card { stroke-width: 1.4; rx: 16; }
+      .step-blue { fill: #3e6f8f; }
+      .step-amber { fill: #b77a2a; }
+      .step-green { fill: #4b8067; }
+    </style>
+  </defs>
+
+  <rect width="1920" height="1360" fill="#f7f8f6"/>
+
+  <!-- Header -->
+  <text x="72" y="64" class="title">Secure External Release</text>
+  <text x="72" y="98" class="subtitle">Human approval, package encryption, and a sole Internet egress path</text>
+  <rect x="1450" y="36" width="174" height="32" rx="16" fill="#e7f1f6" stroke="#b8d1df"/>
+  <text x="1537" y="57" text-anchor="middle" class="status" fill="#3e6f8f">DESIGN BASELINE</text>
+  <rect x="1640" y="36" width="208" height="32" rx="16" fill="#fff1dc" stroke="#e2bb80"/>
+  <text x="1744" y="57" text-anchor="middle" class="status" fill="#9a6524">NOT DEPLOYED</text>
+
+  <!-- Trust zones -->
+  <rect x="52" y="164" width="666" height="990" rx="24" fill="#edf5f9" stroke="#c7dce7" stroke-width="1.5"/>
+  <rect x="1218" y="164" width="350" height="990" rx="24" fill="#fff5e8" stroke="#edd2a7" stroke-width="1.5"/>
+  <rect x="1598" y="164" width="300" height="990" rx="24" fill="#eef7f0" stroke="#c4dccb" stroke-width="1.5"/>
+  <text x="76" y="205" class="zone-label">PROTECTED INTRANET</text>
+  <text x="790" y="205" class="zone-label">CONTROL PLANE</text>
+  <text x="1242" y="205" class="zone-label">CONTROLLED EGRESS</text>
+  <text x="1622" y="205" class="zone-label">EXTERNAL PARTY</text>
+  <line x1="1582" y1="252" x2="1582" y2="1080" stroke="#a8c5b0" stroke-width="1.4" stroke-dasharray="6 7"/>
+  <text x="1590" y="285" class="legend" fill="#6d9278">external trust boundary</text>
+
+  <!-- Central topic -->
+  <path d="M670 270 C735 294 748 388 760 500" class="connector-blue"/>
+  <path d="M670 718 C720 704 742 675 760 640" class="connector-amber"/>
+  <path d="M1200 575 C1240 510 1248 316 1280 270" class="connector-green"/>
+  <rect x="760" y="450" width="440" height="240" rx="28" fill="#20394b" filter="url(#shadow)"/>
+  <text x="980" y="497" text-anchor="middle" class="root-kicker">CORE CONTROL</text>
+  <text x="980" y="548" text-anchor="middle" class="root-title">Secure Release</text>
+  <text x="980" y="588" text-anchor="middle" class="root-body">Human approval + package protection</text>
+  <text x="980" y="625" text-anchor="middle" class="root-body">Only an audited, encrypted package can leave</text>
+  <line x1="840" y1="648" x2="1120" y2="648" stroke="#557489" stroke-width="1"/>
+  <text x="980" y="661" text-anchor="middle" class="root-note">No direct Internet path from the agent, database,</text>
+  <text x="980" y="682" text-anchor="middle" class="root-note">model, or MCP</text>
+
+  <!-- Branch 1: prepare -->
+  <rect x="70" y="232" width="600" height="76" rx="18" fill="#3e6f8f"/>
+  <text x="94" y="263" class="branch-title">1  PREPARE THE CANDIDATE</text>
+  <text x="94" y="286" class="branch-subtitle">Choose data, identity, and evidence</text>
+  <path d="M370 308 V675" class="connector-blue"/>
+  <path d="M370 396 H360" class="connector-blue"/>
+  <path d="M370 403 H390" class="connector-blue"/>
+  <path d="M370 575 H350" class="connector-blue"/>
+
+  <rect x="70" y="340" width="290" height="112" fill="#ffffff" stroke="#a9c4d3" class="card"/>
+  <circle cx="94" cy="364" r="15" class="step-blue"/><text x="94" y="368" text-anchor="middle" class="step">01</text>
+  <text x="120" y="369" class="card-title">Researcher intent</text>
+  <text x="94" y="397" class="card-body">Choose what to share</text>
+  <text x="94" y="418" class="card-body">Natural-language request</text>
+  <text x="94" y="439" class="card-note">&quot;Send this artifact&quot;</text>
+
+  <rect x="390" y="340" width="280" height="126" fill="#ffffff" stroke="#a9c4d3" class="card"/>
+  <circle cx="414" cy="364" r="15" class="step-blue"/><text x="414" y="368" text-anchor="middle" class="step">02</text>
+  <text x="440" y="369" class="card-title">Ingress API gateway</text>
+  <text x="414" y="398" class="card-body">SSO / MFA | delegated identity</text>
+  <text x="414" y="420" class="card-body">Policy checks | rate limits</text>
+  <text x="414" y="442" class="card-note">Identity is bound before retrieval</text>
+
+  <path d="M360 396 H390" class="flow-blue"/>
+  <path d="M530 466 C530 488 500 492 500 505" class="flow-blue"/>
+
+  <rect x="70" y="505" width="600" height="170" fill="#ffffff" stroke="#a9c4d3" class="card"/>
+  <circle cx="94" cy="529" r="15" class="step-blue"/><text x="94" y="533" text-anchor="middle" class="step">03</text>
+  <text x="120" y="534" class="card-title">Authorized retrieval + Stage 1A</text>
+  <text x="94" y="566" class="card-body">Forced row-level security (RLS) | evidence bundle</text>
+  <text x="94" y="589" class="card-body">Source: tenant storage or Stage 1A output</text>
+  <text x="94" y="612" class="card-body">AuthorizedEvidenceBundle</text>
+  <text x="94" y="635" class="card-note">Write results to tenant-scoped storage</text>
+  <text x="94" y="658" class="card-note">Source classification is preserved</text>
+
+  <!-- Branch 2: approve and protect -->
+  <rect x="70" y="680" width="600" height="76" rx="18" fill="#b77a2a"/>
+  <text x="94" y="711" class="branch-title">2  APPROVE &amp; PROTECT</text>
+  <text x="94" y="734" class="branch-subtitle">A person binds the release to its recipient</text>
+  <path d="M375 756 V1070" class="connector-amber"/>
+  <path d="M375 815 H360" class="connector-amber"/>
+  <path d="M375 815 H390" class="connector-amber"/>
+  <path d="M375 1058 H360" class="connector-amber"/>
+  <path d="M375 1058 H390" class="connector-amber"/>
+
+  <rect x="70" y="785" width="290" height="142" fill="#fffdf8" stroke="#e4c38e" class="card"/>
+  <circle cx="94" cy="809" r="15" class="step-amber"/><text x="94" y="813" text-anchor="middle" class="step">04</text>
+  <text x="120" y="814" class="card-title">MCP typed tools</text>
+  <text x="94" y="843" class="card-body">Creates a ReleaseCandidate</text>
+  <text x="94" y="865" class="card-body">No Internet, shell, arbitrary HTTP,</text>
+  <text x="94" y="887" class="card-body">or filesystem access</text>
+  <text x="94" y="909" class="card-note">Cannot approve, send, or hold keys</text>
+
+  <rect x="390" y="785" width="280" height="162" fill="#fffdf8" stroke="#e4c38e" class="card"/>
+  <circle cx="414" cy="809" r="15" class="step-amber"/><text x="414" y="813" text-anchor="middle" class="step">05</text>
+  <text x="440" y="814" class="card-title">Trusted UI + human approval</text>
+  <text x="414" y="843" class="card-body">Review recipient + key fingerprint</text>
+  <text x="414" y="865" class="card-body">MFA | two-person approval for high-value</text>
+  <text x="414" y="887" class="card-body">Approval binds manifest, purpose, expiry,</text>
+  <text x="414" y="909" class="card-body">and policy version; any change invalidates it</text>
+  <text x="414" y="933" class="card-note">Chat confirmation is not approval</text>
+
+  <rect x="70" y="970" width="290" height="176" fill="#fffdf8" stroke="#e4c38e" class="card"/>
+  <circle cx="94" cy="994" r="15" class="step-amber"/><text x="94" y="998" text-anchor="middle" class="step">06</text>
+  <text x="120" y="999" class="card-title">Secure-Release Service</text>
+  <text x="94" y="1028" class="card-body">Server-authoritative classification</text>
+  <text x="94" y="1050" class="card-body">Verify recipient, encrypt, and sign</text>
+  <text x="94" y="1072" class="card-body">Plaintext exists here only briefly</text>
+  <text x="94" y="1095" class="card-note">KMS / HSM keeps private-key custody</text>
+  <text x="94" y="1118" class="card-note">Private keys never reach MCP</text>
+
+  <rect x="390" y="970" width="280" height="176" fill="#fffdf8" stroke="#e4c38e" class="card"/>
+  <circle cx="414" cy="994" r="15" class="step-amber"/><text x="414" y="998" text-anchor="middle" class="step">07</text>
+  <text x="440" y="999" class="card-title">Audit + transactional outbox</text>
+  <text x="414" y="1028" class="card-body">approved -> audit_committed</text>
+  <text x="414" y="1050" class="card-body">-> delivery_pending</text>
+  <text x="414" y="1072" class="card-note">Store opaque ID, hash, and status only</text>
+  <text x="414" y="1095" class="card-note">Relay accepts delivery_pending only</text>
+  <text x="414" y="1118" class="card-note">No blind retry after timeout</text>
+
+  <!-- Branch 3: send and reconcile -->
+  <rect x="1280" y="232" width="280" height="76" rx="18" fill="#4b8067"/>
+  <text x="1304" y="263" class="branch-title">3  SEND &amp; RECONCILE</text>
+  <text x="1304" y="286" class="branch-subtitle">One route out. Verified delivery back.</text>
+  <path d="M1250 308 V865" class="connector-green"/>
+  <path d="M1250 437 H1280" class="connector-green"/>
+  <path d="M1250 634 H1280" class="connector-green"/>
+  <path d="M1250 837 H1280" class="connector-green"/>
+
+  <rect x="1280" y="345" width="280" height="184" fill="#fffaf2" stroke="#dfb978" class="card"/>
+  <circle cx="1304" cy="369" r="15" class="step-green"/><text x="1304" y="373" text-anchor="middle" class="step">08</text>
+  <text x="1330" y="374" class="card-title">Outbound transfer gateway</text>
+  <text x="1304" y="404" class="card-body">The sole Internet route</text>
+  <text x="1304" y="426" class="card-body">Default-deny | destination allowlist</text>
+  <text x="1304" y="448" class="card-body">mTLS | expiry | idempotency</text>
+  <text x="1304" y="474" class="card-note">Accept only approved, audited,</text>
+  <text x="1304" y="496" class="card-note">delivery_pending encrypted + signed</text>
+  <text x="1304" y="518" class="card-note">packages only; no plaintext or keys</text>
+
+  <rect x="1280" y="565" width="280" height="138" fill="#fffaf2" stroke="#dfb978" class="card"/>
+  <circle cx="1304" cy="589" r="15" class="step-green"/><text x="1304" y="593" text-anchor="middle" class="step">09</text>
+  <text x="1330" y="594" class="card-title">Egress policy</text>
+  <text x="1304" y="623" class="card-body">Pinned DNS / IP / port</text>
+  <text x="1304" y="645" class="card-body">Block SSRF, redirects,</text>
+  <text x="1304" y="667" class="card-body">and unsolicited inbound</text>
+  <text x="1304" y="689" class="card-note">All other hosts have no Internet route</text>
+
+  <rect x="1280" y="765" width="280" height="164" fill="#fffaf2" stroke="#dfb978" class="card"/>
+  <circle cx="1304" cy="789" r="15" class="step-green"/><text x="1304" y="793" text-anchor="middle" class="step">12</text>
+  <text x="1330" y="794" class="card-title">Delivery receipt</text>
+  <text x="1304" y="823" class="card-body">accepted_by_transport | downloaded</text>
+  <text x="1304" y="846" class="card-body">key_unwrapped</text>
+  <text x="1304" y="869" class="card-body">decryption_acknowledged_by</text>
+  <text x="1304" y="891" class="card-body">recipient</text>
+  <text x="1304" y="914" class="card-note">Timeout -> pending_reconciliation</text>
+
+  <!-- External party leaves -->
+  <rect x="1620" y="345" width="240" height="130" fill="#f8fcf8" stroke="#a7c9af" class="card"/>
+  <circle cx="1644" cy="369" r="15" class="step-green"/><text x="1644" y="373" text-anchor="middle" class="step">10</text>
+  <text x="1670" y="374" class="card-title">Approved transport</text>
+  <text x="1644" y="403" class="card-body">HTTPS / SFTP / AS2</text>
+  <text x="1644" y="426" class="card-body">Receives encrypted package only</text>
+  <text x="1644" y="449" class="card-note">Transport endpoint</text>
+
+  <rect x="1620" y="520" width="240" height="170" fill="#f8fcf8" stroke="#a7c9af" class="card"/>
+  <circle cx="1644" cy="544" r="15" class="step-green"/><text x="1644" y="548" text-anchor="middle" class="step">11</text>
+  <text x="1670" y="549" class="card-title">External collaborator</text>
+  <text x="1644" y="579" class="card-body">Verify signature + hash</text>
+  <text x="1644" y="602" class="card-body">Unwrap data-encryption key</text>
+  <text x="1644" y="625" class="card-body">Decrypt package</text>
+  <text x="1644" y="647" class="card-body">Sign delivery receipt</text>
+  <text x="1644" y="670" class="card-note">Recipient identity stays explicit</text>
+
+  <rect x="1620" y="750" width="240" height="170" fill="#f8fcf8" stroke="#a7c9af" class="card"/>
+  <text x="1644" y="782" class="card-title">Optional ledger checkpoint</text>
+  <text x="1644" y="812" class="card-body">Opaque hash + timestamp only</text>
+  <text x="1644" y="835" class="card-body">Never store plaintext, keys,</text>
+  <text x="1644" y="857" class="card-body">or ciphertext</text>
+  <text x="1644" y="879" class="card-note">Does not replace approval, encryption,</text>
+  <text x="1644" y="901" class="card-note">or receipt</text>
+
+  <!-- Explicit package and receipt paths -->
+  <path d="M670 1058 H1210 V437 H1280" class="flow-green"/>
+  <text x="930" y="1049" text-anchor="middle" class="legend" fill="#4b8067">audited encrypted package</text>
+  <path d="M1560 430 H1620" class="flow-green"/>
+  <text x="1590" y="328" text-anchor="middle" class="legend" fill="#4b8067">encrypted + signed package</text>
+  <path d="M1740 475 V520" class="flow-green"/>
+  <path d="M1740 670 V750" class="flow-amber"/>
+  <path d="M1620 595 C1585 630 1580 755 1560 837" class="flow-amber"/>
+  <text x="1584" y="708" text-anchor="end" class="legend" fill="#b77a2a">signed receipt</text>
+  <path d="M1280 837 C1090 837 1020 1140 670 1058" class="flow-amber"/>
+  <text x="1000" y="1092" text-anchor="middle" class="legend" fill="#b77a2a">reconciliation status</text>
+
+  <!-- Non-negotiables -->
+  <rect x="70" y="1160" width="1780" height="140" rx="18" fill="#fffdf8" stroke="#e4c38e" stroke-width="1.4"/>
+  <text x="96" y="1192" class="bottom-title">WHAT MUST ALWAYS BE TRUE</text>
+  <text x="96" y="1225" class="bottom-body">MCP proposes; a person approves.</text>
+  <text x="96" y="1248" class="bottom-body">Approval binds manifest, recipient fingerprint, purpose, expiry, and policy.</text>
+  <text x="96" y="1271" class="bottom-body">Any change invalidates approval.</text>
+  <text x="650" y="1225" class="bottom-body">Application encryption + signing happen before egress.</text>
+  <text x="650" y="1248" class="bottom-body">TLS / mTLS protects transport only.</text>
+  <text x="650" y="1271" class="bottom-body">It does not replace package protection.</text>
+  <text x="1320" y="1225" class="bottom-body">Only the relay has Internet access.</text>
+  <text x="1320" y="1248" class="bottom-body">Timeout means pending_reconciliation; do not blindly retry.</text>
+  <text x="1320" y="1271" class="bottom-body">The ledger is an optional integrity witness, never content or keys.</text>
+
+  <!-- Legend and pilot note -->
+  <line x1="76" y1="1330" x2="145" y2="1330" class="flow-blue"/>
+  <text x="160" y="1335" class="legend">solid = package / data path</text>
+  <line x1="390" y1="1330" x2="459" y2="1330" class="flow-amber"/>
+  <text x="474" y="1335" class="legend">dashed = approval / policy / audit</text>
+  <text x="900" y="1335" class="legend">Pilot only: separate processes, identities, namespaces, ports, and default-deny firewall rules; production separates intranet, KMS, and DMZ relay.</text>
+</svg>

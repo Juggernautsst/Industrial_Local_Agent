@@ -76,12 +76,33 @@ separate human-approved secure-release component
 
 Only the reverse proxy/API gateway is exposed to the user network. The database, Stage 1A worker, Ollama/vLLM, audit sink, and internal management interfaces must be restricted by host firewall rules, separate service identities, and minimal port exposure. A single host saves hardware but provides no high availability and cannot defend against an attacker with host-administrator privileges.
 
+### 3.1 唯一外发出口与工作流 / Sole Egress and Workflow
+
+入口 API gateway 和外发传输 gateway 是两个逻辑边界。外发 gateway 可以在受控单机试点中与 MCP、Secure-Release Service 共址，但必须使用独立进程/容器、service identity、网络命名空间、端口和 default-deny 防火墙策略。生产部署应优先将内网控制平面、Secure-Release/KMS 区和 DMZ egress relay 分开。
+
+The ingress API gateway and outbound transfer gateway are separate logical boundaries. In a controlled single-host pilot, the outbound gateway may share hardware with MCP and the Secure-Release Service, but it must use separate processes/containers, service identities, network namespaces, ports, and default-deny firewall rules. Production should preferably separate the intranet control plane, Secure-Release/KMS zone, and DMZ egress relay.
+
+![外发网关安全工作流 / Secure egress workflow](figures/intranet-secure-release-egress.svg)
+
+MCP 只允许把研究者意图转换为结构化 `ReleaseCandidate`，例如 `artifacts.search`、`recipients.resolve`、`release.create_draft`、`release.preview`、`release.submit_for_approval`、`release.status` 和 `release.cancel`。MCP 不得直接 approve、send_file、调用任意 shell/filesystem/HTTP、修改 classification、读取私钥或建立公网连接；LLM 对话中的“确认”也不是最终审批。
+
+MCP only converts researcher intent into a structured `ReleaseCandidate`, using limited operations such as `artifacts.search`, `recipients.resolve`, `release.create_draft`, `release.preview`, `release.submit_for_approval`, `release.status`, and `release.cancel`. MCP must not directly approve or send files, call arbitrary shell/filesystem/HTTP tools, modify classification, read private keys, or establish Internet connections; a confirmation in an LLM conversation is not final approval.
+
+Secure-Release Service 在包离开内网前完成服务端分类、接收者公钥 fingerprint 核验、可信 UI/MFA/人工审批绑定、应用层 envelope encryption 和签名，并通过 KMS/HSM 托管密钥。外发 relay 只接受带持久 audit receipt、状态为 `delivery_pending` 的 encrypted + signed package；它负责 allowlisted destination、固定 DNS/IP/port、TLS/mTLS、expiry、大小/速率和 idempotency 检查，不持有明文或解密私钥。Stage 1A、检索、数据库、模型和 MCP 均默认没有公网路由。
+
+Before a package leaves the intranet, the Secure-Release Service performs server-side classification, recipient public-key fingerprint verification, trusted-UI/MFA/human-approval binding, application-level envelope encryption, and signing, with keys held by KMS/HSM. The egress relay accepts only an encrypted and signed package in `delivery_pending` state with a persisted audit receipt. It enforces an allowlisted destination, pinned DNS/IP/port, TLS/mTLS, expiry, size/rate, and idempotency checks, and holds neither plaintext nor decryption private keys. Stage 1A, retrieval, the database, the model, and MCP have no default Internet route.
+
+外部端点只返回可验证的分级回执；`accepted_by_transport`、`downloaded`、`key_unwrapped` 和 `decryption_acknowledged_by_recipient` 不能混写成一个含糊的 “delivered”。超时或回执丢失进入 `pending_reconciliation`，不得盲目重试。当前图、边界和流程仍是设计基线，未表示 secure-release 或跨网传输已经实现。
+
+The external endpoint returns a verifiable, graded receipt. `accepted_by_transport`, `downloaded`, `key_unwrapped`, and `decryption_acknowledged_by_recipient` must not be collapsed into an ambiguous “delivered”. A timeout or lost receipt enters `pending_reconciliation`; blind retry is forbidden. The figure, boundaries, and workflow are design baselines and do not mean secure release or cross-network transfer has been implemented.
+
 ## 4. 组件责任 / Component Responsibilities
 
 | 组件 / Component | 必须负责 / Must own | 明确不得负责 / Must not own |
 | --- | --- | --- |
 | Institutional IdP / 机构 IdP | 用户认证、MFA、账号生命周期 / User authentication, MFA, and account lifecycle | 科研内容检索或模型调用 / Research-content retrieval or model invocation |
 | API gateway | 验证 IdP token，生成签名短期委托，限流，请求 ID / Validate IdP tokens, create signed short-lived delegation, rate limit, and assign request IDs | 接受客户端自报 tenant/role，或把原始 IdP token 传给模型 / Accept client-declared tenant/role or pass raw IdP tokens to the model |
+| MCP intent adapter / MCP 意图适配器 | 受限 typed tools、创建/预览 `ReleaseCandidate` / Restricted typed tools and creation/preview of `ReleaseCandidate` | 公网访问、审批、直接发送、任意 shell/filesystem/HTTP、私钥访问 / Internet access, approval, direct sending, arbitrary shell/filesystem/HTTP, or private-key access |
 | Policy service | RBAC+ABAC、项目成员关系、数据分类和撤销 / RBAC+ABAC, project membership, data classification, and revocation | 语义排名或生成回答 / Semantic ranking or answer generation |
 | Retrieval service | 在授权范围内做 lexical/vector ranking，重新授权 top-K source，构造 bundle / Rank lexically or by vector inside the authorized scope, reauthorize top-K sources, and build the bundle | 把 metadata filter 当成授权，或让 LLM批准访问 / Treat metadata filters as authorization or ask the LLM to approve access |
 | PostgreSQL/pgvector | tenant/source ACL 的权威记录，强制 RLS，事务一致性 / Authoritative tenant/source ACL records, forced RLS, and transactional consistency | 依赖应用层过滤作为唯一隔离 / Depend on application filtering as the only isolation |
@@ -89,7 +110,9 @@ Only the reverse proxy/API gateway is exposed to the user network. The database,
 | Model gateway | provider allowlist、固定版本、endpoint、timeout、capacity、provenance / Provider allowlist, pinned versions, endpoints, timeouts, capacity, and provenance | 用户授权或 source selection / User authorization or source selection |
 | Model provider | 对收到的最小 prompt 做推理，不保留 prompt/output，也不用于训练 / Infer over the minimal supplied prompt without retaining prompts/outputs or using them for training | 访问 IdP、ACL、数据库、外部工具或未授权 source / Access the IdP, ACLs, database, external tools, or unauthorized sources |
 | Audit sink | 完整性保护的最小安全事件 / Integrity-protected minimal security events | 保存原始 evidence、prompt、embedding、reasoning 或完整输出 / Store raw evidence, prompts, embeddings, reasoning, or full outputs |
+| KMS/HSM + key registry / 密钥服务 | 包级密钥生成/封装、签名操作、recipient-key 生命周期 / Package-key generation/wrapping, signing operations, and recipient-key lifecycle | 向 MCP、LLM 或 egress relay 暴露私钥 / Expose private keys to MCP, the LLM, or the egress relay |
 | Secure release | 接收者核验、人审、加密、签名、密钥封装、撤销与交付证明 / Recipient verification, human approval, encryption, signatures, key wrapping, revocation, and delivery evidence | 自动相信 Stage 1A 输出可以外发 / Automatically assume Stage 1A output is releasable |
+| Outbound egress gateway / 外发出口网关 | 唯一公网路由、destination allowlist、TLS/mTLS、幂等 dispatch、回执对账 / Sole Internet route, destination allowlist, TLS/mTLS, idempotent dispatch, and receipt reconciliation | 明文加密根、审批根、解密私钥、通用 forward proxy / Plaintext crypto root, approval root, decryption private keys, or generic forward proxy |
 
 ## 5. 请求与数据流 / Request and Data Flow
 
@@ -113,6 +136,25 @@ Only the reverse proxy/API gateway is exposed to the user network. The database,
    Results are written to tenant-scoped storage; audit records IDs, decisions, versions, hashes, and status, not research content.
 10. 需要外发时，用户从 tenant storage 显式选择获批的 raw/derived artifact 或 Stage 1A 输出，进入独立 secure-release 流程完成接收者、人审和密码学操作；该流程不要求输入必须来自 Stage 1A。
     For external release, the user explicitly selects approved raw/derived artifacts or Stage 1A outputs from tenant storage and enters a separate secure-release workflow for recipient verification, human approval, and cryptographic operations; inputs need not originate from Stage 1A.
+
+### 5.1 外发流程与出口规则 / External Release Flow and Egress Rules
+
+1. MCP 仅创建或预览结构化 `ReleaseCandidate`；可信 UI 重新显示 artifact、classification、recipient/key fingerprint、purpose、expiry 和 channel。
+   MCP only creates or previews a structured `ReleaseCandidate`; the trusted UI re-displays the artifacts, classification, recipient/key fingerprint, purpose, expiry, and channel.
+2. 人工审批和必要的 MFA/双人控制绑定完整 manifest hash、recipient fingerprint、purpose、expiry 和 policy version。字段任何变化都会使审批失效。
+   Human approval and required MFA/two-person control bind the complete manifest hash, recipient fingerprint, purpose, expiry, and policy version. Any field change invalidates the approval.
+3. Secure-Release Service 调用 KMS/HSM 生成包级密钥、按已核验接收者封装、签名并生成 package hash；明文不进入 egress relay。
+   The Secure-Release Service uses KMS/HSM to generate a package key, wrap it for the verified recipient, sign the package, and produce its package hash; plaintext never enters the egress relay.
+4. approval、audit intent、package hash 和 idempotency key 在同一事务中持久化；只有拿到 signed audit receipt 后才进入 `delivery_pending`。
+   Approval, audit intent, package hash, and the idempotency key are persisted transactionally; the record enters `delivery_pending` only after a signed audit receipt is received.
+5. Egress relay 只允许固定目的地、协议、DNS/IP、port 和 mTLS 证书；禁止通用 forward proxy、SSRF、redirect、任意 DNS 解析和 unsolicited inbound。
+   The egress relay allows only pinned destinations, protocols, DNS/IPs, ports, and mTLS certificates; generic forward proxies, SSRF, redirects, arbitrary DNS resolution, and unsolicited inbound connections are forbidden.
+6. relay 发送后保存精确 receipt outcome；超时进入 `pending_reconciliation`，使用相同 idempotency key 对账，不盲目切换目的地或重复发送。
+   After dispatch, the relay records the precise receipt outcome; a timeout enters `pending_reconciliation` and reconciles with the same idempotency key without changing destination or blindly resending.
+
+除 egress relay 外，Stage 1A、retrieval、database、model gateway、MCP 和 audit sink 都应被主机/网络策略显式拒绝出网。普通防火墙规则不等于硬件 data diode；若机构要求真正单向传输，需要单独的网络工程和安全评审。
+
+Except for the egress relay, Stage 1A, retrieval, the database, model gateway, MCP, and the audit sink should be explicitly denied Internet egress by host and network policy. Ordinary firewall rules are not a hardware data diode; a truly unidirectional requirement needs separate network engineering and security review.
 
 ## 6. 跨组件契约 / Cross-component Contracts
 
@@ -230,9 +272,9 @@ This section defines only the Stage 2.0 protocol baseline and does not mean tran
 
 `DeliveryReceiptBody` is a versioned canonical unsigned object containing `receipt_id`, `release_id`, recipient ID/key fingerprint, `package_hash`, `idempotency_key`, channel, outcome, occurrence time, signer ID, and receipt `key_id`, while excluding `receipt_hash` and signature. The `receipt_hash` uses `Industrial_Local_Agent/DeliveryReceiptHash/v1`, and the signer uses `Industrial_Local_Agent/DeliveryReceiptSignature/v1` to sign canonical `{receipt_id, receipt_hash, outcome}`; verification also checks signer/key trust, validity, revocation, and replay.
 
-安全发布使用经过维护的密码学库和机构批准算法，不自制 encryption/signature primitive。传输 channel 是独立配置；package 在离开系统边界前已经加密并签名。链上记录不是解密所需条件，也不能代替 recipient verification、key custody、access policy 或 delivery receipt。
+安全发布使用经过维护的密码学库和机构批准算法，不自制 encryption/signature primitive。应用层 package encryption/signature 必须由受保护的 Secure-Release Service 完成，并由 KMS/HSM 托管或执行密钥操作；DMZ egress relay 只处理 encrypted + signed package。传输 channel 是独立配置，TLS/mTLS 不能替代包级加密；package 在离开系统边界前已经加密并签名。链上记录不是解密所需条件，也不能代替 recipient verification、key custody、access policy 或 delivery receipt。
 
-Secure release uses maintained cryptographic libraries and institution-approved algorithms, never custom encryption or signature primitives. The transport channel is configured separately; the package is encrypted and signed before leaving the system boundary. An on-chain record is not required for decryption and cannot replace recipient verification, key custody, access policy, or a delivery receipt.
+Secure release uses maintained cryptographic libraries and institution-approved algorithms, never custom encryption or signature primitives. Application-level package encryption and signing happen inside the protected Secure-Release Service, with key operations held or performed by KMS/HSM; the DMZ egress relay handles only encrypted and signed packages. The transport channel is configured separately, and TLS/mTLS cannot replace package encryption; the package is encrypted and signed before leaving the system boundary. An on-chain record is not required for decryption and cannot replace recipient verification, key custody, access policy, or a delivery receipt.
 
 receipt 的 `outcome` 只能使用明确层级，例如 `accepted_by_transport`、`downloaded`、`key_unwrapped` 或 `decryption_acknowledged_by_recipient`，并由能证明该层级的主体签名。`delivered` 只表示 deployment policy 配置的 receipt 层级，UI/audit 必须同时显示精确 `outcome`。transport 接收或下载回执不能被解释为接收方已经 unwrap key 或成功解密；没有可信回执时保持 `pending_reconciliation`。
 
@@ -283,6 +325,10 @@ Protected assets include raw research material, derived text, source/hash metada
 | 恶意或超大文件 / Malicious or oversized files | type/size/page limits、sandboxed parsing、timeouts、resource quotas / Type/size/page limits, sandboxed parsing, timeouts, resource quotas | malformed PDF、zip bomb、oversized top-K tests / 畸形 PDF、zip bomb 和超大 top-K 测试 |
 | Audit unavailable or corrupted / 审计不可用或损坏 | mandatory-event fail closed、append-only integrity、key lifecycle、bounded buffer、operator alert / Mandatory-event fail closed, append-only integrity, key lifecycle, bounded buffer, and operator alert | Failure injection plus tamper/delete/reorder/duplicate/key-rotation tests / 失败注入及篡改、删除、重排、重复、密钥轮换测试 |
 | 外发与审计结果不一致 / Release and audit outcome diverge | Pre-delivery audit intent、transactional outbox、idempotent delivery、receipt reconciliation / 外发前 audit intent、transactional outbox、幂等交付与 receipt 对账 | Pre-release audit failure 和 post-timeout ambiguous-outcome tests / 外发前审计失败与超时后不确定结果测试 |
+| 未授权直接出网 / Unauthorized direct egress | Host/NACL default-deny；只有 egress relay 有公网路由；固定 destination/protocol/port / Host/NACL default-deny; only the egress relay has an Internet route; pin destination/protocol/port | Stage 1A、MCP、DB、model 和 retrieval 的 direct-egress packet tests / Direct-egress packet tests for Stage 1A, MCP, DB, model, and retrieval |
+| MCP prompt injection 或工具越权 / MCP prompt injection or tool abuse | Typed-tool allowlist；无 approve/send/shell/filesystem/HTTP/key access；trusted UI/MFA / Typed-tool allowlist; no approve/send/shell/filesystem/HTTP/key access; trusted UI/MFA | Malicious intent、destination substitution、classification change 和 tool-abuse tests / Malicious-intent, destination-substitution, classification-change, and tool-abuse tests |
+| Egress relay SSRF、DNS 绕过或重放 / Egress SSRF, DNS bypass, or replay | Pinned DNS/IP/port/certificate、no redirect/open proxy、package hash/expiry/idempotency validation / Pin DNS/IP/port/certificate, disable redirects/open proxies, validate package hash/expiry/idempotency | SSRF、DNS rebinding、redirect、wrong recipient/key、replay 和 duplicate-dispatch tests / SSRF, DNS-rebinding, redirect, wrong-recipient/key, replay, and duplicate-dispatch tests |
+| 外发 relay 或传输端点看到明文 / Plaintext visible to relay or transport endpoint | Package encryption/signing before boundary、KMS/HSM key custody、content-free logs / Encrypt and sign before the boundary, keep keys in KMS/HSM, and use content-free logs | Packet capture、relay storage、debug-log 和 key-isolation scans / Packet-capture, relay-storage, debug-log, and key-isolation scans |
 | Host administrator compromise / 主机管理员失陷 | hardened host、service isolation、key separation、backups、monitoring / Hardened host, service isolation, key separation, backups, monitoring | 属于残余风险，单机不能消除 / Residual risk not eliminated by one host |
 | 错误接收者或外发 / Wrong recipient or release | separate approval、recipient key verification、encryption、signature、revocation / Separate approval, recipient-key verification, encryption, signature, revocation | 双人审批与错误 key/recipient tests / Two-person approval and wrong-key/recipient tests |
 
@@ -313,6 +359,7 @@ Blockchain is not a prerequisite for this lifecycle, and raw data is never writt
 - candidate/recipient/key/purpose/expiry 任一变化都会使旧 approval 失效 / Any candidate, recipient, key, purpose, or expiry change invalidates the old approval
 - synthetic test vectors 覆盖 package round trip、wrong recipient/key、signature/hash/ciphertext tamper、expired policy 与 partial/truncated package / Synthetic test vectors cover package round trips, wrong recipient/key, signature/hash/ciphertext tampering, expired policy, and partial/truncated packages
 - signed receipt 必须绑定 release、recipient/key、package hash、idempotency key 与 outcome；错误或重放 receipt 被拒绝 / The signed receipt binds release, recipient/key, package hash, idempotency key, and outcome; wrong or replayed receipts are rejected
+- egress vertical slice 必须证明只有 relay 能够出网、relay 只接受 audit-committed encrypted package，且错误目的地、SSRF、redirect、DNS 绕过、wrong key、重放和明文日志均 fail closed / The egress vertical slice must prove that only the relay can connect externally, the relay accepts only audit-committed encrypted packages, and wrong destinations, SSRF, redirects, DNS bypass, wrong keys, replay, and plaintext logs fail closed
 - 验收报告分别陈述 pre-delivery cancel、pre-unwrap revoke 与 post-key/plaintext 不可撤回的结果，不声称绝对撤销 / Acceptance evidence separately states pre-delivery cancellation, pre-unwrap revocation, and post-key/plaintext non-recall; it never claims absolute revocation
 
 ### E2: Identity-aware Retrieval / 身份感知检索
