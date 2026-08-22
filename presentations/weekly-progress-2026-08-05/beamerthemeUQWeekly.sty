@@ -1,0 +1,121 @@
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{beamerthemeUQWeekly}[2026/08/05 UQ weekly progress Beamer theme]
+
+\RequirePackage{xparse}
+\RequirePackage{graphicx}
+\RequirePackage{tikz}
+\usetikzlibrary{arrows.meta,calc,positioning,shapes.geometric}
+
+\definecolor{UQInk}{HTML}{202124}
+\definecolor{UQMuted}{HTML}{5F6368}
+\definecolor{StatusPinned}{HTML}{2F6D50}
+\definecolor{StatusReview}{HTML}{2F668D}
+\definecolor{StatusLocal}{HTML}{A86E1D}
+\definecolor{StatusDesign}{HTML}{596773}
+\definecolor{StatusPlanned}{HTML}{6D7478}
+\definecolor{StatusRisk}{HTML}{9C3B3B}
+
+\mode<presentation>{
+  \setbeamertemplate{navigation symbols}{}
+  \setbeamersize{text margin left=0pt,text margin right=0pt}
+  \setbeamercolor{normal text}{fg=UQInk,bg=white}
+  \setbeamercolor{structure}{fg=StatusReview}
+  \setbeamercolor{alerted text}{fg=StatusRisk}
+  \setbeamerfont{normal text}{size=\fontsize{9.7}{11.7}\selectfont}
+}
+
+\newcommand{\UQTitleBackgroundFile}{assets/uq-title-background.png}
+\newcommand{\UQContentBackgroundFile}{assets/uq-content-background.png}
+
+\newcommand{\UQUseTitleBackground}{%
+  \usebackgroundtemplate{%
+    \includegraphics[width=\paperwidth,height=\paperheight]{\UQTitleBackgroundFile}%
+  }%
+}
+
+\newcommand{\UQUseContentBackground}{%
+  \usebackgroundtemplate{%
+    \includegraphics[width=\paperwidth,height=\paperheight]{\UQContentBackgroundFile}%
+  }%
+}
+
+\newcommand{\UQStatusBadge}[2]{%
+  \tikz[baseline=(uqtag.base)]{%
+    \node[
+      anchor=base,
+      rounded corners=1.2pt,
+      draw=#1,
+      fill=#1!9,
+      text=#1,
+      line width=0.45pt,
+      inner xsep=3.2pt,
+      inner ysep=1.15pt,
+      font=\fontsize{6.4}{7.5}\selectfont\bfseries
+    ] (uqtag) {#2};%
+  }%
+}
+
+\newcommand{\UQTakeaway}[1]{%
+  \par\noindent
+  \begin{tikzpicture}[baseline=(takeaway.base)]
+    \node[
+      anchor=west,
+      align=left,
+      text width=134.8mm,
+      inner sep=0pt,
+      text=UQMuted,
+      font=\fontsize{8.6}{10.2}\selectfont\bfseries
+    ] (takeaway) at (2.9mm,0) {#1};
+    \draw[StatusReview,line width=0.85pt]
+      ([xshift=-2.9mm,yshift=-0.45mm]takeaway.south west) --
+      ([xshift=-2.9mm,yshift=0.45mm]takeaway.north west);
+  \end{tikzpicture}\par
+}
+
+\newcommand{\UQEnglishChinese}[2]{%
+  \textbf{#1}\par\vspace{0.25mm}%
+  {\color{UQMuted}\fontsize{8.0}{9.5}\selectfont #2}%
+}
+
+\setbeamertemplate{itemize item}{%
+  \raisebox{0.2ex}{%
+    \tikz[scale=0.11]{\fill[UQMuted] (0,0) -- (1.25,0.7) -- (0,1.4) -- cycle;}%
+  }%
+}
+\setbeamertemplate{itemize subitem}{%
+  \raisebox{0.2ex}{%
+    \tikz[scale=0.08]{\fill[UQMuted] (0,0) -- (1.25,0.7) -- (0,1.4) -- cycle;}%
+  }%
+}
+
+\newcommand{\UQFrameHeader}[3]{%
+  \begin{tikzpicture}[remember picture,overlay]
+    \node[
+      anchor=center,
+      align=center,
+      text width=119mm,
+      inner sep=0pt,
+      text=black
+    ] at ([yshift=-10.4mm]current page.north) {%
+      {\fontsize{16.2}{18.2}\selectfont\bfseries #1}%
+    };
+    \node[
+      anchor=south west,
+      inner sep=0pt,
+      text=UQInk
+    ] at ([xshift=12.0mm,yshift=2.6mm]current page.south west) {%
+      \fontsize{5.7}{6.4}\selectfont No. / \insertframenumber
+    };
+  \end{tikzpicture}%
+}
+
+\NewDocumentEnvironment{uqbody}{}{%
+  \par\vspace*{13.0mm}%
+  \noindent\hspace*{11mm}%
+  \begin{minipage}[t][63.2mm][t]{138mm}%
+    \fontsize{9.7}{11.7}\selectfont\raggedright
+}{%
+  \end{minipage}%
+}
+
+\mode<all>

@@ -1,0 +1,28 @@
+@startuml
+!include style.puml
+top to bottom direction
+skinparam ranksep 28
+skinparam nodesep 22
+
+rectangle "IDENTITY + RETRIEVAL" as Access #F4F8FB {
+  rectangle "Researcher" as User #F1F7F3
+  rectangle "Identity-aware\nAgent Gateway" as Gateway #EEF5FA
+  rectangle "Policy Service" as Policy #EEF5FA
+  rectangle "RLS Source Store" as Store #F5F5F5
+  rectangle "Retrieval Gateway\n+ RAG" as Retrieval #EEF5FA
+}
+
+rectangle "MODEL INVOCATION" as ModelPath #F9FBFD {
+  rectangle "Evidence Analysis\nWorker" as Worker #EEF5FA
+  rectangle "Model Gateway" as ModelGateway #EEF5FA
+  rectangle "Registered\nLocal Model" as LLM #FFF6E8
+}
+
+User -right-> Gateway : request
+Gateway -right-> Policy : delegated identity
+Policy -down-> Store : authorized scope
+Store -right-> Retrieval : permitted source set
+Retrieval -down-> Worker : signed evidence bundle
+Worker -right-> ModelGateway : bounded prompt
+ModelGateway -right-> LLM : inference
+@enduml
