@@ -1,0 +1,15 @@
+@startuml
+!include style.puml
+top to bottom direction
+
+rectangle "Evidence Analysis\nWorker" as Agent #EEF5FA
+rectangle "MCP Boundary" as MCP #FFF6E8
+rectangle "Policy Check" as Policy #EEF5FA
+rectangle "Scientific Software Adapter\nread-only" as Adapter #FFF6E8
+rectangle "Approved Tidy3D\nExports" as Exports #F5F5F5
+
+Agent -right-> MCP : import request
+MCP -down-> Policy : check
+Policy -down-> Adapter : allow
+Exports -left-> Adapter : read export
+@enduml
