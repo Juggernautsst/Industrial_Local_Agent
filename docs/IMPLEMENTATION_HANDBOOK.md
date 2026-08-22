@@ -27,9 +27,10 @@ This handbook answers four questions: what is actually runnable now, exactly how
 
 | 对象 / Object | 状态 / State |
 | --- | --- |
-| Parent default branch / 父默认分支 | `main` includes Enterprise E0, the Stage 1A pin, the handbook refresh, and the synthetic E2 core through PR #14 (`6217ef9`). / `main` 已包含 Enterprise E0、Stage 1A pin、手册刷新，以及通过 PR #14（`6217ef9`）合并的 E2 合成核心。 |
-| Parent E0 branch / 父 E0 分支 | `docs/2-enterprise-boundaries` at `72c5a44`, historical source branch for merged PR #3. / `72c5a44` 是已合并 PR #3 的历史源分支。 |
-| Handbook branch / 本手册分支 | `docs/4-implementation-handbook`; this refresh is retargeted to parent `main`. / 本次刷新将 PR base 改为父仓库 `main`。 |
+| Parent stable branch / 父稳定分支 | `main` contains the reviewed project baseline and receives validated merges from `develop`. / `main` 包含已审查项目基线，只接收来自 `develop` 的验证后合并。 |
+| Parent development branch / 父开发分支 | `develop` is the sole routine development and integration branch. / `develop` 是唯一日常开发与集成分支。 |
+| Historical E0 source / 历史 E0 来源 | Commit `72c5a44` records the historical source of merged PR #3; `docs/2-enterprise-boundaries` is no longer an active branch. / 提交 `72c5a44` 保留已合并 PR #3 的历史来源；`docs/2-enterprise-boundaries` 不再是活动分支。 |
+| Historical handbook source / 历史手册来源 | Commit `f3f6dcd` records the historical handbook branch; current handbook maintenance follows `develop`. / 提交 `f3f6dcd` 保留历史手册分支记录；当前手册维护遵循 `develop`。 |
 | Parent submodule pin / 父 gitlink | `components/stage1a-good-story-agent` -> `efea263da1b803a74a6a91c0e592949b3237203c`, merged through parent PR #11 / Issue #9. |
 | Child default branch / 子默认分支 | `main` at `efea263`, component version `0.2.0`; this is also the parent pin. Merged stack includes E1 provider boundary, MCP C1, and material-optional Web chat. |
 | Child historical baseline / 子历史基线 | `4e3bdda`, component `0.1.1`, recorded baseline `38 passed`; retained only for pin history. |
@@ -1317,20 +1318,20 @@ The project uses one canonical Issue per independently acceptable deliverable. I
 ### 24.2 Lifecycle
 
 ```text
-Route -> Define -> Start when needed -> Branch -> Implement -> Validate -> Deliver -> Close
+Route -> Define -> Start when needed -> Implement on develop -> Validate -> Deliver develop->main -> Close
 ```
 
-branch 格式是 `<type>/<issue-number>-<slug>`。Commit 使用 `Refs #N`；中间 commit 不使用 `Closes/Fixes`。只有 merge 即完成且 PR 保留全部证据时，PR body 才使用 `Closes #N`。
+远端只维护 `develop` 和 `main`。所有日常实现直接在 `develop` 上进行，不创建按 Issue 或类型拆分的长期分支；`main` 只通过经过验证的 `develop -> main` 合并更新。Commit 使用 `Refs #N`；中间 commit 不使用 `Closes/Fixes`。只有 merge 即完成且 PR 保留全部证据时，PR body 才使用 `Closes #N`。
 
-Branches use `<type>/<issue-number>-<slug>`. Commits use `Refs #N`; intermediate commits never use `Closes/Fixes`. A PR body uses `Closes #N` only when merge itself completes delivery and the PR retains all evidence.
+Maintain only `develop` and `main` remotely. Perform all routine implementation directly on `develop` without creating per-Issue or per-type long-lived branches; update `main` only through a validated `develop -> main` merge. Commits use `Refs #N`; intermediate commits never use `Closes/Fixes`. A PR body uses `Closes #N` only when merge itself completes delivery and the PR retains all evidence.
 
-修改代码不自动授权 stage/commit；commit 不自动授权 push；push 不自动授权 PR/merge；PR 不自动授权 merge/release/settings。默认 branch 不直推，不 force push，不把无关 dirty files 混入 commit。
+修改代码不自动授权 stage/commit；commit 不自动授权 push；push `develop` 不自动授权合并 `main`、Release 或设置。`main` 不直推、不 force-push，不把无关 dirty files 混入 commit；历史任务分支只有在内容已合入 `main` 或明确放弃后才能删除。
 
-Editing does not automatically authorize staging/committing; committing does not authorize pushing; pushing does not authorize a PR/merge; a PR does not authorize merge/release/settings. Do not push the default branch directly, force-push, or mix unrelated dirty files into a commit.
+Editing does not automatically authorize staging/committing; committing does not authorize pushing; pushing `develop` does not authorize merging `main`, releasing, or changing settings. Do not push `main` directly or force-push; do not mix unrelated dirty files into a commit. Delete historical task branches only after their content is merged into `main` or explicitly abandoned.
 
-当前 handbook Issue 是 [#4](https://github.com/Juggernautsst/Industrial_Local_Agent/issues/4)，branch 为 `docs/4-implementation-handbook`。它只允许本文件和根 README 导航，不允许把任何本地 child checkout（包括历史 `367f971`）混入提交。
+当前 handbook 内容维护在 `develop`，并在稳定交付时随 `develop -> main` 合并；历史来源为提交 `f3f6dcd`。本仓库只允许本文件和根 README 导航变更，不允许把任何本地 child checkout（包括历史 `367f971`）混入提交。
 
-The current handbook Issue is [#4](https://github.com/Juggernautsst/Industrial_Local_Agent/issues/4) on `docs/4-implementation-handbook`. It permits only this document and root README navigation; no local child checkout, including historical `367f971`, may be staged.
+Maintain the current handbook on `develop` and deliver it with the validated `develop -> main` merge; its historical source is commit `f3f6dcd`. This repository permits only this document and root README navigation for handbook changes; no local child checkout, including historical `367f971`, may be staged.
 
 ### 24.3 数据和安全记录 / Data and Security Records
 

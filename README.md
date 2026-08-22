@@ -4,6 +4,30 @@
 
 `Industrial_Local_Agent` is a private Git superproject for organizing local scientific agents, controlled simulation assistance, and later secure-release components. It pins reviewed component versions through Git submodules without copying their source or rewriting their independent histories.
 
+## 分支策略 / Branch Strategy
+
+远端只维护两个分支：`develop` 是唯一开发和集成分支，`main` 是稳定、已验证的交付分支。所有日常功能、修复、测试和文档工作直接在 `develop` 上进行，不创建按 Issue 或类型拆分的长期分支；稳定版本通过经过验证的 `develop -> main` 合并产生。
+
+Maintain only two remote branches: `develop` is the sole development and integration branch, while `main` is the stable, validated delivery branch. Perform routine features, fixes, tests, and documentation directly on `develop` without creating per-Issue or per-type long-lived branches; produce stable releases through a validated `develop -> main` merge.
+
+```bash
+git switch develop
+git pull --ff-only origin develop
+# make and validate changes
+git push origin develop
+
+# after explicit release authorization and validation
+git switch main
+git pull --ff-only origin main
+git merge --no-ff develop
+git push origin main
+git switch develop
+```
+
+历史任务分支的已合入内容归档在 `main` 的提交历史中；历史分支不再作为开发入口。
+
+Content from merged historical task branches is preserved in `main`'s commit history; historical branches are no longer development entry points.
+
 ## 当前结论 / Current Status
 
 - Stage 1A 工程 MVP 已扩展并固定到父仓库：本地、证据可追溯的科研故事 Agent（组件版本 `0.2.0`），包含 provider boundary、MCP `STDIO` facade 和 material-optional Web research chat。父 gitlink 已由 Issue #9 固定到 `efea263`。
