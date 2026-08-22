@@ -1,0 +1,10 @@
+# XeLaTeX / latexmk generated intermediates; rebuildable and not deliverables.
+*.aux
+*.fdb_latexmk
+*.fls
+*.log
+*.nav
+*.out
+*.snm
+*.toc
+*.xdv
