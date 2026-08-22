@@ -1,5 +1,8 @@
 "use strict";
 
+const englishPresentationMode =
+  new URLSearchParams(window.location.hash.slice(1)).get("lang") === "en";
+
 const state = {
   token: "",
   subjectId: "user-alice",
@@ -21,6 +24,51 @@ const elements = {
   shareState: document.getElementById("share-state"),
   tenantMap: document.getElementById("tenant-map"),
 };
+
+const englishPresentationLabels = new Map([
+  ["Enterprise E2 Security Console / 企业 E2 安全控制台", "Enterprise E2 Security Console"],
+  ["Loopback / 本机", "Loopback"],
+  ["No model / 无模型", "No model"],
+  ["Access control demonstration / 权限控制演示", "Access control demonstration"],
+  ["Policy / 策略版本", "Policy version"],
+  ["Audit / 审计事件", "Audit events"],
+  ["Model / 模型连接", "Model connection"],
+  ["Identity scenario / 身份场景", "Identity scenario"],
+  ["Retrieval / 检索", "Retrieval"],
+  ["Query preset / 查询预设", "Query preset"],
+  ["Run retrieval / 执行检索", "Run retrieval"],
+  ["Policy / 策略", "Policy"],
+  ["Share source-a2 / 授权", "Share source-a2"],
+  ["Revoke / 撤销", "Revoke"],
+  ["Negative checks / 负向检查", "Negative checks"],
+  ["Submit forged tenant claim / 伪造权限", "Submit forged tenant claim"],
+  ["Tamper signed bundle / 篡改数据包", "Tamper signed bundle"],
+  ["Verify audit chain / 验证审计链", "Verify audit chain"],
+  ["Observed outcomes / 运行结果", "Observed outcomes"],
+  ["Reset / 重置", "Reset"],
+  ["Global test fixture / 全局测试数据", "Global test fixture"],
+  ["Audit events / 审计事件", "Audit events"],
+  ["No audit events / 暂无审计事件", "No audit events"],
+  ["Synthetic data only / 仅合成数据", "Synthetic data only"],
+]);
+
+function applyEnglishPresentationLabels() {
+  if (!englishPresentationMode) return;
+  document.documentElement.lang = "en";
+  const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+  let node = walker.nextNode();
+  while (node) {
+    const original = node.nodeValue;
+    const trimmed = original.trim();
+    const replacement = englishPresentationLabels.get(trimmed);
+    if (replacement !== undefined) {
+      node.nodeValue = original.replace(trimmed, replacement);
+    }
+    node = walker.nextNode();
+  }
+  const emptyParagraphs = elements.emptyResult.querySelectorAll("p");
+  if (emptyParagraphs.length > 1) emptyParagraphs[1].remove();
+}
 
 function extractToken() {
   const fragment = new URLSearchParams(window.location.hash.slice(1));
@@ -206,10 +254,15 @@ function bindActions() {
 }
 
 async function start() {
+  applyEnglishPresentationLabels();
   state.token = extractToken();
   bindActions();
   if (!state.token) {
-    setError("Missing startup token / 缺少启动令牌。请使用服务器输出的完整 URL。");
+    setError(
+      englishPresentationMode
+        ? "Missing startup token. Use the complete URL printed by the server."
+        : "Missing startup token / 缺少启动令牌。请使用服务器输出的完整 URL。",
+    );
     setBusy(false);
     return;
   }
