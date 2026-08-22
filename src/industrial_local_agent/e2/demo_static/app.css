@@ -409,6 +409,10 @@ h2 {
   text-align: center;
 }
 
+.empty-result[hidden] {
+  display: none;
+}
+
 .empty-code {
   margin-bottom: 12px;
   padding: 4px 8px;

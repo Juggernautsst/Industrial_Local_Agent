@@ -149,10 +149,17 @@ same-tenant share/revoke, forged-claim and bundle-tamper checks, audit-chain
 verification, and state reset. It returns source IDs and security metadata only;
 research content is deliberately omitted.
 
+For an English-only presentation view, append `&lang=en` inside the URL fragment,
+after the startup token. This changes static browser labels only; the runtime,
+API requests, authorization decisions, and results are identical.
+
 如需更直观的现场演示，运行上述浏览器控制台命令，并打开 launcher 输出的完整
 `READY http://127.0.0.1:8780/#token=...` URL。控制台支持身份选择、检索预设、
 同 tenant share/revoke、伪造 claim 与 bundle 篡改检查、audit 链验证和状态重置。
 它只返回 source ID 和安全元数据，刻意不返回科研正文。
+
+如需仅英文的汇报界面，在 URL fragment 中的启动 token 后追加 `&lang=en`。该模式
+只改变浏览器静态标签，不改变 runtime、API 请求、授权决策或结果。
 
 The Web launcher binds exclusively to `127.0.0.1`; its API requires the random
 startup token, bounds JSON bodies to 16 KiB, enforces an independent whole-connection
