@@ -1,0 +1,42 @@
+# Copy this template to a private CODEX_HOME/config.toml on Bunya.
+# 将此模板复制到 Bunya 上私有的 CODEX_HOME/config.toml。
+# This is a permission template, not a credential file.
+# 这是权限模板，不是凭据文件。
+
+default_permissions = "bunya-project-edit"
+cli_auth_credentials_store = "file"
+
+[features]
+# Domain rules require the Codex network proxy to be active.
+# 域名规则只有在 Codex 网络代理启用时才会生效。
+network_proxy = true
+
+[permissions.bunya-project-edit]
+description = "Bunya deployment work inside the active project only"
+extends = ":workspace"
+
+[permissions.bunya-project-edit.filesystem.\":workspace_roots\"]
+"." = "write"
+".git" = "read"
+"**/.env" = "deny"
+"**/.env.*" = "deny"
+"**/.ssh/**" = "deny"
+"**/private/**" = "deny"
+"**/models/**" = "deny"
+"**/runs/**" = "deny"
+"**/uploads/**" = "deny"
+"**/*.pem" = "deny"
+"**/*.key" = "deny"
+"**/*.safetensors" = "deny"
+
+[permissions.bunya-project-edit.network]
+# Keep disabled until RCC/UQ policy confirms outbound Codex API traffic.
+# RCC/UQ 政策确认允许外发 Codex API 流量前保持关闭。
+enabled = false
+
+[permissions.bunya-project-edit.network.domains]
+"api.openai.com" = "allow"
+"auth.openai.com" = "allow"
+"chatgpt.com" = "allow"
+"github.com" = "allow"
+"*.github.com" = "allow"

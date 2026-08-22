@@ -30,6 +30,10 @@ E0 的完成只代表设计决策和验收标准可复核，不代表 enterprise
 
 Completion of E0 means only that design decisions and acceptance criteria are reviewable; it does not mean the enterprise system is deployable. The E1 child PR is also outside the current pinned version until it is merged and the parent gitlink is updated separately.
 
+`deploy/bunya/` 中的 Qwen3.8-27B-FP8 试点是独立的模型可运行性验证，不是 E3 model gateway，也不表示 Bunya、SSO、RAG、Stage 1A remote provider 或多用户服务已经部署。Codex 只用于辅助部署和检查。
+
+The Qwen3.8-27B-FP8 pilot in `deploy/bunya/` is an independent model feasibility check, not the E3 model gateway. It does not mean that Bunya, SSO, RAG, a Stage 1A remote provider, or a multi-user service is deployed. Codex is only used for deployment assistance and inspection.
+
 ## 当前实施优先级 / Current Implementation Priority
 
 1. 完成 E1 provider boundary 的审查；合并后通过独立父仓库 Issue 更新 gitlink。

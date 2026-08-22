@@ -14,6 +14,8 @@
   Stage 1B is not implemented. It remains an independent read-only Tidy3D result adapter, but current engineering first establishes identity-aware authorized retrieval and the secure-release foundation; adapter implementation follows those security gates. The agent does not hold API keys or automatically submit cloud jobs.
 - Enterprise E0 已定义单用户 local 与身份感知 enterprise 两种模式、跨组件契约和威胁模型；SSO、授权检索、RLS、多租户服务和集中式模型 gateway 仍未实现。
   Enterprise E0 defines single-user local and identity-aware enterprise modes, cross-component contracts, and a threat model; SSO, authorized retrieval, RLS, multitenant service, and a centralized model gateway remain unimplemented.
+- Bunya/Codex 部署试点材料已准备，但尚未在 Bunya 执行；Codex 只是部署辅助工具，Qwen3.8 试点不会改变 Stage 1A provider 边界。
+  Bunya/Codex pilot materials are prepared but have not been executed on Bunya; Codex is only a deployment assistant, and the Qwen3.8 pilot does not change the Stage 1A provider boundary.
 - Stage 1A 的 provider-boundary 实施正在子仓库中独立审查；在子 PR 合并并另行更新 gitlink 前，父仓库固定版本仍是 `4e3bdda`，不能把开发分支描述成已部署能力。
   The Stage 1A provider-boundary implementation is under independent review in the child repository. Until its child PR is merged and the gitlink is updated separately, the parent pin remains `4e3bdda` and the development branch is not a deployed capability.
 - 安全发布、跨机构传输和区块链均未实现。未来必须先建立威胁模型、加密、密钥管理、访问控制和审计，再判断区块链是否解决剩余问题。
@@ -24,6 +26,7 @@
 | 路径 / Path | 类型 / Type | 职责 / Responsibility | 当前固定版本 / Current Pin |
 | --- | --- | --- | --- |
 | `components/stage1a-good-story-agent/` | Git submodule | 本地证据可追溯科研写作 Agent / Local evidence-traceable scientific-writing agent | `4e3bdda` |
+| `deploy/bunya/` | 父仓库部署材料 / Parent deployment materials | Codex 辅助的 Bunya Qwen3.8 GPU 试点 / Codex-assisted Bunya Qwen3.8 GPU pilot | 试点脚本与验收模板；未执行 / Pilot scripts and acceptance templates; not executed |
 | `docs/ARCHITECTURE.md` | 父仓库文档 / Parent documentation | 组件边界、更新规则和安全模型 / Component boundaries, update rules, and security model | 当前父仓库 / Current parent |
 | `docs/ENTERPRISE_DEPLOYMENT.md` | 父仓库文档 / Parent documentation | 企业部署模式、契约、威胁模型和验收门槛 / Enterprise deployment modes, contracts, threat model, and acceptance gates | E0 设计基线 / E0 design baseline |
 | `docs/ROADMAP.md` | 父仓库文档 / Parent documentation | Stage 1A 至 Stage 3 的验收路线 / Acceptance roadmap from Stage 1A through Stage 3 | 当前父仓库 / Current parent |
@@ -130,6 +133,7 @@ Ordinary Issues must not contain credentials, real research data, confidential o
 - [项目完整实现手册 / Complete implementation handbook](docs/IMPLEMENTATION_HANDBOOK.md)：从版本状态进入 Stage 1A 源码调用链、运行契约、测试缺口和未来设计的统一阅读地图。 / A unified map from version status into the Stage 1A source call chain, runtime contracts, test gaps, and future design.
 - [总体架构 / Architecture](docs/ARCHITECTURE.md)
 - [企业部署与威胁模型 / Enterprise deployment and threat model](docs/ENTERPRISE_DEPLOYMENT.md)
+- [Bunya/Codex Qwen3.8 试点 / Bunya/Codex Qwen3.8 pilot](deploy/bunya/README.md)
 - [实施路线 / Roadmap](docs/ROADMAP.md)
 - [Stage 1A 历史交接 / Historical Stage 1A handoff](components/stage1a-good-story-agent/STAGE1A_HANDOFF.md)（其中 next-step 顺序已由父仓库 roadmap 取代 / its next-step ordering is superseded by the parent roadmap）
 - [Stage 1A 使用说明 / Stage 1A usage](components/stage1a-good-story-agent/README.md)
