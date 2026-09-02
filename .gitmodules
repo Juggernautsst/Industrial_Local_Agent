@@ -2,3 +2,7 @@
 	path = components/stage1a-good-story-agent
 	url = git@github.com:Juggernautsst/stage1a-good-story-agent.git
 	branch = main
+[submodule "components/tidy3d-research-mcp"]
+	path = components/tidy3d-research-mcp
+	url = https://github.com/Juggernautsst/tidy3d-research-mcp.git
+	branch = main
