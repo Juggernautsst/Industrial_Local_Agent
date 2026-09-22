@@ -14,6 +14,23 @@ This root file does not automatically govern a child repository cloned on its ow
 
 All user-facing communication, Issue summaries, PR summaries, and durable project documentation must be bilingual in Chinese and English. Code identifiers, commands, log excerpts, and quoted third-party text do not require mechanical translation.
 
+### AI 工作路由 / AI Work Routing
+
+开始工作时先读本文件和相关 Issue，再用 [README](README.md) 定位所属组件；进入独立子仓库时，还要读该组件自己的 `AGENTS.md`。只加载当前任务所需的专题文档、源码和测试，避免把整个项目复制进一份说明。
+
+Start by reading this file and the relevant Issue, then use the [README](README.md) to locate the owning component. When working in a standalone child repository, read that component's own `AGENTS.md` as well. Load only the topic documents, source, and tests needed for the task; do not copy the whole project into a single guide.
+
+| 需要确认 / To establish | 维护位置 / Maintained in |
+| --- | --- |
+| 当前阶段、顺序和验收门槛 / Current stages, order, and acceptance gates | [实施路线 / Roadmap](docs/ROADMAP.md) |
+| 组件职责与信任边界 / Component roles and trust boundaries | [总体架构 / Architecture](docs/ARCHITECTURE.md) |
+| E2 合成实现与运行方式 / E2 synthetic implementation and operation | [E2 实施说明 / E2 implementation](docs/E2_IMPLEMENTATION.md) |
+| 企业契约、部署和威胁模型 / Enterprise contracts, deployment, and threat model | [企业部署 / Enterprise deployment](docs/ENTERPRISE_DEPLOYMENT.md) |
+| 安全报告 / Security reporting | [SECURITY.md](SECURITY.md) |
+| 当前运行行为 / Current runtime behavior | 当前父 checkout 的源码与测试，以及 gitlink 指向版本中的组件源码与测试 / Source and tests in the parent checkout and in component revisions selected by its gitlinks |
+
+有日期的实现手册用于深入参考；修改状态或契约时应更新对应的权威文档，不要只改手册中的副本。完整事实优先级见 [手册 §0.3](docs/IMPLEMENTATION_HANDBOOK.md)。 / Use the dated implementation handbook for deep reference. When a status or contract changes, update its owning document rather than only a copy in the handbook. The full fact-authority order is in [Handbook §0.3](docs/IMPLEMENTATION_HANDBOOK.md).
+
 ## 2. 核心原则 / Governing Principles
 
 1. 一项可独立验收的工作对应一个 canonical GitHub Issue；不要按命令、文件或每次测试创建 Issue。

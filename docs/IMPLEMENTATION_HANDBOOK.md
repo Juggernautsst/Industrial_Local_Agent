@@ -4,13 +4,17 @@
 >
 > Canonical work item / 规范工作项: [Industrial_Local_Agent#4](https://github.com/Juggernautsst/Industrial_Local_Agent/issues/4)
 >
-> 文档性质 / Document type: 当前实现、待审差异与未来设计的统一阅读地图；源码仍是运行行为的最终权威。 / A unified reading map for current implementation, review-stage deltas, and future design; source code remains the final authority for runtime behavior.
+> 文档性质 / Document type: dated deep reference and implementation map; its Git/status facts describe the snapshot above. Source code remains the final authority for runtime behavior. / 有日期的深入参考与实现地图；Git/状态事实对应上述快照。运行行为仍以源码为最终权威。
 
 ## 0. 如何使用本手册 / How to Use This Handbook
 
 本手册回答四类问题：现在真正能运行什么；Stage 1A 具体如何运行；哪些内容只有设计而没有代码；下一步为什么按当前顺序推进。它不会把计划写成能力，也不会把形式正确的证据引用写成科学真实性证明。
 
 This handbook answers four questions: what is actually runnable now, exactly how Stage 1A works, which capabilities exist only as designs, and why the next work follows the current order. It does not present plans as delivered capability or formally valid citations as proof of scientific truth.
+
+新读者先从 [README](../README.md) 选择主题。当前阶段和验收门槛由 [Roadmap](ROADMAP.md) 维护；组件边界、E2 实现和企业部署分别由 [Architecture](ARCHITECTURE.md)、[E2 implementation](E2_IMPLEMENTATION.md) 和 [Enterprise deployment](ENTERPRISE_DEPLOYMENT.md) 维护。需要追踪 Stage 1A 调用链或理解这份历史状态快照时，再使用本手册。更新事实时应修改其所属文档，本手册仅保留深入说明和导航。
+
+New readers should choose a topic from the [README](../README.md). The [Roadmap](ROADMAP.md) owns current stages and acceptance gates; [Architecture](ARCHITECTURE.md), [E2 implementation](E2_IMPLEMENTATION.md), and [Enterprise deployment](ENTERPRISE_DEPLOYMENT.md) own their respective boundaries and contracts. Use this handbook for the Stage 1A call chain or its dated status snapshot. Update facts in their owning documents; keep this handbook for deep explanation and navigation.
 
 ### 0.1 状态标签 / Status Labels
 
@@ -44,7 +48,7 @@ In this snapshot both the parent index and child `main` point to `efea263`; a mo
 
 | 问题 / Question | 首要权威 / Primary authority |
 | --- | --- |
-| 当前程序实际行为 / Current program behavior | 父 gitlink 固定的子仓库源码和测试 / Source and tests at the parent-pinned child commit |
+| 当前程序实际行为 / Current program behavior | 当前父 checkout 的源码与测试，以及父 gitlink 固定版本中的组件源码与测试 / Source and tests in the parent checkout and in component revisions selected by its gitlinks |
 | 当前阶段、顺序和 exit gate / Current stage, sequence, and exit gate | [ROADMAP.md](ROADMAP.md) |
 | 组件与信任边界 / Component and trust boundaries | [ARCHITECTURE.md](ARCHITECTURE.md) |
 | Enterprise 字段契约与威胁测试 / Enterprise field contracts and threat tests | [ENTERPRISE_DEPLOYMENT.md](ENTERPRISE_DEPLOYMENT.md) |

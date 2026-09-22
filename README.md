@@ -4,68 +4,41 @@
 
 `Industrial_Local_Agent` is a private Git superproject for organizing local scientific agents, controlled simulation assistance, and later secure-release components. It pins reviewed component versions through Git submodules without copying their source or rewriting their independent histories.
 
+## 从这里开始 / Start Here
+
+| 目标 / Goal | 权威入口 / Start with |
+| --- | --- |
+| 了解组件职责与信任边界 / Understand component roles and trust boundaries | [总体架构 / Architecture](docs/ARCHITECTURE.md) |
+| 查看当前阶段、优先级和验收门槛 / See current stages, priorities, and acceptance gates | [实施路线 / Roadmap](docs/ROADMAP.md) |
+| 理解 E2 合成演示的实现与限制 / Understand the E2 synthetic demo and its limits | [E2 实施说明 / E2 implementation](docs/E2_IMPLEMENTATION.md) |
+| 查看企业部署契约与威胁模型 / Review enterprise contracts and threat model | [企业部署 / Enterprise deployment](docs/ENTERPRISE_DEPLOYMENT.md) |
+| 修改项目或组件 / Change the project or a component | Read [AGENTS.md](AGENTS.md), then the owning component's guidance, source, and tests. / 先读 [AGENTS.md](AGENTS.md)，再读所属组件的规则、源码和测试。 |
+
+运行行为以当前父仓库源码、测试及 gitlink 指向的组件版本为准；阶段状态与下一步以 Roadmap 为准。实现手册是有日期的深入参考，不替代专题文档。 / Runtime behavior follows source and tests in the current parent checkout and component revisions selected by its gitlinks; the Roadmap owns current stage status and next steps. The implementation handbook is a dated deep reference, not a replacement for topic documents.
+
 ## 分支策略 / Branch Strategy
 
-远端只维护两个分支：`develop` 是唯一开发和集成分支，`main` 是稳定、已验证的交付分支。所有日常功能、修复、测试和文档工作直接在 `develop` 上进行，不创建按 Issue 或类型拆分的长期分支；稳定版本通过经过验证的 `develop -> main` 合并产生。
-
-Maintain only two remote branches: `develop` is the sole development and integration branch, while `main` is the stable, validated delivery branch. Perform routine features, fixes, tests, and documentation directly on `develop` without creating per-Issue or per-type long-lived branches; produce stable releases through a validated `develop -> main` merge.
-
-```bash
-git switch develop
-git pull --ff-only origin develop
-# make and validate changes
-git push origin develop
-
-# after explicit release authorization and validation
-git switch main
-git pull --ff-only origin main
-git merge --no-ff develop
-git push origin main
-git switch develop
-```
-
-历史任务分支的已合入内容归档在 `main` 的提交历史中；历史分支不再作为开发入口。
-
-Content from merged historical task branches is preserved in `main`'s commit history; historical branches are no longer development entry points.
+远端维护 `develop`（开发与集成）和 `main`（稳定交付）。Issue、分支、验证与发布流程以 [AGENTS.md](AGENTS.md) 为准。 / The remote maintains `develop` for development and integration and `main` for stable delivery. See [AGENTS.md](AGENTS.md) for Issue, branch, validation, and release workflow.
 
 ## 当前结论 / Current Status
 
-- Stage 1A 工程 MVP 已扩展并固定到父仓库：本地、证据可追溯的科研故事 Agent（组件版本 `0.2.0`），包含 provider boundary、MCP `STDIO` facade 和 material-optional Web research chat。父 gitlink 已由 Issue #9 固定到 `efea263`。
-  The Stage 1A engineering MVP is expanded and pinned in the parent repository: a local, evidence-traceable scientific-story agent (component version `0.2.0`) with the provider boundary, MCP `STDIO` facade, and material-optional Web research chat. Issue #9 pinned the parent gitlink to `efea263`.
-- Stage 1A 的科研质量验收尚未完成；当前只有一组合成光子学案例，还需要四组案例和独立人工评估。
-  Stage 1A scientific-quality acceptance is not complete; the current evidence includes one synthetic photonics case, with four additional cases and independent human evaluation still required.
-- child `main` 的当前工程证据为离线 `117 passed, 1 skipped`、live MCP `qwen2.5:3b` `1 passed`，以及 material-free/attachment Web chat smoke；这些是工程边界证据，不是科学质量或企业安全认证。
-  Current child-main engineering evidence is `117 passed, 1 skipped` offline, one live MCP `qwen2.5:3b` pass, and material-free/attachment Web-chat smoke; these are engineering-boundary evidence, not scientific-quality or enterprise-security certification.
-- Stage 1B 尚未实现。它仍是独立的只读 Tidy3D 结果适配器，但当前工程优先完成身份感知授权检索与安全发布基础；这些安全门槛通过后再实施适配器。Agent 不持有 API key，也不自动提交云端任务。
-  Stage 1B is not implemented. It remains an independent read-only Tidy3D result adapter, but current engineering first establishes identity-aware authorized retrieval and the secure-release foundation; adapter implementation follows those security gates. The agent does not hold API keys or automatically submit cloud jobs.
-- Enterprise E0 已合并到父仓库 `main`，定义单用户 local 与身份感知 enterprise 两种模式、跨组件契约和威胁模型；生产 SSO、PostgreSQL RLS、多租户服务和集中式模型 gateway 仍未实现。
-  Enterprise E0 is merged into the parent `main`, defining single-user local and identity-aware enterprise modes, cross-component contracts, and a threat model; production SSO, PostgreSQL RLS, multitenant service, and a centralized model gateway remain unimplemented.
-- Enterprise E2 的合成、无模型身份感知授权检索 vertical slice 已合并到父仓库 `main`：服务端 tenant mapping、forced-scope SQLite 检索、source reauthorization、签名 bundle、replay protection 和 content-free audit hash chain。命令行菜单和回环浏览器控制台可演示这些契约，但不等于生产 E2。
-  The synthetic, model-free Enterprise E2 identity-aware authorized-retrieval vertical slice is merged into parent `main`: server-side tenant mapping, forced-scope SQLite retrieval, source reauthorization, signed bundles, replay protection, and a content-free audit hash chain. A CLI menu and loopback browser console demonstrate these contracts, but neither is production E2.
-- 子仓库的 provider boundary、MCP facade 和 Web chat 已合并并固定到 parent `main`（`efea263`）。这仍是单用户、回环、本地演示能力，不是企业多用户或安全发布完成。
-  The provider boundary, MCP facade, and Web chat are merged and pinned in parent `main` (`efea263`). This remains a single-user, loopback, local-demo capability, not completed enterprise multiuser or secure release.
-- Bunya/Codex 部署试点材料已准备，但尚未在 Bunya 执行；Codex 只是部署辅助工具，Qwen3.8 试点不会改变 Stage 1A provider 边界。
-  Bunya/Codex pilot materials are prepared but have not been executed on Bunya; Codex is only a deployment assistant, and the Qwen3.8 pilot does not change the Stage 1A provider boundary.
-- 安全发布、跨机构传输和区块链均未实现。未来必须先建立威胁模型、加密、密钥管理、访问控制和审计，再判断区块链是否解决剩余问题。
-  Secure release, cross-institution transfer, and blockchain are not implemented. A future stage must first define threat modeling, encryption, key management, access control, and auditing before deciding whether blockchain solves a remaining problem.
+父仓库包含 Stage 1A 本地工程 MVP 和使用合成数据的 E2 演示切片。Stage 1A 科研验收尚未完成，E2 也不代表生产级企业权限系统。当前状态、证据与验收门槛请查 [Roadmap](docs/ROADMAP.md)；细节由对应专题文档维护。 / The parent repository contains the Stage 1A local engineering MVP and a synthetic-data E2 demonstration slice. Stage 1A scientific acceptance is incomplete, and E2 is not a production enterprise authorization system. See the [Roadmap](docs/ROADMAP.md) for current status, evidence, and gates; topic documents own the details.
 
 ## 仓库结构 / Repository Structure
 
-| 路径 / Path | 类型 / Type | 职责 / Responsibility | 当前固定版本 / Current Pin |
-| --- | --- | --- | --- |
-| `components/stage1a-good-story-agent/` | Git submodule | 本地科研 Agent、MCP facade 和 material-optional chat / Local research agent, MCP facade, and material-optional chat | `efea263` |
-| `src/industrial_local_agent/e2/` | 父仓库合成实现 / Parent synthetic implementation | E2 身份、策略、forced scope、bundle、audit 和演示 adapter / E2 identity, policy, forced scope, bundle, audit, and demonstration adapters | Parent `main` + Issue #10 continuation |
-| `scripts/e2_demo.py` | 父仓库演示辅助 / Parent demo helper | 终端 synthetic E2 权限与审计演示 / Terminal synthetic E2 authorization and audit demo | Parent `main` |
-| `scripts/e2_web_demo.py` | 父仓库演示辅助 / Parent demo helper | 回环浏览器 E2 安全控制台 / Loopback browser E2 security console | Issue #10 continuation |
-| `docs/E2_IMPLEMENTATION.md` | 父仓库文档 / Parent documentation | E2 实施边界、运行命令和限制 / E2 implementation boundary, commands, and limits | Current branch |
-| `deploy/bunya/` | 父仓库部署材料 / Parent deployment materials | Codex 辅助的 Bunya Qwen3.8 GPU 试点 / Codex-assisted Bunya Qwen3.8 GPU pilot | 试点脚本与验收模板；未执行 / Pilot scripts and acceptance templates; not executed |
-| `docs/ARCHITECTURE.md` | 父仓库文档 / Parent documentation | 组件边界、更新规则和安全模型 / Component boundaries, update rules, and security model | 当前父仓库 / Current parent |
-| `docs/ENTERPRISE_DEPLOYMENT.md` | 父仓库文档 / Parent documentation | 企业部署模式、契约、威胁模型和验收门槛 / Enterprise deployment modes, contracts, threat model, and acceptance gates | E0 + E2 synthetic status |
-| `docs/ROADMAP.md` | 父仓库文档 / Parent documentation | Stage 1A 至 Stage 3 的验收路线 / Acceptance roadmap from Stage 1A through Stage 3 | 当前父仓库 / Current parent |
+| 路径 / Path | 类型 / Type | 职责 / Responsibility |
+| --- | --- | --- |
+| `components/stage1a-good-story-agent/` | Git submodule | 本地科研 Agent、MCP facade 和 material-optional chat / Local research agent, MCP facade, and material-optional chat |
+| `src/industrial_local_agent/e2/` | 父仓库合成实现 / Parent synthetic implementation | E2 身份、策略、forced scope、bundle、audit 和演示 adapter / E2 identity, policy, forced scope, bundle, audit, and demonstration adapters |
+| `scripts/e2_demo.py` | 父仓库演示辅助 / Parent demo helper | 终端 synthetic E2 权限与审计演示 / Terminal synthetic E2 authorization and audit demo |
+| `scripts/e2_web_demo.py` | 父仓库演示辅助 / Parent demo helper | 回环浏览器 E2 安全控制台 / Loopback browser E2 security console |
+| `docs/E2_IMPLEMENTATION.md` | 父仓库文档 / Parent documentation | E2 实施边界、运行命令和限制 / E2 implementation boundary, commands, and limits |
+| `deploy/bunya/` | 父仓库部署材料 / Parent deployment materials | Codex 辅助的 Bunya Qwen3.8 GPU 试点 / Codex-assisted Bunya Qwen3.8 GPU pilot |
+| `docs/ARCHITECTURE.md` | 父仓库文档 / Parent documentation | 组件边界、更新规则和安全模型 / Component boundaries, update rules, and security model |
+| `docs/ENTERPRISE_DEPLOYMENT.md` | 父仓库文档 / Parent documentation | 企业部署模式、契约、威胁模型和验收门槛 / Enterprise deployment modes, contracts, threat model, and acceptance gates |
+| `docs/ROADMAP.md` | 父仓库文档 / Parent documentation | Stage 1A 至 Stage 3 的验收路线 / Acceptance roadmap from Stage 1A through Stage 3 |
 
-未来可能增加 `tidy3d-adapter`、identity-aware retrieval、model gateway、`secure-data-transfer` 和 `workflow-orchestrator`，但在接口与验收条件稳定前不创建空组件。
-
-Future components may include a production identity-aware retrieval service, `tidy3d-adapter`, a model gateway, `secure-data-transfer`, and `workflow-orchestrator`, but empty components will not be created before their interfaces and acceptance criteria are stable.
+Git submodule 的精确 pin 可通过 `git submodule status` 查看，能力状态以 Roadmap 为准。潜在组件只有在接口与验收条件稳定后才建立。 / Inspect exact Git submodule pins with `git submodule status`; the Roadmap owns capability status. Create potential components only after their interfaces and acceptance criteria are stable.
 
 ## 获取完整仓库 / Clone the Complete Repository
 
